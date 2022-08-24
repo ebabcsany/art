@@ -1,11 +1,11 @@
-var canvas = document.getElementById('myCanvas');
-var context = canvas.getContext('2d');
-var canvasWidth = canvas.width;
-var canvasHeight = canvas.height;
-var lineCount = prompt('line count');
+const canvas = document.getElementById('myCanvas');
+const context = canvas.getContext('2d');
+const canvasWidth = canvas.width;
+const canvasHeight = canvas.height;
+const lineCount = prompt('line count');
 
 function randomRgbColoredLineToCenterCount() {
-  for (int = 0; int < lineCount; int++) {
+  for (let int = 0; int < lineCount; int++) {
     rgbColoredLineToCenterRandom();
   }
 }
@@ -16,10 +16,10 @@ function rgbColoredLineToCenterRandom() {
 
 function rgbColoredLineToCenter(posX, posY, red, green, blue) {
   context.beginPath();
-  canvasWidthHalf = canvasWidth/2;
-  canvasHeightHalf = canvasHeight/2;
-  canvasWidthHalfOutOfPosX = canvasWidthHalf - posX;
-  canvasHeightHalfOutOfPosY = canvasHeightHalf - posY;
+  let canvasWidthHalf = canvasWidth / 2;
+  let canvasHeightHalf = canvasHeight / 2;
+  let canvasWidthHalfOutOfPosX = canvasWidthHalf - posX;
+  let canvasHeightHalfOutOfPosY = canvasHeightHalf - posY;
   context.moveTo(posX, posY);
   context.lineTo(canvasWidthHalf + canvasWidthHalfOutOfPosX,canvasHeightHalf + canvasHeightHalfOutOfPosY);
   context.strokeStyle = 'rgba(' + red + ',' + green + ',' + blue + ')';

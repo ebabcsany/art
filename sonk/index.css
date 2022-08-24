@@ -1,3 +1,11 @@
+canvas-item {
+    color: black;
+}
+
 canvas-text {
+    color: black;
+}
+
+.colored-item {
     color: black;
 }
