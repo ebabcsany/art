@@ -10,24 +10,24 @@ var blueText = "rgbBlueCount";
 rgbColoredRandomLineToCenterCount();
 
 function rgbColoredRandomLineToCenterCount() {
-  for (int = 1; int <= count; int++) {
+  for (let int = 1; int <= count; int++) {
     rgbColoredRandomLineToCenter();
   }
 }
 
 function rgbColoredRandomLineToCenter() {
-  posX = random(canvasWidth,0);
-  posY = random(canvasHeight,0);
+  let posX = random(canvasWidth,0);
+  let posY = random(canvasHeight,0);
   context.beginPath();
-  canvasWidthHalf = canvasWidth/2;
-  canvasHeightHalf = canvasHeight/2;
-  canvasWidthHalfOutOfPosX = canvasWidthHalf - posX;
-  canvasHeightHalfOutOfPosY = canvasHeightHalf - posY;
+  let canvasWidthHalf = canvasWidth/2;
+  let canvasHeightHalf = canvasHeight/2;
+  let canvasWidthHalfOutOfPosX = canvasWidthHalf - posX;
+  let canvasHeightHalfOutOfPosY = canvasHeightHalf - posY;
   context.moveTo(posX,posY);
   context.lineTo(canvasWidthHalf + canvasWidthHalfOutOfPosX,canvasHeightHalf + canvasHeightHalfOutOfPosY);
-  red = rgbColorCountBorders(redText,prompt(redText),redText);
-  green = rgbColorCountBorders(greenText,prompt(greenText),greenText);
-  blue = rgbColorCountBorders(blueText,prompt(blueText),blueText);
+  let red = rgbColorCountBorders(redText,prompt(redText),redText);
+  let green = rgbColorCountBorders(greenText,prompt(greenText),greenText);
+  let blue = rgbColorCountBorders(blueText,prompt(blueText),blueText);
   rgbStrokeStyle(red,green,blue);
   context.stroke();
 }
@@ -37,8 +37,8 @@ function rgbStrokeStyle(red,green,blue) {
 }
 
 function rgbColorCountBorders(rgbColorCount,count,i) {
-  Ł = 0;
-  K = 255;
+  let Ł = 0;
+  let K = 255;
   while ((count < Ł) || (count > K)) {
     alert(countBordersText(rgbColorCount,count,Ł,K));
     count = prompt(i);
