@@ -1,6 +1,11 @@
+// noinspection JSDeprecatedSymbols
+window.getMousePos = (element) => ({
+    x: validateNumber(event.clientX - Number.parseInt(element.getBoundingClientRect().left), 0, element.width),
+    y: validateNumber(event.clientY - Number.parseInt(element.getBoundingClientRect().top), 0, element.height)
+});
 window.canvas = null;
 window.context = null;
-const DIGITS = "0123456789";
+const DIGITS = '0123456789';
 const canvasWidthInputText = "canvas-width";
 const canvasHeightInputText = "canvas-height";
 const canvasWidthInput = document.getElementById(canvasWidthInputText);
@@ -16,8 +21,10 @@ const threeEighths = quarter + eighth;
 const fiveEighths = half + eighth;
 const sevenEighths = threeQuarter + eighth;
 const sixteenth = eighth / 2;
-const lowercaseLettersAToF = 'abcdef';
-const capitalLettersAToF = 'ABCDEF';
+const lowercaseLettersAToZ = 'abcdefghijklmnopqrstuvwxyz';
+const capitalLettersAToZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const lowercaseLettersAToF = subStringWithToIndex(lowercaseLettersAToZ, 5);
+const capitalLettersAToF = subStringWithToIndex(capitalLettersAToZ, 5);
 const digitsAndLowercaseLettersAToF = DIGITS + lowercaseLettersAToF;
 const digitsAndCapitalLettersAToF = DIGITS + capitalLettersAToF;
 const hexStringLength = lowercaseLettersAToF.length;
@@ -38,15 +45,15 @@ tHex.isHexColor = function (value) {
     return value !== null && isStringAllCharsEqualsMatchSomeOfCharsInText(value, DIGITS + lowercaseLettersAToF + capitalLettersAToF) && (length === 3 || length === 6 || length === 8);
 };
 tHex.isHex = value => tHex.isHexColor(tHex.hexColor(value)) && value[0] === "#";
-tHex.changeUppercaseHexCharToLowercaseHexCharCondition = function (hexChar) {
-    return hexChar !== null && isCharEqualsCharacterOfText(hexChar, DIGITS + lowercaseLettersAToF + capitalLettersAToF) && getNonNullString(hexChar).length === 1;
+tHex.isHexColorChar = function (hexColorChar) {
+    return hexColorChar !== null && isCharEqualsCharacterOfText(hexColorChar, DIGITS + lowercaseLettersAToF + capitalLettersAToF) && getNonNullString(hexColorChar).length === 1;
 };
 tHex.changeUppercaseHexCharToLowercaseHexChar = function (hexChar) {
     let value = "";
     hexChar = getNonNullString(hexChar);
-    if (tHex.changeUppercaseHexCharToLowercaseHexCharCondition(hexChar)) {
-        if (isCharEqualsCharacterOfText(hexChar, capitalLettersAToF)) {
-            hexChar = lowercaseLettersAToF[capitalLettersAToF.indexOf(hexChar)];
+    if (tHex.isHexColorChar(hexChar)) {
+        if (isCharEqualsCharacterOfText(hexChar, DIGITS + capitalLettersAToF)) {
+            hexChar = digitsAndLowercaseLettersAToF[digitsAndCapitalLettersAToF.indexOf(hexChar)];
         }
         value = hexChar;
     }
@@ -70,7 +77,7 @@ tHex.validateNumberIfNumberBetween0And255 = function (number) {
     let value = 0;
     number = Number.parseInt(number);
     if (number >= 0 && number <= 255) {
-        return number;
+        value = number;
     }
     return value;
 };
@@ -78,7 +85,7 @@ tHex.validateNumberIfNumberBetween255And510 = function (number) {
     let value = 0;
     number = Number.parseInt(number);
     if (number >= 255 && number <= 510) {
-        return tHex.validateNumberIfNumberBetween0And255(255 - (number - 255));
+        value = tHex.validateNumberIfNumberBetween0And255(255 - (number - 255));
     }
     return value;
 };
@@ -166,7 +173,7 @@ tHex.convertNumberToHexPartIfNumberBetween0And510 = function (number) {
 };
 tHex.convertNumberToHexPartIfNumberGreaterThanOrEquals0 = function (number) {
     number = tHex.validateNumberIfNumberGreaterThanOrEquals0(number);
-    return tHex.validateNumberIfNumberBetween0And255(number);
+    return tHex.convertNumberToHexPartIfNumberBetween0And255(number);
 };
 tHex.convertNumberToHexPart = function (number) {
     number = tHex.validateNumber(number);
@@ -189,7 +196,7 @@ tHex.convertRgbNumbersArrayToHex = function (rgbArray) {
     return tHex.convertRgbNumbersToHex(rgbArray[0], rgbArray[1], rgbArray[2]);
 };
 tHex.getNumberWithTypePossibleParameters = function (type) {
-    return createIfAndElseAndReturns(type === numberWithTypePossibleParameters[1], minToMaxNumberWithNumberTypePossibleParameters, createIfAndElseAndReturns(type === numberWithTypePossibleParameters[0], numberWithNumberTypePossibleParameters, []));
+    return createIfAndElseAndReturns(type === numberWithTypePossibleParameters[0], numberWithNumberTypePossibleParameters, createIfAndElseAndReturns(type === numberWithTypePossibleParameters[1], minToMaxNumberWithNumberTypePossibleParameters, []));
 }
 tHex.getNumberWithTypeIndexPossibleParameters = function (typeIndex) {
     return tHex.getNumberWithTypePossibleParameters(numberWithTypePossibleParameters[typeIndex]);
@@ -344,63 +351,90 @@ tHex.getReverseRgbThreeSixteenthsToThirteenSixteensHex = hex => tHex.getReverseR
 tHex.getReverseRgbFiveSixteenthsToElevenSixteensHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 5);
 tHex.getReverseRgbSevenSixteenthsToNineSixteensHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 6);
 
-//// noinspection JSDeprecatedSymbols
-//event.getMousePos = (element) => ({
-//    x: event.clientX - element.getBoundingClientRect().left,
-//    y: event.clientY - element.getBoundingClientRect().top
-//});
+function isLetterAToZ(letter) {
+    return letter !== null && isCharEqualsCharacterOfText(letter, lowercaseLettersAToZ + capitalLettersAToZ) && getNonNullString(letter).length === 1;
+}
 
-console.log(tHex.getReverseHex("#fffaaa"));
-console.log(tHex.getReverseHex("#ffffffff"));
-console.log(tHex.getReverseHex("#ffffff"));
-console.log(tHex.convertNumberToHexPart(255));
-console.log(tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex("#ffffffff", 0, 0));
-console.log(tHex.getRgbaEighthHex("#ffffffff"));
-console.log(tHex.getRgbaQuarterHex("#ffffffff"));
-console.log(tHex.getRgbaThreeEighthsHex("#ffffffff"));
-console.log(tHex.getRgbaHalfHex("#ffffffff"));
-console.log(tHex.getRgbaFiveEighthsHex("#ffffffff"));
-console.log(tHex.getRgbaThreeQuarterHex("#ffffffff"));
-console.log(tHex.getRgbaSevenEighthsHex("#ffffffff"));
-console.log(getMinToMaxIntegerWithNumberTypeIndex(0, 256, 0));
-console.log(tHex.getRgbaEighthToSevenEighthsHex("#ffffffff"));
-console.log(tHex.getRgbaQuarterToThreeQuarterHex("#ffffffff"));
-console.log(tHex.getRgbaThreeEighthsToFiveEighthsHex("#ffffffff"));
-console.log(tHex.getRgbaSixteenToFifteenSixteensHex("#ffffffff"));
-console.log(tHex.getRgbaThreeSixteenthsToThirteenSixteensHex("#ffffffff"));
-console.log(tHex.getRgbaFiveSixteenthsToElevenSixteensHex("#ffffffff"));
-console.log(tHex.getRgbaSevenSixteenthsToNineSixteensHex("#ffffffff"));
-console.log(getMinToMaxIntegerWithNumberTypeIndex(1, 256, 0));
-console.log(getMinToMaxIntegerWithNumberTypeIndex(2, 256, 0));
-console.log(getMinToMaxIntegerWithNumberTypeIndex(3, 256, 0));
-console.log(getMinToMaxIntegerWithNumberTypeIndex(4, 256, 0));
-console.log(getMinToMaxIntegerWithNumberTypeIndex(5, 256, 0));
-console.log(getMinToMaxIntegerWithNumberTypeIndex(6, 256, 0));
-console.log(tHex.convertNumberToHexPart(getNumberWithType("number", "half", null, 50)));
-const hex1_ = "#e568c091";
-console.log(tHex.convertHexToRgbaArray(hex1_));
-console.log(tHex.numberWithTypeReferenceNumber("number"));
-console.log(tHex.numberWithTypeReferenceNumber("min to max"));
-console.log(tHex.validateNumber(-255));
-console.log(getHalfInteger(tHex.convertHexToRgbaArray(hex1_)[0]));
-console.log(getHalfInteger(tHex.convertHexToRgbaArray(hex1_)[1]));
-console.log(getHalfInteger(tHex.convertHexToRgbaArray(hex1_)[2]));
-console.log(getHalfInteger(tHex.convertHexToRgbaArray(hex1_)[3]));
-console.log(getNumberWithType("number", "half", null, tHex.convertHexToRgbaArray(hex1_)[0]));
-console.log(getNumberWithType("number", "half", null, tHex.convertHexToRgbaArray(hex1_)[1]));
-console.log(getNumberWithType("number", "half", null, tHex.convertHexToRgbaArray(hex1_)[2]));
-console.log(getNumberWithType("number", "half", null, tHex.convertHexToRgbaArray(hex1_)[3]));
-console.log(tHex.convertNumberToHexPart(getNumberWithType("number", "half", null, tHex.convertHexToRgbaArray(hex1_)[0])));
-console.log(tHex.convertNumberToHexPart(getNumberWithType("number", "half", null, tHex.convertHexToRgbaArray(hex1_)[1])));
-console.log(tHex.convertNumberToHexPart(getNumberWithType("number", "half", null, tHex.convertHexToRgbaArray(hex1_)[2])));
-console.log(tHex.convertNumberToHexPart(getNumberWithType("number", "half", null, tHex.convertHexToRgbaArray(hex1_)[3])));
-console.log(getNumberWithType("min to max", "quarter to three-quarter", 256, tHex.convertHexToRgbaArray("#ff000000")[0] + 1) - 1);
-console.log(getNumberWithType("number", "quarter", null, 500));
-console.log(tHex.convertNumberToHexPart(getNumberWithType(numberWithTypePossibleParameters[1], minToMaxNumberWithNumberTypePossibleParameters[0], 256, tHex.convertHexToRgbaArray("#00000000")[0] + 1) - 1));
-console.log(getNumberWithNumberTypeIndex(10, 256));
-console.log(getNumberWithNumberTypeIndex(10, 256));
+function changeLowercaseLetterToUppercaseWithAToZ(letter) {
+    let value = "";
+    letter = getNonNullString(letter);
+    if (isLetterAToZ(letter)) {
+        if (isCharEqualsCharacterOfText(letter, lowercaseLettersAToZ)) {
+            letter = capitalLettersAToZ[lowercaseLettersAToZ.indexOf(letter)];
+        }
+        value = letter;
+    }
+    return value;
+}
 
-function stringNumber(stringNumberValue) {
+function changeLowercaseLettersToUppercaseWithAToZ(letters) {
+    let value = "";
+    letters = getNonNullString(letters);
+    for (const element of letters) {
+        value += isLetterAToZ(element) ? changeLowercaseLetterToUppercaseWithAToZ(element) : element;
+    }
+    return value;
+}
+
+function changeLowercaseStringFirstLetterToUppercaseWithAToZ(string) {
+    string = getNonNullString(string);
+    return changeLowercaseLetterToUppercaseWithAToZ(string[0]) + subStringWithFromIndex(string, 1);
+}
+
+function changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(stringArray) {
+    let value = [];
+    stringArray = getNonNullArray(stringArray);
+    for (const element of stringArray) {
+        value += changeLowercaseStringFirstLetterToUppercaseWithAToZ(getNonNullString(element));
+    }
+    return value;
+}
+
+function getSearchCountInString(string, search) {
+    search = getNonNullString(search);
+    let replace = getNonNullString(string);
+    let counter = 0;
+    while (true) {
+        if (replace.replace(search, "") === replace) {
+            break;
+        } else {
+            replace = replace.replace(search, "");
+            counter++;
+        }
+    }
+    return counter;
+}
+
+function getSearchsCountsInString(string, searchStringArray) {
+    searchStringArray = getNonNullArray(searchStringArray);
+    let value = [];
+    for (const element of searchStringArray) {
+        value.push(getSearchCountInString(string, element));
+    }
+    return value;
+}
+
+function getSearchCharsCountsInString(string, search) {
+    let value = [];
+    for (const element of search) {
+        value.push(getSearchCountInString(string, element));
+    }
+    return value;
+}
+
+function changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZAndStringifyElements(stringArray) {
+    return stringifyArrayElements(changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(stringArray));
+}
+
+function changeLowercaseStringsFirstLetterToUppercaseWithAToZ(...strings) {
+    return changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(createArrayOfObjects(strings));
+}
+
+function changeLowercaseStringsFirstLetterToUppercaseWithAToZAndStringifyElements(...strings) {
+    return changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZAndStringifyElements(createArrayOfObjects(strings));
+}
+
+/*function stringNumber(stringNumberValue) {
     window.stringNumber = stringNumber;
     if (stringNumberValue === null || !isStringAllCharsEqualsDigits(stringNumberValue)) {
         window.stringNumber.value = stringNumberValue === null ? null : "0";
@@ -429,23 +463,7 @@ function stringNumber(stringNumberValue) {
             return value;
         }
     }
-}
-
-function removeAllReplaceStringCharsInSearchString(searchString, replaceString) {
-    let value = getNonNullString(searchString);
-    for (const element of getNonNullString(replaceString)) {
-        value = value.replaceAll(element, "");
-    }
-    return value;
-}
-
-function removeReplaceStringCharsInSearchString(searchString, replaceString) {
-    let value = getNonNullString(searchString);
-    for (const element of getNonNullString(replaceString)) {
-        value = value.replace(element, "");
-    }
-    return value;
-}
+}*/
 
 function isEqualsObjectArrayElements(array) {
     let isEquals = false;
@@ -484,6 +502,10 @@ function createIfAndElseAndReturns(condition, ifTrue, ifFalse) {
     } else {
         return ifFalse;
     }
+}
+
+function getObjectIfEqualsObjects(a, b) {
+    return createIfAndElseAndReturns(a === b, b, a);
 }
 
 function isStringAllCharsEqualsDigitsAndLength(string, length) {
@@ -549,12 +571,12 @@ function max2DigitsOfNumberAddOne(digits) {
 
 function max3DigitsOfNumberAddOne(digits) {
     let value;
-    const addOne = window.max2DigitsOfNumberAddOne(subStringWithToIndex(digits, 1));
+    const addOne = window.max2DigitsOfNumberAddOne(subStringWithFromIndex(digits, 1));
     if (isStringAllCharsEqualsDigitsAndLength(digits, 2)) {
         value = addOne === "0" ? "100" : addOne;
     } else if (isStringAllCharsEqualsDigitsAndLength(digits, 3)) {
         if (addOne[0] === "0") {
-            value = max2DigitsOfNumberAddOne(subStringWithToIndex(digits, 1)) === "0" ? "0" : max2DigitsOfNumberAddOne(subStringWithToIndex(digits, 1)) + "0";
+            value = max2DigitsOfNumberAddOne(subStringWithFromIndex(digits, 1)) === "0" ? "0" : max2DigitsOfNumberAddOne(subStringWithFromIndex(digits, 1)) + "0";
         } else {
             value = digits[0] + addOne;
         }
@@ -609,6 +631,14 @@ function createArrayOfObjects(...elements) {
         array.push(element);
     }
     return array;
+}
+
+function stringifyArrayElements(array) {
+    let value = "";
+    for (const element of array) {
+        value += element;
+    }
+    return value;
 }
 
 function createArrayOfOneObject(element, length) {
@@ -931,6 +961,12 @@ function subStringWithToIndex(string, toIndex) {
     return subString(string, 0, toIndex);
 }
 
+function removeSubString(string, fromIndex, toIndex) {
+    string = getNonNullString(string);
+    const subStringToFromIndex = subStringWithToIndex(string, fromIndex);
+    return subStringWithToIndex(subStringToFromIndex, subStringToFromIndex - 1) + subStringWithFromIndex(string, toIndex + 1);
+}
+
 function drawDiagonalLineLeftAndDown(moveX, moveY, length) {
     drawLine(moveX, moveY, moveX - length, moveY + length);
 }
@@ -1197,11 +1233,10 @@ function getElementById(elementId) {
     return document.getElementById(elementId);
 }
 
-// noinspection JSDeprecatedSymbols
-const getCanvasMousePos = () => ({
-    x: event.clientX - canvas.getBoundingClientRect().left,
-    y: event.clientY - canvas.getBoundingClientRect().top
-});
+function getCanvasMousePos() {
+    // noinspection JSDeprecatedSymbols
+    return window.getMousePos(canvas);
+}
 
 function countBorderTextWithMin(text, count) {
     return "(" + text + " = " + count + ") the " + text + " value must be greater than or equal to " + 0;
@@ -1215,12 +1250,12 @@ function isEmptyString(string) {
     return getNonNullString(string).length === 0;
 }
 
-function getStringIndexOf(string, char) {
-    return getNonNullString(string).indexOf(char);
+function getStringIndexOf(string, search) {
+    return getNonNullString(string).indexOf(search);
 }
 
-function isContainsCharInString(string, char) {
-    return getStringIndexOf(string, char) > -1;
+function isContainsSearchInString(string, search) {
+    return getStringIndexOf(string, search) > -1;
 }
 
 function getNonNullString(string) {
@@ -1228,7 +1263,7 @@ function getNonNullString(string) {
 }
 
 function getNonNullArray(array) {
-    return array === null ? [] : array;
+    return createIfAndElseAndReturns(Array.isArray(array), array, []);
 }
 
 function getNonNullNumber(number) {

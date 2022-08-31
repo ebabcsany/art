@@ -1,111 +1,85 @@
-window.canvas = getElementById("piano-song-editor");
+window.canvas = document.getElementById("piano-song-editor");
 window.context = canvas.getContext("2d");
+const canvasMousePositionXSpan = getElementById("canvas-mouse-position-x");
+const canvasMousePositionYSpan = getElementById("canvas-mouse-position-y");
+const canvasWidthInputColorInput = getElementById("canvas-width-input-color");
+const canvasHeightInputColorInput = getElementById("canvas-height-input-color");
 const canvasInputsButton = getElementById("canvas-inputs-button");
 const canvasInputsResetColorsPart = getElementById("canvas-inputs-reset-colors-part");
 const canvasInputsResetColorsButton = getElementById("canvas-inputs-reset-colors-button");
 const canvasInputs = getElementById("canvas-inputs");
-const canvasBorderColorInput = getElementById("canvas-border-color");
-const canvasBackgroundColorInput = getElementById("canvas-background-color");
-const canvasPianoSongEditorLinesColorInput = getElementById("canvas-piano-song-editor-lines-color");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-border-color", 6, "canvasBorderColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-background-color", 7, "canvasBackgroundColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-song-editor-lines-color", 8, "canvasPianoSongEditorLinesColor");
 const canvasPianoInputsButton = getElementById("canvas-piano-inputs-button");
 const canvasPianoInputsResetColorsPart = getElementById("canvas-piano-inputs-reset-colors-part");
 const canvasPianoInputsResetColorsButton = getElementById("canvas-piano-inputs-reset-colors-button");
 const canvasPianoInputs = getElementById("canvas-piano-inputs");
-const canvasPianoTopMustUpperPartColorInput = getElementById("canvas-piano-top-most-upper-part-color");
-const canvasPianoTopUpperPartColorInput = getElementById("canvas-piano-top-upper-part-color");
-const canvasPianoTopUpperPartCenterColorInput = getElementById("canvas-piano-top-upper-part-center-color");
-const canvasPianoTopLowerPartColorInput = getElementById("canvas-piano-top-lower-part-color");
-const canvasPianoTopMustLowerPartColorInput = getElementById("canvas-piano-top-must-lower-part-color");
-const canvasPianoSeparatingSpacesOfKeysColorInput = getElementById("canvas-piano-separating-spaces-of-keys-color");
-const canvasPianoWholeKeyColorInput = getElementById("canvas-piano-whole-key-color");
-const canvasPianoHalfKeyColorInput = getElementById("canvas-piano-half-key-color");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-top-most-upper-part-color", 11, "canvasPianoTopMostUpperPartColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-top-upper-part-color", 12, "canvasPianoTopUpperPartColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-top-upper-part-center-color", 13, "canvasPianoTopUpperPartCenterColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-top-lower-part-color", 14, "canvasPianoTopLowerPartColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-top-most-lower-part-color", 15, "canvasPianoTopMostLowerPartColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-separating-spaces-of-keys-color", 16, "canvasPianoSeparatingSpacesOfKeysColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-whole-key-color", 17, "canvasPianoWholeKeyColor");
+createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault("canvas-piano-half-key-color", 18, "canvasPianoHalfKeyColor");
 const backgroundColorInput = getElementById("background-color");
-const reloadTimeInput = getElementById("reload-time");
-const reloadTimeSubmitButton = getElementById("reload-time-submit-button");
-const canvasTextItems = document.getElementsByTagName("canvas-text");
-const defaultCanvasBorderColorValue = canvasBorderColorInput.value;
-const defaultCanvasBackgroundColorValue = canvasBackgroundColorInput.value;
-const defaultCanvasPianoSongEditorLinesColorValue = canvasPianoSongEditorLinesColorInput.value;
-const defaultCanvasPianoTopMustUpperPartColorValue = canvasPianoTopMustUpperPartColorInput.value;
-const defaultCanvasPianoTopUpperPartColorValue = canvasPianoTopUpperPartColorInput.value;
-const defaultCanvasPianoTopUpperPartCenterColorValue = canvasPianoTopUpperPartCenterColorInput.value;
-const defaultCanvasPianoTopLowerPartColorValue = canvasPianoTopLowerPartColorInput.value;
-const defaultCanvasPianoTopMustLowerPartColorValue = canvasPianoTopMustLowerPartColorInput.value;
-const defaultCanvasPianoSeparatingSpacesOfKeysColorValue = canvasPianoSeparatingSpacesOfKeysColorInput;
-const defaultCanvasPianoWholeKeyColorValue = canvasPianoWholeKeyColorInput.value;
-const defaultCanvasPianoHalfKeyColorValue = canvasPianoHalfKeyColorInput.value;
+const reloadingTimeInput = getElementById("reloading-time");
+const reloadingTimeSubmitButton = getElementById("reloading-time-submit-button");
+const textItems = document.getElementsByTagName("text-item");
+const textItemsColorInput = document.getElementById("text-items-color");
+const defaultCanvasWidthInputColorValue = canvasWidthInput.value;
+const defaultCanvasHeightInputColorValue = canvasHeightInput.value;
 const defaultBackgroundColorValue = backgroundColorInput.value;
-let allWindowClickCount = 0;
+const defaultTextItemsColorValue = textItemsColorInput.value;
+let allWindowClickedCount = 0;
 let savedAllWindowClickedCountWhenCanvasClicked = 0;
 let savedAllWindowClickedCountWhenBackgroundColorInputClicked = 0;
 /**
  * <strong>if this parameters are greater than 0</strong>
  * <ul>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">0</code>]: <code style="color: #7f008f">{@link window}</code><co,ode></code>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">0</code>]: <code style="color: #7f008f">{@link window}</code>,</code>
  *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">1</code>]: <code style="color: #7f008f">{@link canvasWidthInput}</code>,</code></p>
  *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">2</code>]: <code style="color: #7f008f">{@link canvasHeightInput}</code>,</code></p>
  *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">3</code>]: <code style="color: #7f008f">{@link canvas}</code>,</code></p>
  *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">4</code>]: <code style="color: #7f008f">{@link canvasInputsButton}</code>,</code></p>
  *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">5</code>]: <code style="color: #7f008f">{@link canvasInputsResetColorsButton}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">6</code>]: <code style="color: #7f008f">{@link canvasBorderColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">7</code>]: <code style="color: #7f008f">{@link canvasBackgroundColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">8</code>]: <code style="color: #7f008f">{@link canvasPianoSongEditorLinesColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">6</code>]: <code style="color: #7f008f">{@link HTMLElement canvasBorderColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">7</code>]: <code style="color: #7f008f">{@link HTMLElement canvasBackgroundColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">8</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoSongEditorLinesColorInput}</code>,</code></p>
  *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">9</code>]: <code style="color: #7f008f">{@link canvasPianoInputsButton}</code>,</code></p>
  *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">10</code>]: <code style="color: #7f008f">{@link canvasPianoInputsResetColorsButton}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">11</code>]: <code style="color: #7f008f">{@link canvasPianoTopMustUpperPartColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">12</code>]: <code style="color: #7f008f">{@link canvasPianoTopUpperPartColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">13</code>]: <code style="color: #7f008f">{@link canvasPianoTopUpperPartCenterColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">14</code>]: <code style="color: #7f008f">{@link canvasPianoTopLowerPartColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">15</code>]: <code style="color: #7f008f">{@link canvasPianoTopMustLowerPartColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">16</code>]: <code style="color: #7f008f">{@link canvasPianoSeparatingSpacesOfKeysColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">17</code>]: <code style="color: #7f008f">{@link canvasPianoWholeKeyColorInput}</code>,</code></p>
- *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">18</code>]: <code style="color: #7f008f">{@link canvasPianoHalfKeyColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">11</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoTopMostUpperPartColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">12</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoTopUpperPartColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">13</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoTopUpperPartCenterColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">14</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoTopLowerPartColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">15</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoTopMostLowerPartColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">16</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoSeparatingSpacesOfKeysColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">17</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoWholeKeyColorInput}</code>,</code></p>
+ *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">18</code>]: <code style="color: #7f008f">{@link HTMLElement canvasPianoHalfKeyColorInput}</code>,</code></p>
  *     <p><code style="color: #000000"><code style="color: #1f3faf">{@link allClickedElementsAndCount this}</code>[<code style="color: #3f5fef">19</code>]: <code style="color: #7f008f">{@link backgroundColorInput}</code>,</code></p>
  * </ul>
  */
 let allClickedElementsAndCount = createArrayOfOneObject(0, 20);
-let savedAllClickedElementsAndCount = allClickedElementsAndCount;
-let savedClickedElementAndIndexAndCount = [HTMLElement, 0, 0];
+let savedClickedElementAndIdAndIndexAndCount = [HTMLElement, "", 0, 0];
 let savedLineWidth = 0;
-let windowClickCount = 0;
-let canvasClickCount = 0;
-let canvasWidthInputClickCount = 0;
-let canvasHeightInputClickCount = 0;
-let canvasInputsButtonClickCount = 0;
-let canvasInputsResetColorsButtonClickCount = 0;
-let canvasBorderColorInputClickCount = 0;
-let canvasBackgroundColorInputClickCount = 0;
-let canvasPianoSongEditorLinesColorInputClickCount = 0;
-let canvasPianoInputsButtonClickCount = 0;
-let canvasPianoInputsResetColorsButtonClickCount = 0;
-let canvasPianoTopMustUpperPartColorInputClickCount = 0;
-let canvasPianoTopUpperPartColorInputClickCount = 0;
-let canvasPianoTopUpperPartCenterColorInputClickCount = 0;
-let canvasPianoTopLowerPartColorInputClickCount = 0;
-let canvasPianoTopMustLowerPartColorInputClickCount = 0;
-let canvasPianoSeparatingSpacesOfKeysColorInputClickCount = 0;
-let canvasPianoWholeKeyColorInputClickCount = 0;
-let canvasPianoHalfKeyColorInputClickCount = 0;
-let backgroundColorInputClickCount = 0;
+let windowClickedCount = 0;
+let canvasClickedCount = 0;
+let canvasWidthInputClickedCount = 0;
+let canvasHeightInputClickedCount = 0;
+let canvasInputsButtonClickedCount = 0;
+let canvasInputsResetColorsButtonClickedCount = 0;
+let canvasPianoInputsButtonClickedCount = 0;
+let canvasPianoInputsResetColorsButtonClickedCount = 0;
+let backgroundColorInputClickedCount = 0;
 let isWindowClicked = false;
 let isCanvasClicked = false;
-let isCanvasWidthInputClicked = false;
-let isCanvasHeightInputClicked = false;
+let isCanvasWidthInputMouseDown = false;
+let isCanvasHeightInputMouseDown = false;
 let isCanvasInputsButtonClicked = false;
 let isCanvasInputsResetColorsButtonClicked = false;
-let isCanvasBorderColorInputClicked = false;
-let isCanvasBackgroundColorInputClicked = false;
-let isCanvasPianoSongEditorLinesColorInputClicked = false;
 let isCanvasPianoInputsButtonClicked = false;
 let isCanvasPianoInputsResetColorsButtonClicked = false;
-let isCanvasPianoTopMustUpperPartColorInputClicked = false;
-let isCanvasPianoTopUpperPartColorInputClicked = false;
-let isCanvasPianoTopUpperPartCenterColorInputClicked = false;
-let isCanvasPianoTopLowerPartColorInputClicked = false;
-let isCanvasPianoTopMustLowerPartColorInputClicked = false;
-let isCanvasPianoSeparatingSpacesOfKeysColorInputClicked = false;
-let isCanvasPianoWholeKeyColorInputClicked = false;
-let isCanvasPianoHalfKeyColorInputClicked = false;
 let isBackgroundColorInputClicked = false;
 let isCanvasAndBackgroundColorInputClicked = false;
 let isBackgroundColorInputAndCanvasClicked = false;
@@ -114,225 +88,200 @@ let isCanvasInputsHidden = true;
 let isCanvasPianoInputsHidden = true;
 let isCanvasInputsVisible = false;
 let isCanvasPianoInputsVisible = false;
+let isCanvasMouseMove = false;
+let isCanvasMouseDown = false;
+let isCanvasInputsResetColorsButtonMouseDown = false;
+let isCanvasPianoInputsResetColorsButtonMouseDown = false;
 let savedCanvasMousePos = {
     x: 0,
     y: 0
 }
-window.addEventListener("click", function () {
-    allWindowClickCount++;
+window.addEventListener("mousemove", function () {
+    isCanvasMouseMove = false;
+}, true);
+window.addEventListener("mousedown", function () {
+    allWindowClickedCount++;
     allClickedElementsAndCount[0]++;
-    windowClickCount++;
-    savedAllClickedElementsAndCount = allClickedElementsAndCount;
-    savedClickedElementAndIndexAndCount = [window.toString(), 0, canvasClickCount];
-    isCanvasClicked = false;
+    windowClickedCount++;
     isCanvasInputsButtonClicked = false;
     isCanvasInputsResetColorsButtonClicked = false;
-    isCanvasBorderColorInputClicked = false;
-    isCanvasBackgroundColorInputClicked = false;
-    isCanvasPianoSongEditorLinesColorInputClicked = false;
+    window["isCanvasBorderColorInputClicked"] = false;
+    window["isCanvasBackgroundColorInputClicked"] = false;
+    window["isCanvasPianoSongEditorLinesColorInputClicked"] = false;
     isCanvasPianoInputsButtonClicked = false;
     isCanvasPianoInputsResetColorsButtonClicked = false;
-    isCanvasPianoTopMustUpperPartColorInputClicked = false;
-    isCanvasPianoTopUpperPartColorInputClicked = false;
-    isCanvasPianoTopUpperPartCenterColorInputClicked = false;
-    isCanvasPianoTopLowerPartColorInputClicked = false;
-    isCanvasPianoTopMustLowerPartColorInputClicked = false;
-    isCanvasPianoSeparatingSpacesOfKeysColorInputClicked = false;
-    isCanvasPianoWholeKeyColorInputClicked = false;
-    isCanvasPianoHalfKeyColorInputClicked = false;
-    isBackgroundColorInputClicked = false;
+    window["isCanvasPianoTopMostUpperPartColorInputClicked"] = false;
+    window["isCanvasPianoTopUpperPartColorInputClicked"] = false;
+    window["isCanvasPianoTopUpperPartCenterColorInputClicked"] = false;
+    window["isCanvasPianoTopLowerPartColorInputClicked"] = false;
+    window["isCanvasPianoTopMostLowerPartColorInputClicked"] = false;
+    window["isCanvasPianoSeparatingSpacesOfKeysColorInputClicked"] = false;
+    window["isCanvasPianoWholeKeyColorInputClicked"] = false;
+    window["isCanvasPianoHalfKeyColorInputClicked"] = false;
+    isCanvasInputsResetColorsButtonMouseDown = false;
+    isCanvasPianoInputsResetColorsButtonMouseDown = false;
     isWindowClicked = true;
 }, true);
-canvasWidthInput.onclick = function () {
+canvasWidthInput.onfocus = function () {
     defaultNotWindowClicked();
-    canvasWidthInputClickCount++;
+    canvasWidthInputClickedCount++;
     allClickedElementsAndCount[1]++;
-    savedAllClickedElementsAndCount = allClickedElementsAndCount;
-    savedClickedElementAndIndexAndCount = [this.id, 1, canvasWidthInputClickCount];
-    isCanvasWidthInputClicked = true;
+    savedClickedElementAndIdAndIndexAndCount = [this, this.id, 1, canvasWidthInputClickedCount];
+    isBackgroundColorInputClicked = false;
+    isCanvasWidthInputMouseDown = true;
 };
-canvasHeightInput.onclick = function () {
+canvasHeightInput.onfocus = function () {
     defaultNotWindowClicked();
-    canvasHeightInputClickCount++;
+    canvasHeightInputClickedCount++;
     allClickedElementsAndCount[2]++;
-    savedAllClickedElementsAndCount = allClickedElementsAndCount;
-    savedClickedElementAndIndexAndCount = [this.id, 2, canvasHeightInputClickCount];
-    isCanvasHeightInputClicked = true;
+    savedClickedElementAndIdAndIndexAndCount = [this, this.id, 2, canvasHeightInputClickedCount];
+    isBackgroundColorInputClicked = false;
+    isCanvasHeightInputMouseDown = true;
 };
-canvas.onclick = function () {
-    defaultNotWindowClicked();
-    canvasClickCount++;
-    allClickedElementsAndCount[3]++;
-    savedClickedElementAndIndexAndCount = [this.id, 3, canvasClickCount];
-    savedAllWindowClickedCountWhenCanvasClicked = allWindowClickCount;
-    isCanvasClicked = true;
-    isCanvasInputsButtonClicked = false;
-    isCanvasPianoInputsButtonClicked = false;
-    if ((savedAllWindowClickedCountWhenBackgroundColorInputClicked + 1) === savedAllWindowClickedCountWhenCanvasClicked) {
-        isCanvasAndBackgroundColorInputClicked = true;
-    }
+canvas.onmousemove = function () {
     savedCanvasMousePos.x = getCanvasMousePos().x;
     savedCanvasMousePos.y = getCanvasMousePos().y;
+    isCanvasMouseMove = true;
+};
+canvas.onmousedown = function () {
+    defaultNotWindowClicked();
+    isCanvasMouseDown = true;
+};
+canvas.onclick = function () {
+    canvasClickedCount++;
+    allClickedElementsAndCount[3]++;
+    savedClickedElementAndIdAndIndexAndCount = [this, this.id, 3, canvasClickedCount];
+    savedAllWindowClickedCountWhenCanvasClicked = allWindowClickedCount;
+    isCanvasInputsButtonClicked = false;
+    isCanvasPianoInputsButtonClicked = false;
+    isBackgroundColorInputAndCanvasClicked = isBackgroundColorInputClicked;
+    isBackgroundColorInputClicked = false;
+    isCanvasClicked = true;
 };
 canvasInputsButton.onclick = function () {
     defaultNotWindowClicked();
-    canvasInputsButtonClickCount++;
+    canvasInputsButtonClickedCount++;
     allClickedElementsAndCount[4]++;
-    savedClickedElementAndIndexAndCount = [this.id, 4, canvasInputsButtonClickCount];
+    savedClickedElementAndIdAndIndexAndCount = [this, this.id, 4, canvasInputsButtonClickedCount];
     isCanvasInputsButtonClicked = true;
+    isBackgroundColorInputClicked = false;
     isCanvasInputsHidden = canvasInputs.hidden = !canvasInputs.hidden;
     isCanvasInputsVisible = !canvasInputs.hidden;
+    canvasInputsResetColorsPart.hidden = true;
     if (isCanvasInputsHidden) {
         isCanvasPianoInputsHidden = canvasPianoInputs.hidden = true;
         isCanvasPianoInputsVisible = !canvasPianoInputs.hidden;
     }
 };
+canvasInputsResetColorsButton.onmousedown = function () {
+    defaultNotWindowClicked();
+    isCanvasInputsResetColorsButtonMouseDown = true;
+};
 canvasInputsResetColorsButton.onclick = function () {
-    defaultNotWindowClicked();
-    canvasInputsResetColorsButtonClickCount++;
+    canvasInputsResetColorsButtonClickedCount++;
     allClickedElementsAndCount[5]++;
-    savedClickedElementAndIndexAndCount = [this.id, 5, canvasInputsResetColorsButtonClickCount];
-    isCanvasPianoInputsResetColorsButtonClicked = true;
-    setCanvasInputs();
-}
-canvasBorderColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasBorderColorInputClickCount++;
-    allClickedElementsAndCount[6]++;
-    savedClickedElementAndIndexAndCount = [this.id, 6, canvasBorderColorInputClickCount];
-    isCanvasBorderColorInputClicked = true;
-};
-canvasBackgroundColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasBackgroundColorInputClickCount++;
-    allClickedElementsAndCount[7]++;
-    savedClickedElementAndIndexAndCount = [this.id, 7, canvasBackgroundColorInputClickCount];
-    isCanvasBackgroundColorInputClicked = true;
-};
-canvasPianoSongEditorLinesColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoSongEditorLinesColorInputClickCount++;
-    allClickedElementsAndCount[8]++;
-    savedClickedElementAndIndexAndCount = [this.id, 8, canvasPianoSongEditorLinesColorInputClickCount];
-    isCanvasPianoSongEditorLinesColorInputClicked = true;
+    savedClickedElementAndIdAndIndexAndCount = [this, this.id, 5, canvasInputsResetColorsButtonClickedCount];
+    isBackgroundColorInputClicked = false;
+    isCanvasInputsResetColorsButtonClicked = true;
 };
 canvasPianoInputsButton.onclick = function () {
     defaultNotWindowClicked();
-    canvasPianoInputsButtonClickCount++;
+    canvasPianoInputsButtonClickedCount++;
     allClickedElementsAndCount[9]++;
-    savedClickedElementAndIndexAndCount = [this.id, 9, canvasInputsButtonClickCount];
+    savedClickedElementAndIdAndIndexAndCount = [this, this.id, 9, canvasInputsButtonClickedCount];
     isCanvasPianoInputsButtonClicked = true;
+    isBackgroundColorInputClicked = false;
     isCanvasPianoInputsHidden = canvasPianoInputs.hidden = !canvasPianoInputs.hidden;
     isCanvasPianoInputsVisible = !canvasPianoInputs.hidden;
+    canvasPianoInputsResetColorsPart.hidden = true;
+};
+canvasPianoInputsResetColorsButton.onmousedown = function () {
+    defaultNotWindowClicked();
+    isCanvasPianoInputsResetColorsButtonMouseDown = true;
 };
 canvasPianoInputsResetColorsButton.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoInputsResetColorsButtonClickCount++;
+    canvasPianoInputsResetColorsButtonClickedCount++;
     allClickedElementsAndCount[10]++;
-    savedClickedElementAndIndexAndCount = [this.id, 10, canvasPianoInputsResetColorsButtonClickCount];
+    savedClickedElementAndIdAndIndexAndCount = [this, this.id, 10, canvasPianoInputsResetColorsButtonClickedCount];
+    isBackgroundColorInputClicked = false;
     isCanvasPianoInputsResetColorsButtonClicked = true;
-    setCanvasPianoInputs();
-}
-canvasPianoTopMustUpperPartColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoTopMustUpperPartColorInputClickCount++;
-    allClickedElementsAndCount[11]++;
-    savedClickedElementAndIndexAndCount = [this.id, 11, canvasPianoTopMustUpperPartColorInputClickCount];
-    isCanvasPianoTopMustUpperPartColorInputClicked = true;
-};
-canvasPianoTopUpperPartColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoTopUpperPartColorInputClickCount++;
-    allClickedElementsAndCount[12]++;
-    savedClickedElementAndIndexAndCount = [this.id, 12, canvasPianoTopUpperPartColorInputClickCount];
-    isCanvasPianoTopUpperPartColorInputClicked = true;
-};
-canvasPianoTopUpperPartCenterColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoTopUpperPartCenterColorInputClickCount++;
-    allClickedElementsAndCount[13]++;
-    savedClickedElementAndIndexAndCount = [this.id, 13, canvasPianoTopUpperPartCenterColorInputClickCount];
-    isCanvasPianoTopUpperPartCenterColorInputClicked = true;
-};
-canvasPianoTopLowerPartColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoTopLowerPartColorInputClickCount++;
-    allClickedElementsAndCount[14]++;
-    savedClickedElementAndIndexAndCount = [this.id, 14, canvasPianoTopLowerPartColorInputClickCount];
-    isCanvasPianoTopLowerPartColorInputClicked = true;
-};
-canvasPianoTopMustLowerPartColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoTopMustLowerPartColorInputClickCount++;
-    allClickedElementsAndCount[15]++;
-    savedClickedElementAndIndexAndCount = [this.id, 15, canvasPianoTopMustLowerPartColorInputClickCount];
-    isCanvasPianoTopMustLowerPartColorInputClicked = true;
-};
-canvasPianoSeparatingSpacesOfKeysColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoSeparatingSpacesOfKeysColorInputClickCount++;
-    allClickedElementsAndCount[16]++;
-    savedClickedElementAndIndexAndCount = [this.id, 16, canvasPianoSeparatingSpacesOfKeysColorInputClickCount];
-    isCanvasPianoSeparatingSpacesOfKeysColorInputClicked = true;
-};
-canvasPianoWholeKeyColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoWholeKeyColorInputClickCount++;
-    allClickedElementsAndCount[17]++;
-    savedClickedElementAndIndexAndCount = [this.id, 17, canvasPianoWholeKeyColorInputClickCount];
-    isCanvasPianoWholeKeyColorInputClicked = true;
-};
-canvasPianoHalfKeyColorInput.onclick = function () {
-    defaultNotWindowClicked();
-    canvasPianoHalfKeyColorInputClickCount++;
-    allClickedElementsAndCount[18]++;
-    savedClickedElementAndIndexAndCount = [this.id, 18, canvasPianoHalfKeyColorInputClickCount];
-    isCanvasPianoHalfKeyColorInputClicked = true;
 };
 backgroundColorInput.onclick = function () {
     defaultNotWindowClicked();
-    backgroundColorInputClickCount++;
+    backgroundColorInputClickedCount++;
     allClickedElementsAndCount[19]++;
-    savedClickedElementAndIndexAndCount = [this.id, 19, backgroundColorInputClickCount];
-    savedAllWindowClickedCountWhenBackgroundColorInputClicked = allWindowClickCount;
+    savedClickedElementAndIdAndIndexAndCount = [this, this.id, 19, backgroundColorInputClickedCount];
+    savedAllWindowClickedCountWhenBackgroundColorInputClicked = allWindowClickedCount;
+    isCanvasAndBackgroundColorInputClicked = isCanvasClicked;
+    isCanvasClicked = false;
     isBackgroundColorInputClicked = true;
-    if ((savedAllWindowClickedCountWhenCanvasClicked + 1) === savedAllWindowClickedCountWhenBackgroundColorInputClicked) {
-        isBackgroundColorInputAndCanvasClicked = true;
-    }
 };
-reloadTimeInput.onclick = function () {
+
+reloadingTimeInput.onmousedown = function () {
     defaultNotWindowClicked();
+    isBackgroundColorInputClicked = false;
 };
-reloadTimeSubmitButton.onclick = function () {
+reloadingTimeInput.onkeydown = function () {
+    isBackgroundColorInputClicked = false;
+};
+reloadingTimeSubmitButton.onclick = function () {
     defaultNotWindowClicked();
-    main(isEmptyString(reloadTimeInput.value) ? 0 : reloadTimeInput.value);
+    main(createIfAndElseAndReturns(isEmptyString(reloadingTimeInput.value), 0, reloadingTimeInput.value));
+};
+
+/**
+ * @return <code style="color: #000000">creates the fields <em>({@link HTMLElement <code style="color: #7f008f">element</code>}, {@link PaymentCurrencyAmount.value <code style="color: #7f008f">defaultValue</code>}, {@link Number <code style="color: #3f5fef">clickedCount</code>}, {@link Boolean <code style="color: #1f3faf">isClicked</code>})</em> associated with the color input element;</code>
+ */
+function createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElement(element, name, isClicked, clickedCount) {
+    const fieldName = name + "Input";
+    window[fieldName] = element;
+    window["default" + changeLowercaseStringFirstLetterToUppercaseWithAToZ(name) + "Value"] = element.value;
+    window[fieldName + "ClickedCount"] = clickedCount;
+    window["is" + changeLowercaseStringFirstLetterToUppercaseWithAToZ(fieldName) + "Clicked"] = isClicked;
 }
 
-//function createsTheFieldsAssociatedWithTheElement() {
-//
-//}
+function createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementById(elementId, name, isClicked, clickedCount) {
+    createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElement(document.getElementById(elementId), name, isClicked, clickedCount);
+}
+
+function createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValue(elementId, index, name, isClicked, clickedCount) {
+    createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementById(elementId, name, isClicked, clickedCount);
+    const fieldName = name + "Input";
+    window[fieldName].onclick = function () {
+        defaultNotWindowClicked();
+        window[fieldName + "ClickedCount"]++;
+        allClickedElementsAndCount[index]++;
+        savedClickedElementAndIdAndIndexAndCount = [window[fieldName], elementId, index, window[fieldName + "ClickedCount"]];
+        isBackgroundColorInputClicked = false;
+        window["is" + changeLowercaseStringFirstLetterToUppercaseWithAToZ(fieldName) + "Clicked"] = true;
+    };
+}
+
+function createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValueWithDefault(elementId, index, name) {
+    createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementByIdAndElementIndexAndAddOnclickValue(elementId, index, name, false, 0);
+}
 
 function defaultNotWindowClicked() {
-    windowClickCount--;
+    windowClickedCount--;
     allClickedElementsAndCount[0]--;
     isWindowClicked = false;
 }
 
 function setCanvasInputs() {
-    canvasBorderColorInput.value = defaultCanvasBorderColorValue;
-    canvasBackgroundColorInput.value = defaultCanvasBackgroundColorValue;
-    canvasPianoSongEditorLinesColorInput.value = defaultCanvasPianoSongEditorLinesColorValue;
+    window["canvasBorderColorInput"].value = window["defaultCanvasBorderColorValue"];
+    window["canvasBackgroundColorInput"].value = window["defaultCanvasBackgroundColorValue"];
+    window["canvasPianoSongEditorLinesColorInput"].value = window["defaultCanvasPianoSongEditorLinesColorValue"];
 }
 
 function setCanvasPianoInputs() {
-    canvasPianoTopMustUpperPartColorInput.value = defaultCanvasPianoTopMustUpperPartColorValue;
-    canvasPianoTopUpperPartColorInput.value = defaultCanvasPianoTopUpperPartColorValue;
-    canvasPianoTopUpperPartCenterColorInput.value = defaultCanvasPianoTopUpperPartCenterColorValue;
-    canvasPianoTopLowerPartColorInput.value = defaultCanvasPianoTopLowerPartColorValue;
-    canvasPianoTopMustLowerPartColorInput.value = defaultCanvasPianoTopMustLowerPartColorValue;
-    canvasPianoSeparatingSpacesOfKeysColorInput.value = defaultCanvasPianoSeparatingSpacesOfKeysColorValue;
-    canvasPianoWholeKeyColorInput.value = defaultCanvasPianoWholeKeyColorValue;
-    canvasPianoHalfKeyColorInput.value = defaultCanvasPianoHalfKeyColorValue;
+    window["canvasPianoTopMostUpperPartColorInput"].value = window["defaultCanvasPianoTopMostUpperPartColorValue"];
+    window["canvasPianoTopUpperPartColorInput"].value = window["defaultCanvasPianoTopUpperPartColorValue"];
+    window["canvasPianoTopUpperPartCenterColorInput"].value = window["defaultCanvasPianoTopUpperPartCenterColorValue"];
+    window["canvasPianoTopLowerPartColorInput"].value = window["defaultCanvasPianoTopLowerPartColorValue"];
+    window["canvasPianoTopMostLowerPartColorInput"].value = window["defaultCanvasPianoTopMostLowerPartColorValue"];
+    window["canvasPianoSeparatingSpacesOfKeysColorInput"].value = window["defaultCanvasPianoSeparatingSpacesOfKeysColorValue"];
+    window["canvasPianoWholeKeyColorInput"].value = window["defaultCanvasPianoWholeKeyColorValue"];
+    window["canvasPianoHalfKeyColorInput"].value = window["defaultCanvasPianoHalfKeyColorValue"];
 }
 
 function setCanvasWidth(value) {
@@ -348,12 +297,40 @@ function setCanvasSize(size) {
     setCanvasHeight(size);
 }
 
+function getPartOfNumber(number, numberOfParts, partOfNumber) {
+    return number / (getNonNullNumber(numberOfParts) / validateNumber(partOfNumber, 0, numberOfParts));
+}
+
 function getPartOfWidth(width, partOfWidth) {
-    return canvas.width / (width / partOfWidth);
+    return getPartOfNumber(canvas.width, width, partOfWidth);
 }
 
 function getPartOfHeight(height, partOfHeight) {
-    return canvas.height / (height / partOfHeight);
+    return getPartOfNumber(canvas.height, height, partOfHeight);
+}
+
+/**
+ * get part of height
+ * @param outOfCanvasHeightOfDivider this is (out of canvas-height of divider)
+ * @param partOfHeight this is part of canvas-height
+ * @returns {number}
+ */
+function getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthThenPartOfWidthOrElsePartOfHeight(outOfCanvasHeightOfDivider, partOfHeight) {
+    return getNonNullNumber(createIfAndElseAndReturns(canvas.height > canvas.width, canvas.height - (canvas.width * (1 / getNonNullNumber(outOfCanvasHeightOfDivider))), getNonNullNumber(partOfHeight)));
+}
+
+/**
+ * get part of height
+ * @param outOfCanvasHeightOfDivider this is (out of canvas-height of divider)
+ * @returns {number}
+ */
+function getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidth(outOfCanvasHeightOfDivider) {
+    outOfCanvasHeightOfDivider = getNonNullNumber(outOfCanvasHeightOfDivider);
+    return getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthThenPartOfWidthOrElsePartOfHeight(outOfCanvasHeightOfDivider, getNonNullNumber(canvas.height * (1 - (1 / outOfCanvasHeightOfDivider))));
+}
+
+function getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, partOfHeightOfCanvas) {
+    return getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidth(getNonNullNumber(height / (height - partOfHeightOfCanvas)));
 }
 
 function drawVerticalColoredLineWithWidthAndPartOfWidth(style, width, partOfWidth, moveY, lineY) {
@@ -388,7 +365,7 @@ function drawKeyOfPiano(strokeStyle, fillStyle, x, y, width, height) {
 
 function drawWholeKeyOctaveOfPiano(strokeStyle, fillStyle, width, height, partOfWidthAndStart) {
     for (let i = partOfWidthAndStart, counter = 0; counter < 7; i += 16, counter++) {
-        drawKeyOfPiano(strokeStyle, fillStyle, getPartOfWidth(width, i), getPartOfHeight(height, height - 105), getPartOfWidth(width, 16), getPartOfHeight(height, height - 1));
+        drawKeyOfPiano(strokeStyle, fillStyle, getPartOfWidth(width, i), getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, height - 105), getPartOfWidth(width, 16), getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, height - 1));
     }
 }
 
@@ -396,7 +373,7 @@ function drawHalfKeyOctaveOfPiano(strokeStyle, fillStyle, width, height, partOfW
     const listOfNumberOfSpacesBetweenHalfKeys = [18, 30, 17, 17];
     const maxLength = listOfNumberOfSpacesBetweenHalfKeys.length;
     for (let i = partOfWidthAndStart, counter = 0; counter <= maxLength; i += (counter < maxLength ? listOfNumberOfSpacesBetweenHalfKeys[counter] : 0), counter++) {
-        drawKeyOfPiano(strokeStyle, fillStyle, getPartOfWidth(width, i), getPartOfHeight(height, height - 105), getPartOfWidth(width, 9), getPartOfHeight(height, 68));
+        drawKeyOfPiano(strokeStyle, fillStyle, getPartOfWidth(width, i), getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, height - 105), getPartOfWidth(width, 9), canvas.height > canvas.width ? getPartOfWidth(width, 62) : getPartOfHeight(height, 68));
     }
 }
 
@@ -409,15 +386,7 @@ function drawClassicPianoAndSonkEditorLines() {
     isCanvasListener = true;
     const width = 834;
     const height = 912;
-    const pianoTop = canvas.height * sevenEighths;
-    const rgb50PercentGray = "rgb(64, 64, 64)";
-
-    //canvas.onmousedown = function () {
-    //    fillColoredRect("#ff0000", savedCanvasMousePos.x, savedCanvasMousePos.y, 100, 100);
-    //}
-    //canvas.onmouseup = function () {
-    //
-    //}
+    const pianoTopOfHeight = partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 114);
 
     function partOfWidth(value) {
         return getPartOfWidth(width, value);
@@ -427,19 +396,25 @@ function drawClassicPianoAndSonkEditorLines() {
         return getPartOfHeight(height, value);
     }
 
-    function getObjectIfObjectEqualsDefaultObject(object, defaultObject) {
-        return createIfAndElseAndReturns(object === defaultObject, defaultObject, object);
+    function partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(partOfHeightOfCanvas) {
+        return getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, partOfHeightOfCanvas);
+    }
+
+    function getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor(name, modifiedColor) {
+        const inputValue = window[name + "Input"].value;
+        const defaultValue = window["default" + changeLowercaseStringFirstLetterToUppercaseWithAToZ(name) + "Value"].value;
+        return createIfAndElseAndReturns(!isBackgroundColorInputClicked, inputValue, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked || isBackgroundColorInputAndCanvasClicked, modifiedColor, getObjectIfEqualsObjects(inputValue, defaultValue)));
     }
 
     function drawVerticalSonkEditorLines() {
+        const linesColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoSongEditorLinesColor", tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value));
         function drawVertical50PercentGrayLineFrom0ToPianoTop(from) {
-            drawVerticalColoredLineWithWidthAndPartOfWidth(rgb50PercentGray, width, from, 0, pianoTop);
+            drawVerticalColoredLineWithWidthAndPartOfWidth(linesColor, width, from, 0, pianoTopOfHeight);
         }
-
         function drawOctave(from) {
-            drawOctaveOfPianoVerticalSonkEditorLines(rgb50PercentGray, width, from, 0, pianoTop);
+            drawOctaveOfPianoVerticalSonkEditorLines(linesColor, width, from, 0, pianoTopOfHeight);
         }
-
+        savedLineWidth = canvas.width / width;
         drawVertical50PercentGrayLineFrom0ToPianoTop(0);
         drawVertical50PercentGrayLineFrom0ToPianoTop(14);
         drawVertical50PercentGrayLineFrom0ToPianoTop(22);
@@ -450,25 +425,21 @@ function drawClassicPianoAndSonkEditorLines() {
     }
 
     function drawClassicPiano() {
-        const topMustUpperPartColor = getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(canvasPianoTopMustUpperPartColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked, tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value), getObjectIfObjectEqualsDefaultObject(canvasPianoTopMustUpperPartColorInput.value, defaultCanvasPianoTopMustUpperPartColorValue)));
-        const topUpperPartColor = getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(canvasPianoTopUpperPartColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked, tHex.getRgbSixteenToFifteenSixteensHex(backgroundColorInput.value), getObjectIfObjectEqualsDefaultObject(canvasPianoTopUpperPartColorInput.value, defaultCanvasPianoTopUpperPartColorValue)));
-        const topUpperPartCenterColor = getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(canvasPianoTopUpperPartColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked, backgroundColorInput.value, getObjectIfObjectEqualsDefaultObject(canvasPianoTopUpperPartCenterColorInput.value, defaultCanvasPianoTopUpperPartCenterColorValue)));
-        const topLowerPartColor = getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(canvasPianoTopLowerPartColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked, tHex.getReverseRgbEighthToSevenEighthsHex(backgroundColorInput.value), getObjectIfObjectEqualsDefaultObject(canvasPianoTopLowerPartColorInput.value, defaultCanvasPianoTopLowerPartColorValue)));
-        const topMustLowerPartColor = getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(canvasPianoTopLowerPartColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked, tHex.getReverseRgbSixteenToFifteenSixteensHex(backgroundColorInput.value), getObjectIfObjectEqualsDefaultObject(canvasPianoTopMustLowerPartColorInput.value, defaultCanvasPianoTopMustLowerPartColorValue)));
-        const separatingSpacesOfKeysColor = getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(canvasPianoSeparatingSpacesOfKeysColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked, tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value), getObjectIfObjectEqualsDefaultObject(canvasPianoSeparatingSpacesOfKeysColorInput.value, defaultCanvasPianoSeparatingSpacesOfKeysColorValue)));
-        const wholeKeyColor = getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(canvasPianoWholeKeyColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked, backgroundColorInput.value, getObjectIfObjectEqualsDefaultObject(canvasPianoWholeKeyColorInput.value, defaultCanvasPianoWholeKeyColorValue)));
-        const halfKeyColor = getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(canvasPianoHalfKeyColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked, tHex.getReverseHex(backgroundColorInput.value), getObjectIfObjectEqualsDefaultObject(canvasPianoHalfKeyColorInput.value, defaultCanvasPianoHalfKeyColorValue)));
-
-        function getColorWithCanvasPianoInputsValueNotEqualsDefaultColor(ifTrue, ifFalse) {
-            return createIfAndElseAndReturns(isEqualsObjects(), ifTrue, ifFalse);
-        }
+        const topMostUpperPartColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoTopMostUpperPartColor", tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value));
+        const topUpperPartColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoTopUpperPartColor", tHex.getRgbSixteenToFifteenSixteensHex(backgroundColorInput.value));
+        const topUpperPartCenterColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoTopUpperPartCenterColor", backgroundColorInput.value);
+        const topLowerPartColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoTopLowerPartColor", tHex.getReverseRgbSixteenToFifteenSixteensHex(backgroundColorInput.value));
+        const topMostLowerPartColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoTopMostLowerPartColor", tHex.getReverseRgbEighthToSevenEighthsHex(backgroundColorInput.value));
+        const separatingSpacesOfKeysColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoSeparatingSpacesOfKeysColor", tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value));
+        const wholeKeyColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoWholeKeyColor", backgroundColorInput.value);
+        const halfKeyColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasPianoHalfKeyColor", tHex.getReverseHex(backgroundColorInput.value));
 
         function drawWholeKey(partOfWidthAndStart) {
-            drawKeyOfPiano(separatingSpacesOfKeysColor, wholeKeyColor, partOfWidth(partOfWidthAndStart), partOfHeight(height - 105), partOfWidth(16), partOfHeight(height - 1));
+            drawKeyOfPiano(separatingSpacesOfKeysColor, wholeKeyColor, partOfWidth(partOfWidthAndStart), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 105), partOfWidth(16), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 1));
         }
 
         function drawHalfKey(partOfWidthAndStart) {
-            drawKeyOfPiano(separatingSpacesOfKeysColor, halfKeyColor, partOfWidth(partOfWidthAndStart), partOfHeight(height - 105), partOfWidth(9), partOfHeight(68));
+            drawKeyOfPiano(separatingSpacesOfKeysColor, halfKeyColor, partOfWidth(partOfWidthAndStart), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 105), partOfWidth(9), canvas.height > canvas.width ? partOfWidth(62) : partOfHeight(68));
         }
 
         function drawOctave(from) {
@@ -476,47 +447,49 @@ function drawClassicPianoAndSonkEditorLines() {
         }
 
         function fillColoredRectWithPartOfHeight(style, posY, rectHeight) {
-            fillColoredRect(style, 0, pianoTop + partOfHeight(posY), canvas.width, partOfHeight(rectHeight));
+            fillColoredRect(style, 0, partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - (114 - posY)), canvas.width, partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(rectHeight));
         }
 
-        fillColoredRectWithPartOfHeight(topMustUpperPartColor, 0, 1);
+        fillColoredRectWithPartOfHeight(topMostUpperPartColor, 0, 1);
         fillColoredRectWithPartOfHeight(topUpperPartColor, 1, 3);
         fillColoredRectWithPartOfHeight(topUpperPartCenterColor, 2, 1);
-        fillColoredRectWithPartOfHeight(topMustLowerPartColor, 4, 5);
-        fillColoredRectWithPartOfHeight(topLowerPartColor, 8, 1);
-        savedLineWidth = canvas.height / height;
-        drawKeyOfPiano(separatingSpacesOfKeysColor, wholeKeyColor, partOfWidth(0), partOfHeight(height - 105), partOfWidth(17), partOfHeight(height - 1));
+        fillColoredRectWithPartOfHeight(topLowerPartColor, 4, 5);
+        fillColoredRectWithPartOfHeight(topMostLowerPartColor, 8, 1);
+        savedLineWidth = canvas.width / width;
+        drawKeyOfPiano(separatingSpacesOfKeysColor, wholeKeyColor, partOfWidth(0), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 105), partOfWidth(17), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 1));
         drawWholeKey(17);
         drawHalfKey(13);
         let i = 33;
         for (let counter = 0; counter < 7; i += 112, counter++) {
             drawOctave(i);
         }
-        drawKeyOfPiano(separatingSpacesOfKeysColor, wholeKeyColor, partOfWidth(i), partOfHeight(height - 105), partOfWidth(17), partOfHeight(height - 1));
-        drawVerticalColoredLine(separatingSpacesOfKeysColor, 0, pianoTop, canvas.height);
-        drawVerticalColoredLine(separatingSpacesOfKeysColor, canvas.width, pianoTop, canvas.height);
+        drawKeyOfPiano(separatingSpacesOfKeysColor, wholeKeyColor, partOfWidth(i), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 105), partOfWidth(17), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 1));
+        drawVerticalColoredLine(separatingSpacesOfKeysColor, 0, pianoTopOfHeight, canvas.height);
+        drawVerticalColoredLine(separatingSpacesOfKeysColor, canvas.width, pianoTopOfHeight, canvas.height);
         drawHorizontalColoredLine(separatingSpacesOfKeysColor, 0, canvas.width, canvas.height);
     }
 
-    if (!isCanvasWidthInputClicked && !isCanvasHeightInputClicked) {
+    if (!isCanvasWidthInputMouseDown && !isCanvasHeightInputMouseDown) {
         setCanvasSize(Math.min(innerWidth, innerHeight) * threeQuarter);
     } else {
-        setCanvasWidth(createIfAndElseAndReturns(isCanvasWidthInputClicked, canvasWidthInput.value, innerWidth * threeQuarter));
-        setCanvasHeight(createIfAndElseAndReturns(isCanvasHeightInputClicked, canvasHeightInput.value, innerHeight * threeQuarter));
+        setCanvasWidth(createIfAndElseAndReturns(isCanvasWidthInputMouseDown, canvasWidthInput.value, innerWidth * threeQuarter));
+        setCanvasHeight(createIfAndElseAndReturns(isCanvasHeightInputMouseDown, canvasHeightInput.value, innerHeight * threeQuarter));
     }
 
     function setStyleColorAttributeCanvasTextItems(color) {
-        for (let i = 0; i < canvasTextItems.length; i++) {
-            canvasTextItems.item(i).setAttribute("style", "color: " + color);
+        const texItemsColorInputValue = textItemsColorInput.value = createIfAndElseAndReturns(!isBackgroundColorInputClicked, textItemsColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked || isBackgroundColorInputAndCanvasClicked, color, getObjectIfEqualsObjects(textItemsColorInput.value, defaultTextItemsColorValue)));
+        for (let i = 0; i < textItems.length; i++) {
+            textItems.item(i).setAttribute("style", "color: " + texItemsColorInputValue);
         }
-        canvas.style.border = "1px solid" + color;
         document.getElementById("canvas-width").style.color = color;
         document.getElementById("canvas-height").style.color = color;
     }
 
-    document.body.style.backgroundColor = createIfAndElseAndReturns(backgroundColorInput.value !== defaultBackgroundColorValue, backgroundColorInput.value, defaultBackgroundColorValue);
-    document.getElementById("canvas-width").style.backgroundColor = backgroundColorInput.value;
-    document.getElementById("canvas-height").style.backgroundColor = backgroundColorInput.value;
+    canvas.style.border = "1px solid" + getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasBorderColor", getReverseHex(backgroundColorInput.value));
+    canvas.style.backgroundColor = getColorWithNotBackgroundColorInputClickedAndValueNotEqualsDefaultColor("canvasBackgroundColor", backgroundColorInput.value);
+    document.body.style.backgroundColor = getObjectIfEqualsObjects(backgroundColorInput.value, defaultBackgroundColorValue);
+    canvasWidthInputColorInput.value = document.getElementById("canvas-width").style.backgroundColor = createIfAndElseAndReturns(!isBackgroundColorInputClicked, canvasWidthInputColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked || isBackgroundColorInputAndCanvasClicked, backgroundColorInput.value, getObjectIfEqualsObjects(canvasWidthInputColorInput.value, defaultCanvasWidthInputColorValue)));
+    canvasHeightInputColorInput.value = document.getElementById("canvas-height").style.backgroundColor = createIfAndElseAndReturns(!isBackgroundColorInputClicked, canvasHeightInputColorInput.value, createIfAndElseAndReturns(isCanvasAndBackgroundColorInputClicked || isBackgroundColorInputAndCanvasClicked, backgroundColorInput.value, getObjectIfEqualsObjects(canvasHeightInputColorInput.value, defaultCanvasHeightInputColorValue)));
     setStyleColorAttributeCanvasTextItems(getReverseHex(backgroundColorInput.value));
     drawVerticalSonkEditorLines();
     drawClassicPiano();
@@ -537,30 +510,69 @@ function main(timeout) {
 }
 
 function drawPianoSongEditor() {
-    if (isCanvasInputsVisible) {
-        const isCanvasBorderColorEqualsToDefaultColor = canvasBorderColorInput.value === defaultCanvasBorderColorValue;
-        const isCanvasBackgroundColorEqualsToDefaultColor = canvasBackgroundColorInput.value === defaultCanvasBackgroundColorValue;
-        const isCanvasPianoSongEditorLinesColorEqualsToDefaultColor = canvasPianoSongEditorLinesColorInput.value === defaultCanvasPianoSongEditorLinesColorValue;
-        canvasInputsResetColorsPart.hidden = isCanvasBorderColorEqualsToDefaultColor && isCanvasBackgroundColorEqualsToDefaultColor && isCanvasPianoSongEditorLinesColorEqualsToDefaultColor;
+    const self = this;
+    if (isCanvasInputsVisible && isCanvasPianoInputsHidden && (isCanvasInputsResetColorsButtonClicked || isCanvasInputsResetColorsButtonMouseDown)) {
+        setCanvasInputs();
     }
-    if (isCanvasPianoInputsVisible) {
-        const isCanvasPianoTopMustUpperPartColorEqualsDefaultColor = canvasPianoTopMustUpperPartColorInput.value === defaultCanvasPianoTopMustUpperPartColorValue;
-        const isCanvasPianoTopUpperPartColorEqualsDefaultColor = canvasPianoTopUpperPartColorInput.value === defaultCanvasPianoTopUpperPartColorValue;
-        const isCanvasPianoTopLowerPartColorEqualsDefaultColor = canvasPianoTopLowerPartColorInput.value === defaultCanvasPianoTopLowerPartColorValue;
-        const isCanvasPianoSeparatingSpacesOfKeysColorEqualsDefaultColor = canvasPianoSeparatingSpacesOfKeysColorInput.value === defaultCanvasPianoSeparatingSpacesOfKeysColorValue;
-        const isCanvasPianoWholeKeyColorEqualsDefaultColor = canvasPianoWholeKeyColorInput.value === defaultCanvasPianoWholeKeyColorValue;
-        const isCanvasPianoHalfKeyColorEqualsDefaultColor = canvasPianoHalfKeyColorInput.value === defaultCanvasPianoHalfKeyColorValue;
-        canvasPianoInputsResetColorsPart.hidden = isCanvasPianoTopMustUpperPartColorEqualsDefaultColor && isCanvasPianoTopUpperPartColorEqualsDefaultColor && isCanvasPianoTopLowerPartColorEqualsDefaultColor && isCanvasPianoTopMustUpperPartColorEqualsDefaultColor && isCanvasPianoSeparatingSpacesOfKeysColorEqualsDefaultColor && isCanvasPianoWholeKeyColorEqualsDefaultColor && isCanvasPianoHalfKeyColorEqualsDefaultColor;
+    if (isCanvasInputsVisible && isCanvasPianoInputsVisible && (isCanvasInputsResetColorsButtonClicked || isCanvasInputsResetColorsButtonMouseDown)) {
+        setCanvasInputs();
+        setCanvasPianoInputs();
+    }
+    if (isCanvasInputsVisible && isCanvasPianoInputsVisible && (isCanvasPianoInputsResetColorsButtonClicked || isCanvasPianoInputsResetColorsButtonMouseDown)) {
+        setCanvasPianoInputs();
+    }
+    function createFieldWithCanvasColorInputValueEqualsDefaultValue(name) {
+        const capitalNameFirstLetterAToZ = changeLowercaseStringFirstLetterToUppercaseWithAToZ(name);
+        self["isCanvas" + capitalNameFirstLetterAToZ + "ColorEqualsDefaultColor"] = window["canvas" + capitalNameFirstLetterAToZ + "ColorInput"].value === window["defaultCanvas" + capitalNameFirstLetterAToZ + "ColorValue"];
+    }
+    function isCanvasField(name) {
+        return self["isCanvas" + changeLowercaseStringFirstLetterToUppercaseWithAToZ(name) + "ColorEqualsDefaultColor"];
+    }
+    function isCanvasFields(...names) {
+        let isTrue = true;
+        for (const element of names) {
+            isTrue = isTrue && isCanvasField(element);
+        }
+        return isTrue;
+    }
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("border");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("background");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoSongEditorLines");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoTopMostUpperPart");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoTopUpperPart");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoTopUpperPartCenter");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoTopLowerPart");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoTopMostLowerPart");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoSeparatingSpacesOfKeys");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoWholeKey");
+    createFieldWithCanvasColorInputValueEqualsDefaultValue("pianoHalfKey");
+    const isCanvasInputsResetColorsPartHiddenIfPianoInputsHidden = isCanvasFields("border", "background", "pianoSongEditorLines");
+    const isCanvasPianoInputsResetColorsPartHidden = isCanvasFields("pianoTopMostUpperPart", "pianoTopUpperPart", "pianoTopUpperPartCenter", "pianoTopLowerPart", "pianoTopMostLowerPart", "pianoSeparatingSpacesOfKeys", "pianoWholeKey", "pianoHalfKey");
+    if (isCanvasInputsVisible && isCanvasPianoInputsHidden) {
+        canvasInputsResetColorsPart.hidden = isCanvasInputsResetColorsPartHiddenIfPianoInputsHidden;
+    }
+    if (isCanvasInputsVisible && isCanvasPianoInputsVisible) {
+        canvasInputsResetColorsPart.hidden = isCanvasInputsResetColorsPartHiddenIfPianoInputsHidden;
+        canvasPianoInputsResetColorsPart.hidden = isCanvasPianoInputsResetColorsPartHidden;
+    }
+    if (isCanvasMouseMove) {
+        canvasMousePositionXSpan.innerText = savedCanvasMousePos.x;
+        canvasMousePositionYSpan.innerText = savedCanvasMousePos.y;
+    }
+    if (isCanvasMouseDown) {
+        fillColoredRect("#ff0000", savedCanvasMousePos.x, savedCanvasMousePos.y, 100, 100);
     }
     if (isWindowClicked) {
+        savedClickedElementAndIdAndIndexAndCount = [window, window.toString(), 0, canvasClickedCount];
         if (canvasWidthInput.value === "") {
-            isCanvasWidthInputClicked = false;
+            isCanvasWidthInputMouseDown = false;
         }
         if (canvasHeightInput.value === "") {
-            isCanvasHeightInputClicked = false;
+            isCanvasHeightInputMouseDown = false;
         }
         isCanvasAndBackgroundColorInputClicked = false;
         isBackgroundColorInputAndCanvasClicked = false;
     }
+    //console.log("window clicked count: " + allWindowClickedCount + ", " + windowClickedCount + " | " + isCanvasAndBackgroundColorInputClicked + ", " + isBackgroundColorInputAndCanvasClicked + ", " + canvasClickedCount + ", " + backgroundColorInputClickedCount);
     drawClassicPianoAndSonkEditorLines();
 }
