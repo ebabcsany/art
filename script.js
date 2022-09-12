@@ -1,7 +1,7 @@
 // noinspection JSDeprecatedSymbols
 window.getMousePos = (element) => ({
-    x: validateNumber(event.clientX - Number.parseInt(element.getBoundingClientRect().left), 0, element.width),
-    y: validateNumber(event.clientY - Number.parseInt(element.getBoundingClientRect().top), 0, element.height)
+    x: event.clientX - element.getBoundingClientRect().left,
+    y: event.clientY - element.getBoundingClientRect().top
 });
 window.canvas = null;
 window.context = null;
@@ -27,6 +27,7 @@ const lowercaseLettersAToF = subStringWithToIndex(lowercaseLettersAToZ, 5);
 const capitalLettersAToF = subStringWithToIndex(capitalLettersAToZ, 5);
 const digitsAndLowercaseLettersAToF = DIGITS + lowercaseLettersAToF;
 const digitsAndCapitalLettersAToF = DIGITS + capitalLettersAToF;
+const hexChars = DIGITS + lowercaseLettersAToF + capitalLettersAToF;
 const hexStringLength = lowercaseLettersAToF.length;
 const numberWithNumberTypePossibleParameters = ["half", "quarter", "three-quarter", "eighth", "three-eighths", "five-eighths", "seven-eighths", "sixteenth", "three-sixteenths", "five-sixteenths", "seven-sixteenths", "nine-sixteenths", "eleven-sixteenths", "thirteen-sixteenths", "fifteen-sixteenths"];
 const minToMaxNumberWithNumberTypePossibleParameters = ["quarter to three-quarter", "eighth to seven-eighths", "three-eighths to five-eighths", "sixteenth to fifteen-sixteenths", "three-sixteenths to thirteen-sixteenths", "five-sixteenths to eleven-sixteenths", "seven-sixteenths to nine-sixteenths"];
@@ -36,23 +37,23 @@ tHex.min = 0;
 tHex.max = 255;
 tHex.numberWithTypeReferenceNumber = type => createIfAndElseAndReturns(type === numberWithTypePossibleParameters[0], null, createIfAndElseAndReturns(type === numberWithTypePossibleParameters[1], 256, 0));
 tHex.isSearchEqualsMinToMaxWithNumberTypePossibleParametersSomeElement = function (search) {
-    return isObjectEqualsSomeElementOfArray(getNonNullString(search), minToMaxNumberWithNumberTypePossibleParameters);
+    return isObjectEqualsSomeElementOfArray(getValidString(search), minToMaxNumberWithNumberTypePossibleParameters);
 };
 tHex.hexColor = hex => subStringWithFromIndex(hex, 1);
 tHex.subStringHexPart = (hex, fromIndex) => subString(tHex.hexColor(hex), fromIndex, fromIndex + 1);
 tHex.isHexColor = function (value) {
-    const length = getNonNullString(value).length;
-    return value !== null && isStringAllCharsEqualsMatchSomeOfCharsInText(value, DIGITS + lowercaseLettersAToF + capitalLettersAToF) && (length === 3 || length === 6 || length === 8);
+    const length = getValidString(value).length;
+    return value !== null && isStringAllCharsEqualsMatchSomeOfCharsInText(value, hexChars) && (length === 3 || length === 6 || length === 8);
 };
 tHex.isHex = value => tHex.isHexColor(tHex.hexColor(value)) && value[0] === "#";
 tHex.isHexColorChar = function (hexColorChar) {
-    return hexColorChar !== null && isCharEqualsCharacterOfText(hexColorChar, DIGITS + lowercaseLettersAToF + capitalLettersAToF) && getNonNullString(hexColorChar).length === 1;
+    return hexColorChar !== null && isCharEqualsCharacterOfText(hexColorChar, hexChars) && getValidString(hexColorChar).length === 1;
 };
 tHex.changeUppercaseHexCharToLowercaseHexChar = function (hexChar) {
     let value = "";
-    hexChar = getNonNullString(hexChar);
+    hexChar = getValidString(hexChar);
     if (tHex.isHexColorChar(hexChar)) {
-        if (isCharEqualsCharacterOfText(hexChar, DIGITS + capitalLettersAToF)) {
+        if (isCharEqualsCharacterOfText(hexChar, digitsAndCapitalLettersAToF)) {
             hexChar = digitsAndLowercaseLettersAToF[digitsAndCapitalLettersAToF.indexOf(hexChar)];
         }
         value = hexChar;
@@ -60,7 +61,7 @@ tHex.changeUppercaseHexCharToLowercaseHexChar = function (hexChar) {
     return value;
 };
 tHex.changeUppercaseHexPartToLowercaseHexPart = function (hexPart) {
-    hexPart = getNonNullString(hexPart);
+    hexPart = getValidString(hexPart);
     return tHex.changeUppercaseHexCharToLowercaseHexChar(hexPart[0]) + tHex.changeUppercaseHexCharToLowercaseHexChar(hexPart[1]);
 };
 tHex.changeUppercaseHexToLowercaseHex = function (hex) {
@@ -72,83 +73,83 @@ tHex.changeUppercaseHexToLowercaseHex = function (hex) {
 };
 tHex.getHexCharIndex = hexChar => digitsAndLowercaseLettersAToF.indexOf(tHex.changeUppercaseHexCharToLowercaseHexChar(hexChar));
 tHex.getReverseHexCharIndex = hexChar => (hexStringLength - 1) - tHex.getHexCharIndex(hexChar);
-tHex.getQuarterToThreeQuarterNumber = number => getSevenEighthsInteger(number) + getSixteenthInteger(number);
-tHex.validateNumberIfNumberBetween0And255 = function (number) {
+tHex.getQuarterToThreeQuarterInteger = integer => getSevenEighthsInteger(integer) + getSixteenthInteger(integer);
+tHex.validateIntegerIfIntegerBetween0And255 = function (integer) {
     let value = 0;
-    number = Number.parseInt(number);
-    if (number >= 0 && number <= 255) {
-        value = number;
+    integer = getValidInteger(integer);
+    if (integer >= 0 && integer <= 255) {
+        value = integer;
     }
     return value;
 };
-tHex.validateNumberIfNumberBetween255And510 = function (number) {
+tHex.validateIntegerIfIntegerBetween255And510 = function (integer) {
     let value = 0;
-    number = Number.parseInt(number);
-    if (number >= 255 && number <= 510) {
-        value = tHex.validateNumberIfNumberBetween0And255(255 - (number - 255));
+    integer = getValidInteger(integer);
+    if (integer >= 255 && integer <= 510) {
+        value = tHex.validateIntegerIfIntegerBetween0And255(255 - (integer - 255));
     }
     return value;
 };
-tHex.validateNumberIfNumberBetween0And510 = function (number) {
+tHex.validateIntegerIfIntegerBetween0And510 = function (integer) {
     let value = 0;
-    number = Number.parseInt(number);
-    if (number >= 0 && number <= 510) {
-        if (number <= 255) {
-            value = tHex.validateNumberIfNumberBetween0And255(number);
-        } else if (number >= 255) {
-            value = tHex.validateNumberIfNumberBetween255And510(number);
+    integer = getValidInteger(integer);
+    if (integer >= 0 && integer <= 510) {
+        if (integer <= 255) {
+            value = tHex.validateIntegerIfIntegerBetween0And255(integer);
+        } else if (integer >= 255) {
+            value = tHex.validateIntegerIfIntegerBetween255And510(integer);
         }
     }
     return value;
 };
-tHex.validateNumberIfNumberGreaterThanOrEquals0 = function (number) {
+tHex.validateIntegerIfIntegerGreaterThanOrEquals0 = function (integer) {
     let value = 0;
-    number = Number.parseInt(number);
-    if (number >= 0) {
-        let i = number;
-        if (number > 510) {
+    integer = getValidInteger(integer);
+    if (integer >= 0) {
+        let i = integer;
+        if (integer > 510) {
             while (i > 510) {
                 i -= 510;
             }
         }
-        value = tHex.validateNumberIfNumberBetween0And510(i);
+        value = tHex.validateIntegerIfIntegerBetween0And510(i);
     }
     return value;
 };
-tHex.validateNumber = number => tHex.validateNumberIfNumberGreaterThanOrEquals0(getPositiveNumber(Number.parseInt(number)));
-tHex.convertHexPartToNumber = function (hexPart) {
+tHex.validateInteger = integer => tHex.validateIntegerIfIntegerGreaterThanOrEquals0(getPositiveInteger(integer));
+tHex.convertHexPartToInteger = function (hexPart) {
     hexPart = tHex.changeUppercaseHexPartToLowercaseHexPart(hexPart);
     return ((digitsAndLowercaseLettersAToF.indexOf(hexPart[0]) * 16) - 1) + (digitsAndLowercaseLettersAToF.indexOf(hexPart[1]) + 1);
 };
 tHex.convertHexToRgbaArray = function (hex) {
     let value = [0, 0, 0, 0];
-    hex = getNonNullString(hex);
+    hex = getValidString(hex);
     if (tHex.isHex(hex) && hex.length === 9) {
-        const red = tHex.convertHexPartToNumber(tHex.subStringHexPart(hex, 0));
-        const green = tHex.convertHexPartToNumber(tHex.subStringHexPart(hex, 2));
-        const blue = tHex.convertHexPartToNumber(tHex.subStringHexPart(hex, 4));
-        const alpha = tHex.convertHexPartToNumber(tHex.subStringHexPart(hex, 6));
+        const red = tHex.convertHexPartToInteger(tHex.subStringHexPart(hex, 0));
+        const green = tHex.convertHexPartToInteger(tHex.subStringHexPart(hex, 2));
+        const blue = tHex.convertHexPartToInteger(tHex.subStringHexPart(hex, 4));
+        const alpha = tHex.convertHexPartToInteger(tHex.subStringHexPart(hex, 6));
         value = [red, green, blue, alpha];
     }
     return value;
 };
 tHex.convertHexToRgbArray = function (hex) {
     let value = [0, 0, 0];
-    hex = getNonNullString(hex);
+    hex = getValidString(hex);
     if (tHex.isHex(hex) && hex.length === 7) {
         value = tHex.convertHexToRgbaArray(hex + "ff");
         value.pop();
     }
     return value;
 };
-tHex.convertNumberToHexPartIfNumberBetween0And255 = function (number) {
+tHex.convertIntegerToHexPartIfIntegerBetween0And255 = function (integer) {
     let value = "";
-    number = getNonNullNumber(number);
-    if (number >= 0 && number <= 255) {
-        if ((number + 1) % 16 === 0) {
-            value = digitsAndLowercaseLettersAToF[((number + 1) / 16) - 1] + "f";
-        } else if ((number + 1) % 16 !== 0) {
-            let i = number + 1;
+    integer = getValidInteger(integer);
+    if (integer >= 0 && integer <= 255) {
+        if ((integer + 1) % 16 === 0) {
+            value = digitsAndLowercaseLettersAToF[((integer + 1) / 16) - 1] + "f";
+        } else if ((integer + 1) % 16 !== 0) {
+            let i = integer + 1;
             let counter = 0;
             while (i % 16 !== 0) {
                 i--;
@@ -163,37 +164,37 @@ tHex.convertNumberToHexPartIfNumberBetween0And255 = function (number) {
     }
     return value;
 };
-tHex.convertNumberToHexPartIfNumberBetween255And510 = function (number) {
-    number = tHex.validateNumberIfNumberBetween255And510(number);
-    return tHex.convertNumberToHexPartIfNumberBetween0And255(number);
+tHex.convertIntegerToHexPartIfIntegerBetween255And510 = function (integer) {
+    integer = tHex.validateIntegerIfIntegerBetween255And510(integer);
+    return tHex.convertIntegerToHexPartIfIntegerBetween0And255(integer);
 };
-tHex.convertNumberToHexPartIfNumberBetween0And510 = function (number) {
-    number = tHex.validateNumberIfNumberBetween0And510(number);
-    return tHex.convertNumberToHexPartIfNumberBetween0And255(number);
+tHex.convertIntegerToHexPartIfIntegerBetween0And510 = function (integer) {
+    integer = tHex.validateIntegerIfIntegerBetween0And510(integer);
+    return tHex.convertIntegerToHexPartIfIntegerBetween0And255(integer);
 };
-tHex.convertNumberToHexPartIfNumberGreaterThanOrEquals0 = function (number) {
-    number = tHex.validateNumberIfNumberGreaterThanOrEquals0(number);
-    return tHex.convertNumberToHexPartIfNumberBetween0And255(number);
+tHex.convertIntegerToHexPartIfIntegerGreaterThanOrEquals0 = function (integer) {
+    integer = tHex.validateIntegerIfIntegerGreaterThanOrEquals0(integer);
+    return tHex.convertIntegerToHexPartIfIntegerBetween0And255(integer);
 };
-tHex.convertNumberToHexPart = function (number) {
-    number = tHex.validateNumber(number);
-    return tHex.convertNumberToHexPartIfNumberBetween0And255(number);
+tHex.convertIntegerToHexPart = function (integer) {
+    integer = tHex.validateInteger(integer);
+    return tHex.convertIntegerToHexPartIfIntegerBetween0And255(integer);
 };
-tHex.convertRgbaNumbersToHex = function (red, green, blue, alpha) {
-    const redPart = tHex.convertNumberToHexPart(red);
-    const greenPart = tHex.convertNumberToHexPart(green);
-    const bluePart = tHex.convertNumberToHexPart(blue);
-    const alphaPart = tHex.convertNumberToHexPart(alpha);
+tHex.convertRgbaIntegersToHex = function (red, green, blue, alpha) {
+    const redPart = tHex.convertIntegerToHexPart(red);
+    const greenPart = tHex.convertIntegerToHexPart(green);
+    const bluePart = tHex.convertIntegerToHexPart(blue);
+    const alphaPart = tHex.convertIntegerToHexPart(alpha);
     return "#" + redPart + greenPart + bluePart + alphaPart;
 };
-tHex.convertRgbNumbersToHex = (red, green, blue) => subStringWithToIndex(tHex.convertRgbaNumbersToHex(red, green, blue, 255), 6);
-tHex.convertRgbaNumbersArrayToHex = function (rgbaArray) {
-    rgbaArray = getNonNullArray(rgbaArray);
-    return tHex.convertRgbaNumbersToHex(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
+tHex.convertRgbIntegersToHex = (red, green, blue) => subStringWithToIndex(tHex.convertRgbaIntegersToHex(red, green, blue, 255), 6);
+tHex.convertRgbaIntegersArrayToHex = function (rgbaArray) {
+    rgbaArray = getValidArray(rgbaArray);
+    return tHex.convertRgbaIntegersToHex(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
 };
-tHex.convertRgbNumbersArrayToHex = function (rgbArray) {
-    rgbArray = getNonNullArray(rgbArray);
-    return tHex.convertRgbNumbersToHex(rgbArray[0], rgbArray[1], rgbArray[2]);
+tHex.convertRgbIntegersArrayToHex = function (rgbArray) {
+    rgbArray = getValidArray(rgbArray);
+    return tHex.convertRgbIntegersToHex(rgbArray[0], rgbArray[1], rgbArray[2]);
 };
 tHex.getNumberWithTypePossibleParameters = function (type) {
     return createIfAndElseAndReturns(type === numberWithTypePossibleParameters[0], numberWithNumberTypePossibleParameters, createIfAndElseAndReturns(type === numberWithTypePossibleParameters[1], minToMaxNumberWithNumberTypePossibleParameters, []));
@@ -201,15 +202,15 @@ tHex.getNumberWithTypePossibleParameters = function (type) {
 tHex.getNumberWithTypeIndexPossibleParameters = function (typeIndex) {
     return tHex.getNumberWithTypePossibleParameters(numberWithTypePossibleParameters[typeIndex]);
 }
-tHex.getRgbaTHexWithNumberType = function (hex, type, numberType) {
+tHex.getRgbaTHexWithNumberType = function (hex, type, integerType) {
     const possibleParameters = numberWithTypePossibleParameters;
     let value = "";
     if (tHex.isHex(hex) && hex.length === 9 && isObjectEqualsSomeElementOfArray(type, possibleParameters)) {
         const rgbaArray = tHex.convertHexToRgbaArray(hex);
-        const redPart = tHex.convertNumberToHexPart(getNumberWithType(type, numberType, tHex.numberWithTypeReferenceNumber(type), rgbaArray[0] + 1) - 1);
-        const greenPart = tHex.convertNumberToHexPart(getNumberWithType(type, numberType, tHex.numberWithTypeReferenceNumber(type), rgbaArray[1] + 1) - 1);
-        const bluePart = tHex.convertNumberToHexPart(getNumberWithType(type, numberType, tHex.numberWithTypeReferenceNumber(type), rgbaArray[2] + 1) - 1);
-        const alphaPart = tHex.convertNumberToHexPart(getNumberWithType(type, numberType, tHex.numberWithTypeReferenceNumber(type), rgbaArray[3] + 1) - 1);
+        const redPart = tHex.convertIntegerToHexPart(getIntegerWithType(type, tHex.numberWithTypeReferenceNumber(type), integerType, rgbaArray[0] + 1) - 1);
+        const greenPart = tHex.convertIntegerToHexPart(getIntegerWithType(type, tHex.numberWithTypeReferenceNumber(type), integerType, rgbaArray[1] + 1) - 1);
+        const bluePart = tHex.convertIntegerToHexPart(getIntegerWithType(type, tHex.numberWithTypeReferenceNumber(type), integerType, rgbaArray[2] + 1) - 1);
+        const alphaPart = tHex.convertIntegerToHexPart(getIntegerWithType(type, tHex.numberWithTypeReferenceNumber(type), integerType, rgbaArray[3] + 1) - 1);
         value = "#" + redPart + greenPart + bluePart + alphaPart;
     }
     return value;
@@ -232,8 +233,8 @@ tHex.getRgbaNineSixteenthsHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTyp
 tHex.getRgbaElevenSixteenthsHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 12);
 tHex.getRgbaThirteenSixteenthsHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 13);
 tHex.getRgbaFifteenSixteenthsHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 14);
-tHex.getRgbaEighthToSevenEighthsHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 0);
-tHex.getRgbaQuarterToThreeQuarterHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 1);
+tHex.getRgbaQuarterToThreeQuarterHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 0);
+tHex.getRgbaEighthToSevenEighthsHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 1);
 tHex.getRgbaThreeEighthsToFiveEighthsHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 2);
 tHex.getRgbaSixteenToFifteenSixteensHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 3);
 tHex.getRgbaThreeSixteenthsToThirteenSixteensHex = hex => tHex.getRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 4);
@@ -258,8 +259,8 @@ tHex.getRgbNineSixteenthsHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeI
 tHex.getRgbElevenSixteenthsHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 12);
 tHex.getRgbThirteenSixteenthsHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 13);
 tHex.getRgbFifteenSixteenthsHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 14);
-tHex.getRgbEighthToSevenEighthsHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 0);
-tHex.getRgbQuarterToThreeQuarterHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 1);
+tHex.getRgbQuarterToThreeQuarterHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 0);
+tHex.getRgbEighthToSevenEighthsHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 1);
 tHex.getRgbThreeEighthsToFiveEighthsHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 2);
 tHex.getRgbSixteenToFifteenSixteensHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 3);
 tHex.getRgbThreeSixteenthsToThirteenSixteensHex = hex => tHex.getRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 4);
@@ -291,10 +292,10 @@ tHex.getReverseRgbaTHexWithNumberType = function (hex, type, numberType) {
     let value = "";
     if (tHex.isHex(hex) && hex.length === 9 && isObjectEqualsSomeElementOfArray(type, possibleParameters)) {
         const rgbaArray = tHex.convertHexToRgbaArray(hex);
-        const redPart = tHex.getReverseHexPart(tHex.convertNumberToHexPart(getNumberWithType(type, numberType, referenceNumber, rgbaArray[0] + 1) - 1));
-        const greenPart = tHex.getReverseHexPart(tHex.convertNumberToHexPart(getNumberWithType(type, numberType, referenceNumber, rgbaArray[1] + 1) - 1));
-        const bluePart = tHex.getReverseHexPart(tHex.convertNumberToHexPart(getNumberWithType(type, numberType, referenceNumber, rgbaArray[2] + 1) - 1));
-        const alphaPart = tHex.getReverseHexPart(tHex.convertNumberToHexPart(getNumberWithType(type, numberType, referenceNumber, rgbaArray[3] + 1) - 1));
+        const redPart = tHex.getReverseHexPart(tHex.convertIntegerToHexPart(getIntegerWithType(type, referenceNumber, numberType, rgbaArray[0] + 1)));
+        const greenPart = tHex.getReverseHexPart(tHex.convertIntegerToHexPart(getIntegerWithType(type, referenceNumber, numberType, rgbaArray[1] + 1)));
+        const bluePart = tHex.getReverseHexPart(tHex.convertIntegerToHexPart(getIntegerWithType(type, referenceNumber, numberType, rgbaArray[2] + 1)));
+        const alphaPart = tHex.getReverseHexPart(tHex.convertIntegerToHexPart(getIntegerWithType(type, referenceNumber, numberType, rgbaArray[3] + 1)));
         value = "#" + redPart + greenPart + bluePart + alphaPart;
     }
     return value;
@@ -317,8 +318,8 @@ tHex.getReverseRgbaNineSixteenthsHex = hex => tHex.getReverseRgbaTHexWithTypeInd
 tHex.getReverseRgbaElevenSixteenthsHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 12);
 tHex.getReverseRgbaThirteenSixteenthsHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 13);
 tHex.getReverseRgbaFifteenSixteenthsHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 14);
-tHex.getReverseRgbaEighthToSevenEighthsHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 0);
-tHex.getReverseRgbaQuarterToThreeQuarterHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 1);
+tHex.getReverseRgbaQuarterToThreeQuarterHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 0);
+tHex.getReverseRgbaEighthToSevenEighthsHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 1);
 tHex.getReverseRgbaThreeEighthsToFiveEighthsHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 2);
 tHex.getReverseRgbaSixteenToFifteenSixteensHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 3);
 tHex.getReverseRgbaThreeSixteenthsToThirteenSixteensHex = hex => tHex.getReverseRgbaTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 4);
@@ -343,23 +344,56 @@ tHex.getReverseRgbNineSixteenthsHex = hex => tHex.getReverseRgbTHexWithTypeIndex
 tHex.getReverseRgbElevenSixteenthsHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 12);
 tHex.getReverseRgbThirteenSixteenthsHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 13);
 tHex.getReverseRgbFifteenSixteenthsHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 0, 14);
-tHex.getReverseRgbEighthToSevenEighthsHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 0);
-tHex.getReverseRgbQuarterToThreeQuarterHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 1);
+tHex.getReverseRgbQuarterToThreeQuarterHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 0);
+tHex.getReverseRgbEighthToSevenEighthsHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 1);
 tHex.getReverseRgbThreeEighthsToFiveEighthsHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 2);
 tHex.getReverseRgbSixteenToFifteenSixteensHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 3);
 tHex.getReverseRgbThreeSixteenthsToThirteenSixteensHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 4);
 tHex.getReverseRgbFiveSixteenthsToElevenSixteensHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 5);
 tHex.getReverseRgbSevenSixteenthsToNineSixteensHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 6);
 
+console.log(tHex.convertHexPartToInteger("df"));
+console.log("half, " + getHalfInteger(255));
+console.log("quarter, " + getQuarterInteger(255));
+console.log("threeQuarter, " + getThreeQuarterInteger(255));
+console.log("eighth, " + getEighthInteger(255));
+console.log("threeEighths, " + getThreeEighthsInteger(255));
+console.log("fiveEighths, " + getFiveEighthsInteger(255));
+console.log("sevenEighths, " + getSevenEighthsInteger(255));
+console.log("sixteenth, " + getSixteenthInteger(255));
+console.log("threeSixteenths, " + getThreeSixteenthsInteger(255));
+console.log("fiveSixteenths, " + getFiveSixteenthsInteger(255));
+console.log("sevenSixteenths, " + getSevenSixteenthsInteger(255));
+console.log("nineSixteenths, " + getNineSixteenthsInteger(255));
+console.log("elevenSixteenths, " + getElevenSixteenthsInteger(255));
+console.log("thirteenSixteenths, " + getThirteenSixteenthsInteger(255));
+console.log("fifteenSixteenths, " + getFifteenthSixteenthsInteger(255));
+console.log("quarterToThreeQuarter, " + getQuarterToThreeQuarterInteger(255, 255));
+console.log("eighthToSevenEighths, " + getEighthToSevenEighthsInteger(255, 255));
+console.log("threeEighthsToFiveEighths, " + getThreeEighthsToFiveEighthsInteger(255, 255));
+console.log("sixteenthToFifteenSixteenths, " + getSixteenthToFifteenSixteenthsInteger(255, 255));
+console.log("threeSixteenthsToThirteenSixteenths, " + getThreeSixteenthsToThirteenSixteenthsInteger(255, 255));
+console.log("fiveSixteenthsToElevenSixteenths, " + getFiveSixteenthsToElevenSixteenthsInteger(255, 255));
+console.log("sevenSixteenthsToNineSixteenths, " + getSevenSixteenthsToNineSixteenthsInteger(255, 255));
+console.log(tHex.getReverseRgbQuarterToThreeQuarterHex("#ffffff"));
+console.log(tHex.convertHexToRgbArray("#3f3f3f"));
+
+function isLowercaseLetterAToZ(letter) {
+    return letter !== null && isCharEqualsCharacterOfText(letter, lowercaseLettersAToZ) && getValidString(letter).length === 1;
+}
+
+function isCapitalLetterAToZ(letter) {
+    return letter !== null && isCharEqualsCharacterOfText(letter, capitalLettersAToZ) && getValidString(letter).length === 1;
+}
+
 function isLetterAToZ(letter) {
-    return letter !== null && isCharEqualsCharacterOfText(letter, lowercaseLettersAToZ + capitalLettersAToZ) && getNonNullString(letter).length === 1;
+    return letter !== null && isCharEqualsCharacterOfText(letter, lowercaseLettersAToZ + capitalLettersAToZ) && getValidString(letter).length === 1;
 }
 
 function changeLowercaseLetterToUppercaseWithAToZ(letter) {
-    let value = "";
-    letter = getNonNullString(letter);
+    let value = letter = getValidString(letter);
     if (isLetterAToZ(letter)) {
-        if (isCharEqualsCharacterOfText(letter, lowercaseLettersAToZ)) {
+        if (isLowercaseLetterAToZ(letter)) {
             letter = capitalLettersAToZ[lowercaseLettersAToZ.indexOf(letter)];
         }
         value = letter;
@@ -369,55 +403,48 @@ function changeLowercaseLetterToUppercaseWithAToZ(letter) {
 
 function changeLowercaseLettersToUppercaseWithAToZ(letters) {
     let value = "";
-    letters = getNonNullString(letters);
-    for (const element of letters) {
-        value += isLetterAToZ(element) ? changeLowercaseLetterToUppercaseWithAToZ(element) : element;
+    letters = getValidString(letters);
+    for (const letter of letters) {
+        value += createIfAndElseAndReturns(isLetterAToZ(letter), changeLowercaseLetterToUppercaseWithAToZ(letter), letter);
     }
     return value;
 }
 
 function changeLowercaseStringFirstLetterToUppercaseWithAToZ(string) {
-    string = getNonNullString(string);
-    return changeLowercaseLetterToUppercaseWithAToZ(string[0]) + subStringWithFromIndex(string, 1);
+    return changeLowercaseLetterToUppercaseWithAToZ(getValidString(string)[0]) + subStringWithFromIndex(string, 1);
 }
 
 function changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(stringArray) {
     let value = [];
-    stringArray = getNonNullArray(stringArray);
+    stringArray = getValidArray(stringArray);
     for (const element of stringArray) {
-        value += changeLowercaseStringFirstLetterToUppercaseWithAToZ(getNonNullString(element));
+        value += changeLowercaseStringFirstLetterToUppercaseWithAToZ(getValidString(element));
     }
     return value;
 }
 
-function getSearchCountInString(string, search) {
-    search = getNonNullString(search);
-    let replace = getNonNullString(string);
-    let counter = 0;
-    while (true) {
-        if (replace.replace(search, "") === replace) {
-            break;
-        } else {
-            replace = replace.replace(search, "");
-            counter++;
-        }
-    }
-    return counter;
+function changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZ(string, search, searchTh) {
+    const searchThBeforeIndex = getStringIndexOfSearchTh(string, search, searchTh) - 1;
+    const searchThAfterIndex = searchThBeforeIndex + (getValidString(search).length + 1);
+    return subStringWithToIndex(string, searchThBeforeIndex + 1) + changeLowercaseLetterToUppercaseWithAToZ(getValidString(string)[searchThAfterIndex]) + subStringWithFromIndex(string, searchThAfterIndex + 1);
 }
 
-function getSearchsCountsInString(string, searchStringArray) {
-    searchStringArray = getNonNullArray(searchStringArray);
-    let value = [];
-    for (const element of searchStringArray) {
-        value.push(getSearchCountInString(string, element));
+function changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZAndRemoveSearchTh(string, search, searchTh) {
+    return removeSearchThInString(changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZ(string, search, searchTh), search, searchTh);
+}
+
+function changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs(string, search) {
+    let value = string;
+    for (let i = 1; i <= containsSearchCountInString(string, search); i++) {
+        value = changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZAndRemoveSearchTh(value, search, 1);
     }
     return value;
 }
 
-function getSearchCharsCountsInString(string, search) {
-    let value = [];
-    for (const element of search) {
-        value.push(getSearchCountInString(string, element));
+function changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZ(string, search) {
+    let value = string;
+    for (let i = 1; i <= containsSearchCountInString(string, search); i++) {
+        value = changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZ(value, search, i);
     }
     return value;
 }
@@ -434,6 +461,289 @@ function changeLowercaseStringsFirstLetterToUppercaseWithAToZAndStringifyElement
     return changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZAndStringifyElements(createArrayOfObjects(strings));
 }
 
+function isContainsCapitalLetterInString(string) {
+    let value = false;
+    for (const element of string) {
+        if (isCapitalLetterAToZ(element)) {
+            value = true;
+            break;
+        }
+    }
+    return value;
+}
+
+function getStringCapitalLetterIndex(string) {
+    let letterIndex = -1;
+    for (let i = 0; i < string.length; i++) {
+        if (isCapitalLetterAToZ(string[i])) {
+            letterIndex = i;
+            break;
+        }
+    }
+    return letterIndex;
+}
+
+function getStringCapitalLetter(string) {
+    const stringChar = string[getStringCapitalLetterIndex(string)];
+    return createIfAndElseAndReturns(typeof stringChar === "string", stringChar, "");
+}
+
+function removeCapitalLetterInString(string) {
+    return removeSearchCharInString(string, getStringCapitalLetter(string));
+}
+
+function containsCapitalLetterCountInString(string) {
+    let capitalLetterCounter = 0;
+    let disassembledString = string;
+    while (isContainsCapitalLetterInString(disassembledString)) {
+        capitalLetterCounter++;
+        disassembledString = removeCapitalLetterInString(disassembledString);
+    }
+    return capitalLetterCounter;
+}
+
+function isContainsCapitalLetterCountInString(string, capitalLetterCount) {
+    return containsCapitalLetterCountInString(string) >= validateNumberWithMin(capitalLetterCount, 0);
+}
+
+function getStringCapitalLetterThIndex(string, capitalLetterTh) {
+    string = getValidString(string);
+    capitalLetterTh = getValidSearchTh(capitalLetterTh);
+    const capitalLetterCount = containsCapitalLetterCountInString(string);
+    let disassembledString = string;
+    let value = 0;
+    if (capitalLetterTh <= capitalLetterCount) {
+        let i = 0;
+        while (i < capitalLetterTh) {
+            value = getStringCapitalLetterIndex(disassembledString) + i;
+            disassembledString = removeCapitalLetterInString(disassembledString);
+            i++;
+        }
+    } else {
+        value = string.length;
+    }
+    return value;
+}
+
+function changeUppercaseLetterToLowercaseWithAToZ(letter) {
+    let value = letter = getValidString(letter);
+    if (isLetterAToZ(letter)) {
+        if (isCapitalLetterAToZ(letter)) {
+            letter = lowercaseLettersAToZ[capitalLettersAToZ.indexOf(letter)];
+        }
+        value = letter;
+    }
+    return value;
+}
+
+function changeUppercaseLettersToLowercaseWithAToZ(letters) {
+    let value = "";
+    for (const letter of getValidString(letters)) {
+        value += isLetterAToZ(letter) ? changeUppercaseLetterToLowercaseWithAToZ(letter) : letter;
+    }
+    return value;
+}
+
+function changeUppercaseStringFirstLetterToLowercaseWithAToZ(string) {
+    return changeUppercaseLetterToLowercaseWithAToZ(getValidString(string)[0]) + subStringWithFromIndex(string, 1);
+}
+
+function changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZ(stringArray) {
+    let value = [];
+    stringArray = getValidArray(stringArray);
+    for (const element of stringArray) {
+        value += changeUppercaseStringFirstLetterToLowercaseWithAToZ(getValidString(element));
+    }
+    return value;
+}
+
+function changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZ(string, search, searchTh) {
+    const searchThBeforeIndex = getStringIndexOfSearchTh(string, search, searchTh) - 1;
+    const searchThAfterIndex = searchThBeforeIndex + (getValidString(search).length + 1);
+    return subStringWithToIndex(string, searchThBeforeIndex + 1) + changeUppercaseLetterToLowercaseWithAToZ(getValidString(string)[searchThAfterIndex]) + subStringWithFromIndex(string, searchThAfterIndex + 1);
+}
+
+function changeStringUppercaseLetterThToLowercaseWithAToZ(string, capitalLetterTh) {
+    const capitalLetterThIndex = getStringCapitalLetterThIndex(string, capitalLetterTh);
+    return subStringWithToIndex(string, capitalLetterThIndex - 1) + changeUppercaseLetterToLowercaseWithAToZ(getValidString(string)[capitalLetterThIndex]) + subStringWithFromIndex(string, capitalLetterThIndex + 1);
+}
+
+function placeStringCapitalLetterThBeforeToPlace(string, capitalLetterTh, place) {
+    capitalLetterTh = getValidSearchTh(capitalLetterTh);
+    return createIfAndElseAndReturns(capitalLetterTh > 0, placeStringFromIndexInString(string, getStringCapitalLetterThIndex(string, capitalLetterTh), place), string);
+}
+
+function placeStringAllCapitalLetterThBeforeToPlace(string, place) {
+    let value = string;
+    for (let i = 1; i <= containsCapitalLetterCountInString(string); i++) {
+        value = placeStringCapitalLetterThBeforeToPlace(value, i, place);
+    }
+    return value;
+}
+
+function placeStringCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(string, capitalLetterTh, place) {
+    return changeStringUppercaseLetterThToLowercaseWithAToZ(placeStringCapitalLetterThBeforeToPlace(string, capitalLetterTh, place));
+}
+
+function placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(string, place) {
+    let value = string;
+    for (let i = 1; i <= containsCapitalLetterCountInString(string); i++) {
+        value = placeStringCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(value, 1, place);
+    }
+    return value;
+}
+
+function getStringCapitalLetterThToNextSearch(string, capitalLetterTh) {
+    capitalLetterTh = getValidSearchTh(capitalLetterTh);
+    const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(capitalLetterTh > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, capitalLetterTh));
+    const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((capitalLetterTh + 1) > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, getValidSearchTh(capitalLetterTh) + 1) - 1);
+    const searchedStringStartIndex = createIfAndElseAndReturns(capitalLetterTh > 0, searchedStringStartIndexIfIndexGreaterThan0, -1);
+    const searchedStringEndIndex = createIfAndElseAndReturns(capitalLetterTh > 0, searchedStringEndIndexIfIndexGreaterThan0, getStringCapitalLetter(string) - 1);
+    return subString(string, searchedStringStartIndex, searchedStringEndIndex);
+}
+
+function isStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, capitalLetterTh, afterSearch) {
+    return getStringCapitalLetterThToNextSearch(string, capitalLetterTh) === getValidString(afterSearch);
+}
+
+function getStringAfterSearchIfStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, searchTh, afterSearch) {
+    return createIfAndElseAndReturns(isStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, searchTh, afterSearch), afterSearch, "");
+}
+
+function replaceStringCapitalLetterThToNextSearch(string, capitalLetterTh, replace) {
+    capitalLetterTh = getValidSearchTh(capitalLetterTh);
+    const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(capitalLetterTh > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, capitalLetterTh) - 1);
+    const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((capitalLetterTh + 1) > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, getValidSearchTh(capitalLetterTh) + 1));
+    const searchedStringStartIndex = createIfAndElseAndReturns(getValidSearchTh(capitalLetterTh) > 0, searchedStringStartIndexIfIndexGreaterThan0, -1);
+    const searchedStringEndIndex = createIfAndElseAndReturns(getValidSearchTh(capitalLetterTh) > 0, searchedStringEndIndexIfIndexGreaterThan0, getStringCapitalLetterIndex(string));
+    return subStringWithToIndex(string, searchedStringStartIndex) + getValidString(replace) + subStringWithFromIndex(string, searchedStringEndIndex);
+}
+
+const gsłŁ$String = "gs-łŁ$í€Í€˛`-6666666-zgvuvvgvggvgvgz-bzbzbzbbzbzzzbbbzbzuuu-iffuffffufuuufffuuiiifit-gr";
+const capitalLetter$String = changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs(gsłŁ$String, "-");
+
+console.log(containsCapitalLetterCountInString(capitalLetter$String));
+console.log(getStringCapitalLetterThToNextSearch(capitalLetter$String, 0));
+console.log(getStringCapitalLetterThToNextSearch(capitalLetter$String, 1));
+console.log(getStringCapitalLetterThToNextSearch(capitalLetter$String, 2));
+console.log(getStringCapitalLetterThToNextSearch(capitalLetter$String, 3));
+console.log(getStringCapitalLetterThToNextSearch(capitalLetter$String, 4));
+console.log(getStringCapitalLetterThToNextSearch(capitalLetter$String, 5));
+console.log(replaceStringCapitalLetterThToNextSearch(capitalLetter$String, 0, "_"));
+console.log(replaceStringCapitalLetterThToNextSearch(capitalLetter$String, 1, "_"));
+console.log(replaceStringCapitalLetterThToNextSearch(capitalLetter$String, 2, "_"));
+console.log(replaceStringCapitalLetterThToNextSearch(capitalLetter$String, 3, "_"));
+console.log(replaceStringCapitalLetterThToNextSearch(capitalLetter$String, 4, "_"));
+
+function getStringAfterOfSearchThToNextSearch(string, search, searchTh) {
+    searchTh = getValidSearchTh(searchTh);
+    const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(searchTh > containsSearchCountInString(string, search), string.length, getStringIndexOfSearchTh(string, search, searchTh) + 1);
+    const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((searchTh + 1) > containsSearchCountInString(string, search), string.length, getStringIndexOfSearchTh(string, search, getValidSearchTh(searchTh) + 1) - 1);
+    const searchedStringStartIndex = createIfAndElseAndReturns(searchTh > 0, searchedStringStartIndexIfIndexGreaterThan0, -1);
+    const searchedStringEndIndex = createIfAndElseAndReturns(searchTh > 0, searchedStringEndIndexIfIndexGreaterThan0, getStringIndexOf(string, search) - 1);
+    return subString(string, searchedStringStartIndex, searchedStringEndIndex);
+}
+
+function isStringAfterOfSearchThToNextSearchEqualsAfterSearch(string, search, searchTh, afterSearch) {
+    return getStringAfterOfSearchThToNextSearch(string, search, searchTh) === getValidString(afterSearch);
+}
+
+function replaceStringAfterOfSearchThToNextSearch(string, search, searchTh, replace) {
+    searchTh = getValidSearchTh(searchTh);
+    const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(searchTh > containsSearchCountInString(string, search), string.length, getStringIndexOfSearchTh(string, search, searchTh));
+    const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((searchTh + 1) > containsSearchCountInString(string, search), string.length, getStringIndexOfSearchTh(string, search, getValidSearchTh(searchTh) + 1));
+    const searchedStringStartIndex = createIfAndElseAndReturns(getValidSearchTh(searchTh) > 0, searchedStringStartIndexIfIndexGreaterThan0, -1);
+    const searchedStringEndIndex = createIfAndElseAndReturns(getValidSearchTh(searchTh) > 0, searchedStringEndIndexIfIndexGreaterThan0, getStringIndexOf(string, search));
+    return subStringWithToIndex(string, searchedStringStartIndex) + getValidString(replace) + subStringWithFromIndex(string, searchedStringEndIndex);
+}
+
+function changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZAndRemoveSearchTh(string, search, searchTh) {
+    return removeSearchThInString(changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZ(string, search, searchTh), search, searchTh);
+}
+
+function changeUppercaseStringAllSearchAfterLetterToLowercaseWithAToZAndRemoveAllSearchs(string, search) {
+    let value = string;
+    for (let i = 1; i <= containsSearchCountInString(string, search); i++) {
+        value = changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZAndRemoveSearchTh(value, search, 1);
+    }
+    return value;
+}
+
+function changeUppercaseStringAllSearchAfterLetterToLowercaseWithAToZ(string, search) {
+    let value = string;
+    for (let i = 1; i <= containsSearchCountInString(string, search); i++) {
+        value = changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZ(value, search, i);
+    }
+    return value;
+}
+
+function changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZAndStringifyElements(stringArray) {
+    return stringifyArrayElements(changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZ(stringArray));
+}
+
+function changeUppercaseStringsFirstLetterToLowercaseWithAToZ(...strings) {
+    return changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZ(createArrayOfObjects(strings));
+}
+
+function changeUppercaseStringsFirstLetterToLowercaseWithAToZAndStringifyElements(...strings) {
+    return changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZAndStringifyElements(createArrayOfObjects(strings));
+}
+
+function containsSearchCountInString(string, search) {
+    search = getValidString(search);
+    let replace = getValidString(string);
+    let counter = 0;
+    while (true) {
+        if (replace.replace(search, "") === replace) {
+            break;
+        } else {
+            replace = replace.replace(search, "");
+            counter++;
+        }
+    }
+    return counter;
+}
+
+function getSearchsCountsInString(string, searchStringArray) {
+    searchStringArray = getValidArray(searchStringArray);
+    let value = [];
+    for (const element of searchStringArray) {
+        value.push(containsSearchCountInString(string, element));
+    }
+    return value;
+}
+
+function getSearchCharsCountsInString(string, search) {
+    let value = [];
+    for (const element of search) {
+        value.push(containsSearchCountInString(string, element));
+    }
+    return value;
+}
+
+function sqrXTh(x, xXth) {
+    x = getValidNumber(x);
+    if (xXth > 0) {
+        const I = x;
+        let X = x;
+        for (let i = 1; i < xXth; i++) {
+            X = X * I;
+        }
+        return X;
+    } else if (xXth < 0) {
+        const I = x;
+        let X = x;
+        for (let i = -1; i > xXth; i--) {
+            X = X * I;
+        }
+        return x / X;
+    } else {
+        if (xXth === 0) {
+            return 1;
+        }
+    }
+}
+
 /*function stringNumber(stringNumberValue) {
     window.stringNumber = stringNumber;
     if (stringNumberValue === null || !isStringAllCharsEqualsDigits(stringNumberValue)) {
@@ -441,7 +751,7 @@ function changeLowercaseStringsFirstLetterToUppercaseWithAToZAndStringifyElement
     } else {
         function isNumberBetweenMinAndMax(number, min, max) {
             const validMinAndMax = validateMinAndMax(min, max);
-            number = getNonNullNumber(number);
+            number = getValidNumber(number);
             return !(number < validMinAndMax[0] || number > validMinAndMax[1]);
         }
 
@@ -494,6 +804,10 @@ function createIfAndReturn(condition, returnValue) {
     if (condition) {
         return returnValue;
     }
+}
+
+function getObjectWithConditionalBoolean(condition, ifTrue, ifFalse) {
+    return condition ? ifTrue : ifFalse;
 }
 
 function createIfAndElseAndReturns(condition, ifTrue, ifFalse) {
@@ -556,7 +870,7 @@ function max1DigitOfNumberAddOne(digit) {
 
 function max2DigitsOfNumberAddOne(digits) {
     let value;
-    const addOne = window.max1DigitOfNumberAddOneIfNumberGreaterThan0(digits[digits.length - 1]);
+    const addOne = max1DigitOfNumberAddOneIfNumberGreaterThan0(digits[digits.length - 1]);
     if (isStringAllCharsEqualsDigitsAndLength(digits, 1)) {
         value = addOne === "0" ? "10" : addOne;
     } else if (isStringAllCharsEqualsDigitsAndLength(digits, 2)) {
@@ -571,12 +885,14 @@ function max2DigitsOfNumberAddOne(digits) {
 
 function max3DigitsOfNumberAddOne(digits) {
     let value;
-    const addOne = window.max2DigitsOfNumberAddOne(subStringWithFromIndex(digits, 1));
-    if (isStringAllCharsEqualsDigitsAndLength(digits, 2)) {
+    const addOne = max2DigitsOfNumberAddOne(subStringWithFromIndex(digits, 1));
+    if (isStringAllCharsEqualsDigitsAndLength(digits, 1)) {
+        value = max2DigitsOfNumberAddOne(digits);
+    } else if (isStringAllCharsEqualsDigitsAndLength(digits, 2)) {
         value = addOne === "0" ? "100" : addOne;
     } else if (isStringAllCharsEqualsDigitsAndLength(digits, 3)) {
         if (addOne[0] === "0") {
-            value = max2DigitsOfNumberAddOne(subStringWithFromIndex(digits, 1)) === "0" ? "0" : max2DigitsOfNumberAddOne(subStringWithFromIndex(digits, 1)) + "0";
+            value = max2DigitsOfNumberAddOne(subStringWithToIndex(digits, 1)) === "0" ? "0" : max2DigitsOfNumberAddOne(subStringWithToIndex(digits, 1)) + "0";
         } else {
             value = digits[0] + addOne;
         }
@@ -592,8 +908,8 @@ function digitsOfNumberAddOne() {
 
 function isCharEqualsCharacterOfText(char, text) {
     let value = true;
-    for (const element of getNonNullString(text)) {
-        value = getNonNullString(char) === element;
+    for (const element of getValidString(text)) {
+        value = getValidString(char) === element;
         if (value) {
             break;
         }
@@ -603,15 +919,15 @@ function isCharEqualsCharacterOfText(char, text) {
 
 function isStringAllCharsEqualsMatchSomeOfCharsInText(string, text) {
     let value = true;
-    for (const element of getNonNullString(string)) {
-        value = value && isCharEqualsCharacterOfText(element, getNonNullString(text));
+    for (const element of getValidString(string)) {
+        value = value && isCharEqualsCharacterOfText(element, getValidString(text));
     }
     return value;
 }
 
 function isObjectEqualsSomeElementOfArray(object, array) {
     let isBreak = false;
-    for (const element of array) {
+    for (const element of getValidArray(array)) {
         if (isBreak) {
             break;
         } else {
@@ -649,14 +965,54 @@ function createArrayOfOneObject(element, length) {
     return array;
 }
 
+function addNumberArrayElements(numberArray) {
+    let value = 0;
+    for (const element of getValidArray(numberArray)) {
+        value += getValidNumber(element);
+    }
+    return value;
+}
+
+function addSubNumberArrayElements(numberArray, fromIndex, toIndex) {
+    return addNumberArrayElements(subArray(numberArray, fromIndex, toIndex));
+}
+
+function addSubNumberArrayWithFromIndexElements(numberArray, fromIndex) {
+    return addSubNumberArrayElements(numberArray, fromIndex, numberArray.length - 1);
+}
+
+function addSubNumberArrayWithToIndexElements(numberArray, toIndex) {
+    return addSubNumberArrayElements(numberArray, 0, toIndex);
+}
+
+function subArray(array, fromIndex, toIndex) {
+    array = getValidArray(array);
+    const validFromAndToIndex = validateMinAndMax(fromIndex, toIndex);
+    fromIndex = validFromAndToIndex[0];
+    toIndex = validFromAndToIndex[1];
+    let value = [];
+    for (let i = fromIndex; i < toIndex + 1; i++) {
+        value.push(array[i]);
+    }
+    return value;
+}
+
+function subArrayWithFromIndex(array, fromIndex) {
+    return subArray(array, fromIndex, array.length - 1);
+}
+
+function subArrayWithToIndex(array, toIndex) {
+    return subArray(array, 0, toIndex);
+}
+
 /**
  * @param value if this less than 0, then equal to 0; else this
- * @returns {number|*}
+ * @returns {number}
  */
 function getValueWithGreaterThanOrEqualsZero(value) {
-    value = getNonNullString(value);
-    value = value.length > 0 ? value : 0;
-    return value[0] === "-" ? 0 : value;
+    const stringValue = getValidString(getValidInteger(value));
+    value = getValidString(value).length > 0 ? value : 0;
+    return stringValue[0] === "-" ? 0 : getValidNumber(value);
 }
 
 function isCharEqualsDigit(char) {
@@ -671,8 +1027,12 @@ function getPositiveNumber(number) {
     return createIfAndElseAndReturns(number < 0, -number, number);
 }
 
+function getPositiveInteger(integer) {
+    return getPositiveNumber(getValidInteger(integer));
+}
+
 function getHalfInteger(number) {
-    number = getNonNullNumber(number);
+    number = getValidNumber(number);
     return (number + 1) % 2 === 0 ? ((number + 1) / 2) - 1 : createIfAndElseAndReturns(number % 2 === 0, number / 2, number);
 }
 
@@ -681,7 +1041,7 @@ function getQuarterInteger(number) {
 }
 
 function getThreeQuarterInteger(number) {
-    return getHalfInteger(number) + getQuarterInteger(number);
+    return getHalfInteger(number) + getQuarterInteger(number + 1);
 }
 
 function getEighthInteger(number) {
@@ -689,15 +1049,15 @@ function getEighthInteger(number) {
 }
 
 function getThreeEighthsInteger(number) {
-    return getQuarterInteger(number) + getEighthInteger(number);
+    return getQuarterInteger(number) + getEighthInteger(number + 2);
 }
 
 function getFiveEighthsInteger(number) {
-    return getHalfInteger(number) + getEighthInteger(number);
+    return getHalfInteger(number) + getEighthInteger(number + 2);
 }
 
 function getSevenEighthsInteger(number) {
-    return getThreeQuarterInteger(number) + getEighthInteger(number);
+    return getThreeQuarterInteger(number) + getEighthInteger(number + 2);
 }
 
 function getSixteenthInteger(number) {
@@ -705,81 +1065,81 @@ function getSixteenthInteger(number) {
 }
 
 function getThreeSixteenthsInteger(number) {
-    return getEighthInteger(number) + getSixteenthInteger(number);
+    return getEighthInteger(number) + getSixteenthInteger(number + 4);
 }
 
 function getFiveSixteenthsInteger(number) {
-    return getQuarterInteger(number) + getSixteenthInteger(number);
+    return getQuarterInteger(number) + getSixteenthInteger(number + 4);
 }
 
 function getSevenSixteenthsInteger(number) {
-    return getThreeEighthsInteger(number) + getSixteenthInteger(number);
+    return getThreeEighthsInteger(number) + getSixteenthInteger(number + 4);
 }
 
 function getNineSixteenthsInteger(number) {
-    return getHalfInteger(number) + getSixteenthInteger(number);
+    return getHalfInteger(number) + getSixteenthInteger(number + 4);
 }
 
 function getElevenSixteenthsInteger(number) {
-    return getFiveEighthsInteger(number) + getSixteenthInteger(number);
+    return getFiveEighthsInteger(number) + getSixteenthInteger(number + 4);
 }
 
 function getThirteenSixteenthsInteger(number) {
-    return getQuarterInteger(number) + getSixteenthInteger(number);
+    return getThreeQuarterInteger(number) + getSixteenthInteger(number + 4);
 }
 
 function getFifteenthSixteenthsInteger(number) {
-    return getSevenEighthsInteger(number) + getSixteenthInteger(number);
+    return getSevenEighthsInteger(number) + getSixteenthInteger(number + 4);
 }
 
-function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndReferenceNumber(numberType, positiveReferenceNumber, positiveNumber) {
+function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndReferenceNumber(positiveReferenceNumber, numberType, positiveNumber) {
     const possibleParameters = minToMaxNumberWithNumberTypePossibleParameters;
     let value = 0;
-    positiveReferenceNumber = Number.parseInt(positiveReferenceNumber);
-    positiveNumber = Number.parseInt(positiveNumber);
-    numberType = getNonNullString(numberType);
+    positiveReferenceNumber = getValidInteger(positiveReferenceNumber);
+    numberType = getValidString(numberType);
+    positiveNumber = getValidInteger(positiveNumber);
     if (numberType === possibleParameters[0]) {
-        value = getHalfInteger(positiveNumber) + getQuarterInteger(positiveReferenceNumber);
+        value = getHalfInteger(positiveNumber) + getQuarterInteger(positiveReferenceNumber + 1);
     } else if (numberType === possibleParameters[1]) {
-        value = getThreeQuarterInteger(positiveNumber) + getEighthInteger(positiveReferenceNumber);
+        value = getThreeQuarterInteger(positiveNumber) + getEighthInteger(positiveReferenceNumber + 2);
     } else if (numberType === possibleParameters[2]) {
-        value = getQuarterInteger(positiveNumber) + getThreeEighthsInteger(positiveReferenceNumber);
+        value = getQuarterInteger(positiveNumber) + getThreeEighthsInteger(positiveReferenceNumber + 2);
     } else if (numberType === possibleParameters[3]) {
-        value = getSevenEighthsInteger(positiveNumber) + getSixteenthInteger(positiveReferenceNumber);
+        value = getSevenEighthsInteger(positiveNumber) + getSixteenthInteger(positiveReferenceNumber + 4);
     } else if (numberType === possibleParameters[4]) {
-        value = getFiveEighthsInteger(positiveNumber) + getThreeSixteenthsInteger(positiveReferenceNumber);
+        value = getFiveEighthsInteger(positiveNumber) + getThreeSixteenthsInteger(positiveReferenceNumber + 4);
     } else if (numberType === possibleParameters[5]) {
-        value = getThreeEighthsInteger(positiveNumber) + getFiveSixteenthsInteger(positiveReferenceNumber);
+        value = getThreeEighthsInteger(positiveNumber) + getFiveSixteenthsInteger(positiveReferenceNumber + 4);
     } else if (numberType === possibleParameters[6]) {
-        value = getEighthInteger(positiveNumber) + getSevenSixteenthsInteger(positiveReferenceNumber);
+        value = getEighthInteger(positiveNumber) + getSevenSixteenthsInteger(positiveReferenceNumber + 4);
     }
     return createIfAndElseAndReturns(positiveReferenceNumber >= 0 && positiveNumber >= 0 && positiveNumber <= positiveReferenceNumber, value, 0);
 }
 
-function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetweenReferenceNumberAndOutOfOneOfDoubleReferenceNumber(numberType, positiveReferenceNumber, positiveNumber) {
-    positiveReferenceNumber = Number.parseInt(positiveReferenceNumber);
-    positiveNumber = Number.parseInt(positiveNumber);
-    return createIfAndElseAndReturns(positiveReferenceNumber >= 0 && positiveNumber >= positiveReferenceNumber && positiveNumber <= (positiveReferenceNumber * 2) - 1, validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndReferenceNumber(numberType, positiveReferenceNumber, positiveReferenceNumber - (positiveNumber - positiveReferenceNumber)), 0);
+function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetweenReferenceNumberAndOutOfOneOfDoubleReferenceNumber(positiveReferenceNumber, numberType, positiveNumber) {
+    positiveReferenceNumber = getValidInteger(positiveReferenceNumber);
+    positiveNumber = getValidInteger(positiveNumber);
+    return createIfAndElseAndReturns(positiveReferenceNumber >= 0 && positiveNumber >= positiveReferenceNumber && positiveNumber <= (positiveReferenceNumber * 2) - 1, validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndReferenceNumber(positiveReferenceNumber, numberType, positiveReferenceNumber - (positiveNumber - positiveReferenceNumber)), 0);
 }
 
-function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndOutOfOneOfDoubleReferenceNumber(numberType, positiveReferenceNumber, positiveNumber) {
+function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndOutOfOneOfDoubleReferenceNumber(positiveReferenceNumber, numberType, positiveNumber) {
     let value = 0;
-    positiveReferenceNumber = Number.parseInt(positiveReferenceNumber);
-    positiveNumber = Number.parseInt(positiveNumber);
+    positiveReferenceNumber = getValidInteger(positiveReferenceNumber);
+    positiveNumber = getValidInteger(positiveNumber);
     if (positiveNumber >= 0 && positiveNumber <= (positiveReferenceNumber * 2) - 1) {
         if (positiveNumber <= positiveReferenceNumber) {
-            value = validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndReferenceNumber(numberType, positiveReferenceNumber, positiveNumber);
+            value = validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndReferenceNumber(positiveReferenceNumber, numberType, positiveNumber);
         } else if (positiveNumber >= positiveReferenceNumber) {
-            value = validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetweenReferenceNumberAndOutOfOneOfDoubleReferenceNumber(numberType, positiveReferenceNumber, positiveNumber);
+            value = validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetweenReferenceNumberAndOutOfOneOfDoubleReferenceNumber(positiveReferenceNumber, numberType, positiveNumber);
         }
     }
     return value;
 }
 
-function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberGreaterThanOrEquals0(numberType, positiveReferenceNumber, positiveNumber) {
+function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberGreaterThanOrEquals0(positiveReferenceNumber, numberType, positiveNumber) {
     let value = 0;
-    positiveReferenceNumber = Number.parseInt(positiveReferenceNumber);
-    positiveNumber = Number.parseInt(positiveNumber);
+    positiveReferenceNumber = getValidInteger(positiveReferenceNumber);
+    positiveNumber = getValidInteger(positiveNumber);
     if (positiveNumber >= 0) {
         const max = (positiveReferenceNumber * 2) - 1;
         let i = positiveNumber;
@@ -788,37 +1148,65 @@ function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNu
                 i -= max;
             }
         }
-        value = validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndOutOfOneOfDoubleReferenceNumber(numberType, positiveReferenceNumber, i);
+        value = validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndOutOfOneOfDoubleReferenceNumber(positiveReferenceNumber, numberType, i);
     }
     return value;
 }
 
-function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0(numberType, positiveReferenceNumber, number) {
-    positiveReferenceNumber = Number.parseInt(positiveReferenceNumber);
-    number = Number.parseInt(number);
-    return validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberGreaterThanOrEquals0(numberType, positiveReferenceNumber, getPositiveNumber(number));
+function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0(positiveReferenceNumber, numberType, number) {
+    positiveReferenceNumber = getValidInteger(positiveReferenceNumber);
+    number = getValidInteger(number);
+    return validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberGreaterThanOrEquals0(positiveReferenceNumber, numberType, getPositiveNumber(number));
 }
 
-function validateIntegerWithNumberType(numberType, referenceNumber, number) {
-    referenceNumber = getNonNullNumber(referenceNumber);
-    number = getNonNullNumber(number);
-    return validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0(numberType, createIfAndElseAndReturns(referenceNumber < 0, -referenceNumber, referenceNumber), createIfAndElseAndReturns(referenceNumber < 0, -number, number));
+function validateIntegerWithNumberType(referenceNumber, numberType, number) {
+    referenceNumber = getValidInteger(referenceNumber);
+    number = getValidInteger(number);
+    return validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0(createIfAndElseAndReturns(referenceNumber < 0, -referenceNumber, referenceNumber), numberType, createIfAndElseAndReturns(referenceNumber < 0, -number, number));
 }
 
-function getMinToMaxIntegerWithNumberType(numberType, referenceNumber, number) {
-    referenceNumber = getNonNullNumber(referenceNumber);
-    number = getNonNullNumber(number);
-    return referenceNumber > 0 ? validateIntegerWithNumberType(numberType, referenceNumber, number) : createIfAndElseAndReturns(referenceNumber < 0, -validateIntegerWithNumberType(numberType, -referenceNumber, -number), 0);
+function getMinToMaxIntegerWithNumberType(referenceNumber, numberType, number) {
+    referenceNumber = getValidInteger(referenceNumber);
+    number = getValidInteger(number);
+    return referenceNumber > 0 ? validateIntegerWithNumberType(referenceNumber, numberType, number) : createIfAndElseAndReturns(referenceNumber < 0, -validateIntegerWithNumberType(-referenceNumber, numberType, -number), 0);
 }
 
-function getMinToMaxIntegerWithNumberTypeIndex(numberTypeIndex, referenceNumber, number) {
-    return getMinToMaxIntegerWithNumberType(minToMaxNumberWithNumberTypePossibleParameters[numberTypeIndex], referenceNumber, number);
+function getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, numberTypeIndex, number) {
+    return getMinToMaxIntegerWithNumberType(referenceNumber, minToMaxNumberWithNumberTypePossibleParameters[numberTypeIndex], number);
+}
+
+function getQuarterToThreeQuarterInteger(referenceNumber, number) {
+    return getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, 0, number);
+}
+
+function getEighthToSevenEighthsInteger(referenceNumber, number) {
+    return getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, 1, number);
+}
+
+function getThreeEighthsToFiveEighthsInteger(referenceNumber, number) {
+    return getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, 2, number);
+}
+
+function getSixteenthToFifteenSixteenthsInteger(referenceNumber, number) {
+    return getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, 3, number);
+}
+
+function getThreeSixteenthsToThirteenSixteenthsInteger(referenceNumber, number) {
+    return getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, 4, number);
+}
+
+function getFiveSixteenthsToElevenSixteenthsInteger(referenceNumber, number) {
+    return getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, 5, number);
+}
+
+function getSevenSixteenthsToNineSixteenthsInteger(referenceNumber, number) {
+    return getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, 6, number);
 }
 
 function getNumberWithNumberType(numberType, number) {
     const possibleParameters = numberWithNumberTypePossibleParameters;
     let value = 0;
-    numberType = getNonNullString(numberType);
+    numberType = getValidString(numberType);
     if (numberType === possibleParameters[0]) {
         value = getHalfInteger(number);
     } else if (numberType === possibleParameters[1]) {
@@ -857,13 +1245,13 @@ function getNumberWithNumberTypeIndex(numberTypeIndex, number) {
     return getNumberWithNumberType(numberWithNumberTypePossibleParameters[numberTypeIndex], number);
 }
 
-function getNumberWithType(type, numberType, referenceNumber, number) {
+function getIntegerWithType(type, referenceInteger, integerType, integer) {
     const possibleParameters = numberWithTypePossibleParameters;
     let numberTypeValue = 0;
-    if (type === possibleParameters[0] && referenceNumber === null) {
-        numberTypeValue = getNumberWithNumberType(numberType, number);
+    if (type === possibleParameters[0] && referenceInteger === null) {
+        numberTypeValue = getNumberWithNumberType(integerType, integer);
     } else if (type === possibleParameters[1]) {
-        numberTypeValue = getMinToMaxIntegerWithNumberType(numberType, referenceNumber, number);
+        numberTypeValue = getMinToMaxIntegerWithNumberType(referenceInteger, integerType, integer);
     }
     return numberTypeValue;
 }
@@ -907,9 +1295,36 @@ function getReverseCharOfString(string, char) {
     return value;
 }
 
+function validateNumberWithMin(number, min) {
+    min = getValidNumber(min);
+    if (number < min) {
+        number = min;
+    }
+    return number;
+}
+
+function validateNumberWithMax(number, max) {
+    max = getValidNumber(max);
+    if (number > max) {
+        number = max;
+    }
+    return number;
+}
+
 function validateMinAndMax(min, max) {
-    min = getNonNullNumber(min);
-    max = getNonNullNumber(max);
+    min = getValidNumber(min);
+    max = getValidNumber(max);
+    if (max < min) {
+        const i = min;
+        min = max;
+        max = i;
+    }
+    return [min, max];
+}
+
+function validateMinAndMaxIntegers(min, max) {
+    min = getValidInteger(min);
+    max = getValidInteger(max);
     if (max < min) {
         const i = min;
         min = max;
@@ -919,7 +1334,7 @@ function validateMinAndMax(min, max) {
 }
 
 function validateNumber(number, min, max) {
-    number = getNonNullNumber(number);
+    number = getValidNumber(number);
     const validMinAndMax = validateMinAndMax(min, max);
     min = validMinAndMax[0];
     max = validMinAndMax[1];
@@ -932,19 +1347,29 @@ function validateNumber(number, min, max) {
     return value;
 }
 
+function validateInteger(integer, min, max) {
+    return getValidInteger(validateNumber(integer, min, max));
+}
+
 function validateStartAndEnd(min, max, start, end) {
     start = validateNumber(start, min, max);
     end = validateNumber(end, min, max);
     return [start, end];
 }
 
+function validateStartAndEndIntegers(min, max, start, end) {
+    start = validateInteger(start, min, max);
+    end = validateInteger(end, min, max);
+    return [start, end];
+}
+
 function subString(string, fromIndex, toIndex) {
-    let value;
-    string = getNonNullString(string);
-    if (isEmptyString(string)) {
-        value = string;
-    } else {
-        const validFromAndToIndex = validateStartAndEnd(0, string.length, fromIndex, toIndex);
+    let value = "";
+    string = getValidString(string);
+    fromIndex = getValidInteger(fromIndex);
+    toIndex = getValidInteger(toIndex);
+    if (!isEmptyString(string) && toIndex + 1 !== fromIndex) {
+        const validFromAndToIndex = validateStartAndEndIntegers(0, string.length, fromIndex, toIndex);
         fromIndex = validFromAndToIndex[0];
         toIndex = validFromAndToIndex[1];
         const substring = string.substring(fromIndex, toIndex + 1);
@@ -954,17 +1379,87 @@ function subString(string, fromIndex, toIndex) {
 }
 
 function subStringWithFromIndex(string, fromIndex) {
-    return subString(string, fromIndex, getNonNullString(string).length - 1);
+    return subString(string, fromIndex, getValidString(string).length - 1);
 }
 
 function subStringWithToIndex(string, toIndex) {
     return subString(string, 0, toIndex);
 }
 
-function removeSubString(string, fromIndex, toIndex) {
-    string = getNonNullString(string);
-    const subStringToFromIndex = subStringWithToIndex(string, fromIndex);
-    return subStringWithToIndex(subStringToFromIndex, subStringToFromIndex - 1) + subStringWithFromIndex(string, toIndex + 1);
+function removeSubStringInString(string, fromIndex, toIndex) {
+    string = getValidString(string);
+    fromIndex = getValidInteger(fromIndex);
+    toIndex = getValidInteger(toIndex);
+    const validFromAndToIndex = validateMinAndMaxIntegers(fromIndex, toIndex);
+    let value = "";
+    if (toIndex + 1 !== fromIndex) {
+        fromIndex = validFromAndToIndex[0];
+        toIndex = validFromAndToIndex[1];
+        value = subStringWithToIndex(string, fromIndex - 1) + subStringWithFromIndex(string, toIndex + 1);
+    }
+    return value;
+}
+
+function removeSubStringWithSearchTh(string, search, fromSearchTh, toSearchTh) {
+    string = getValidString(string);
+    search = getValidString(search);
+    const validFromAndToIndex = validateMinAndMaxIntegers(fromSearchTh, toSearchTh);
+    fromSearchTh = validFromAndToIndex[0];
+    toSearchTh = validFromAndToIndex[1];
+    return subStringWithToIndex(string, getStringIndexOfSearchTh(string, search, fromSearchTh) - 1) + subStringWithFromIndex(string, getStringIndexOfSearchTh(string, search, toSearchTh) + search.length);
+}
+
+function removeSubStringInStringWithLength(string, fromIndex, length) {
+    return removeSubStringInString(string, fromIndex, fromIndex + (length - 1));
+}
+
+function removeSearchInString(string, search) {
+    return string.replace(search, "");
+}
+
+function removeSearchCharInString(string, searchChar) {
+    return removeSearchInString(string, searchChar);
+}
+
+function removeSearchThInString(string, search, searchTh) {
+    return removeSubStringInStringWithLength(string, getStringIndexOfSearchTh(string, search, searchTh), search.length);
+}
+
+function removeAllSearchsInString(string, search) {
+    string = getValidString(string);
+    let value = string;
+    for (let i = 0; i < containsSearchCountInString(string, search); i++) {
+        value = removeSearchInString(value, search);
+    }
+    return value;
+}
+
+function removeConsecutiveSearchsInString(string, search, fromSearchTh, toSearchTh) {
+    string = getValidString(string);
+    const validFromAndToSearchTh = validateMinAndMax(fromSearchTh, toSearchTh);
+    fromSearchTh = validFromAndToSearchTh[0];
+    toSearchTh = validFromAndToSearchTh[1];
+    let value = string;
+    for (let i = 0; i < toSearchTh - fromSearchTh; i++) {
+        value = removeSearchThInString(value, search, fromSearchTh);
+    }
+    return value;
+}
+
+function removeCharWithIndexInString(string, charIndex) {
+    return removeSubStringInString(string, charIndex, charIndex);
+}
+
+function replaceStringFromSubString(string, fromIndex, toIndex, replace) {
+    return subStringWithToIndex(string, fromIndex - 1) + replace + subStringWithFromIndex(string, toIndex);
+}
+
+function placeStringFromIndexInString(string, index, place) {
+    return subStringWithToIndex(string, index - 1) + place + subStringWithFromIndex(string, index);
+}
+
+function replaceStringFromCharIndexInString(string, charIndex, replace) {
+    return replaceStringFromSubString(string, charIndex, charIndex, replace);
 }
 
 function drawDiagonalLineLeftAndDown(moveX, moveY, length) {
@@ -1234,7 +1729,6 @@ function getElementById(elementId) {
 }
 
 function getCanvasMousePos() {
-    // noinspection JSDeprecatedSymbols
     return window.getMousePos(canvas);
 }
 
@@ -1247,25 +1741,99 @@ function countBordersText(text, count, min, max) {
 }
 
 function isEmptyString(string) {
-    return getNonNullString(string).length === 0;
+    return getValidString(string).length === 0;
+}
+
+function isEmptyStrings(...strings) {
+    let value = true;
+    for (const element of strings) {
+        value = value && isEmptyString(element);
+    }
+    return value;
 }
 
 function getStringIndexOf(string, search) {
-    return getNonNullString(string).indexOf(search);
+    return getValidString(string).indexOf(getValidString(search));
+}
+
+function getValidSearchTh(searchTh) {
+    if (!Number.isSafeInteger(searchTh) || isNaN(searchTh) || Number(searchTh) === Infinity || Number(searchTh) === -Infinity) {
+        searchTh = 1;
+    } else {
+        if (searchTh <= 0) {
+            searchTh = 0;
+        } else {
+            searchTh = getValidInteger(searchTh);
+        }
+    }
+    return searchTh;
+}
+
+function getStringIndexOfSearchTh(string, search, searchTh) {
+    string = getValidString(string);
+    search = getValidString(search);
+    searchTh = getValidSearchTh(searchTh);
+    let value = 0;
+    if (isContainsSearchInString(string, search) && searchTh > 0) {
+        let disassembledString = string;
+        for (let i = 1; i < searchTh; i++) {
+            disassembledString = removeSearchInString(disassembledString, search);
+        }
+        value = getStringIndexOf(disassembledString, search) + ((searchTh * search.length) - 1);
+    }
+    return value;
 }
 
 function isContainsSearchInString(string, search) {
     return getStringIndexOf(string, search) > -1;
 }
 
-function getNonNullString(string) {
-    return string === null ? "" : "" + string;
+function isContainsOneSearchInString(string, search) {
+    return containsSearchCountInString(string, search) === 1;
 }
 
-function getNonNullArray(array) {
+function isContainsSearchCharOnIndexInString(string, searchChar, index) {
+    return isContainsSearchInString(string, getValidString(searchChar).length === 1 ? searchChar : " ") && getValidString(string)[validateNumber(index, 0, string.length - 1)] === searchChar;
+}
+
+function isContainsOneSearchOnIndexInArray(array, search, index) {
+    return getValidArray(array)[validateNumber(index, 0, getValidArray(array).length - 1)] === search;
+}
+
+function isContainsOneSearchOnIndexInElements(search, index, ...elements) {
+    return isContainsOneSearchOnIndexInArray(createArrayOfObjects(elements), search, index);
+}
+
+function setTimeoutFunction(before, handler, handlerAfter, timeout, after, args) {
+    if (typeof before === "function") {
+        before();
+    }
+    window.setTimeout(function () {
+        if (typeof handler === "function") {
+            handler();
+        }
+        if (typeof handlerAfter === "boolean" && handlerAfter === true) {
+            setTimeoutFunction(before, handler, timeout, after, args);
+        }
+    }, timeout, args);
+    if (typeof after === "function") {
+        after();
+    }
+}
+
+function getValidString(string) {
+    return createIfAndElseAndReturns(string === null, "null", "" + string);
+}
+
+function getValidArray(array) {
     return createIfAndElseAndReturns(Array.isArray(array), array, []);
 }
 
-function getNonNullNumber(number) {
-    return number === null ? 0 : number;
+function getValidNumber(number) {
+    number = Number(number);
+    return createIfAndElseAndReturns(isNaN(number) || number === Infinity || number === -Infinity, 0, number);
+}
+
+function getValidInteger(integer) {
+    return Number.parseInt(getValidNumber(integer));
 }
