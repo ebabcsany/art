@@ -53,6 +53,7 @@ const defaultWholeKeyWidth = 16;
 const defaultWholeKeyHeight = 104;
 const defaultHalfKeyWidth = 7;
 const defaultHalfKeyHeight = 68;
+let drawnElements = 0;
 let soundFrequency = 30;
 let isWindowClicked = false;
 let isCanvasClicked = false;
@@ -70,18 +71,26 @@ let isCanvasInputsVisible = false;
 let isCanvasInputsAndCanvasPianoInputsVisible = false;
 let isAllCanvasInputsVisible = false;
 let isCanvasPianoInputsVisible = false;
+let isWindowMouseMove = false;
 let isCanvasMouseMove = false;
+let isWindowMouseDown = false;
 let isCanvasMouseDown = false;
 let isCanvasInputsResetColorsButtonMouseDown = false;
 let isCanvasPianoInputsResetColorsButtonMouseDown = false;
 let isReloadingTimeSubmitButtonMouseDown = false;
 let isReloadingTimeSubmitButtonMouseUp = false;
 let savedCanvasMouseValidPos = {
-    x: 0,
-    y: 0
+    x: NaN,
+    y: NaN
 };
 window.addEventListener("mousemove", function () {
     isCanvasMouseMove = false;
+    savedCanvasMouseValidPos.x = NaN;
+    savedCanvasMouseValidPos.y = NaN;
+}, true);
+window.addEventListener("mouseup", function () {
+    isWindowMouseDown = false;
+    isCanvasMouseDown = false;
 }, true);
 window.addEventListener("mousedown", function () {
     isCanvasClicked = false;
@@ -100,6 +109,8 @@ window.addEventListener("mousedown", function () {
     window["isCanvasPianoHalfKeyColorInputClicked"] = false;
     isCanvasInputsResetColorsButtonMouseDown = false;
     isCanvasPianoInputsResetColorsButtonMouseDown = false;
+    isCanvasMouseDown = false;
+    isWindowMouseDown = true;
 }, true);
 window.addEventListener("click", function () {
     isWindowClicked = true;
@@ -121,11 +132,13 @@ canvasHeightInputColorInput.onclick = function () {
     isCanvasHeightInputColorInputClicked = true;
 };
 canvas.onmousemove = function () {
+    isWindowMouseMove = false;
     savedCanvasMouseValidPos.x = getValidInteger(getCanvasMousePos().x);
     savedCanvasMouseValidPos.y = getValidInteger(getCanvasMousePos().y);
     isCanvasMouseMove = true;
 };
 canvas.onmousedown = function () {
+    isWindowMouseDown = false;
     isWindowClicked = false;
     isCanvasMouseDown = true;
 };
@@ -568,16 +581,12 @@ function drawClassicPianoAndSonkEditorLines() {
         namedModifiedColors.canvasPianoWholeKeyColor,
         namedModifiedColors.canvasPianoHalfKeyColor
     ];
-    const pianoBackgroundColor = getColorWithNotSaveChangedColorsOnCanvas("canvas-piano-background-color", namedModifiedColors.canvasPianoBackgroundColor);
+    const pianoBackgroundColor = getColorWithNotSaveChangedColorsOnCanvas("canvas-piano-background-color", modifiedColors[3]);
     const wholeKeyColor = getColorWithNotSaveChangedColorsOnCanvas("canvas-piano-whole-key-color", namedModifiedColors.canvasPianoWholeKeyColor);
     const halfKeyColor = getColorWithNotSaveChangedColorsOnCanvas("canvas-piano-half-key-color", namedModifiedColors.canvasPianoHalfKeyColor);
 
     function partOfWidth(value) {
         return getPartOfWidth(width, value);
-    }
-
-    function partOfHeight(value) {
-        return getPartOfHeight(height, value);
     }
 
     function firstAndLastKeyType(sizeOrKey, keyType) {
@@ -714,6 +723,7 @@ function drawClassicPianoAndSonkEditorLines() {
                 }
             }
 
+            //if ()
             loadingHalfKeyClickingPosition("#ff007f", 15);
             for (let counter = 0, i = 45; counter < 7; i += 112, counter++) {
                 loadingHalfKeyOctaveClickingPositions("#ff007f", i);
