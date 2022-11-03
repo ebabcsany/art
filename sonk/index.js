@@ -148,6 +148,9 @@ canvas.onmousemove = function () {
     isWindowMouseMove = false;
     savedCanvasMouseValidPos.x = getValidInteger(getCanvasMousePos().x);
     savedCanvasMouseValidPos.y = getValidInteger(getCanvasMousePos().y);
+    if (isWindowMouseDown) {
+        isCanvasMouseDown = true;
+    }
     isCanvasMouseMove = true;
 };
 canvas.onmousedown = function () {
@@ -944,13 +947,8 @@ function drawClassicPianoAndSonkEditorLines() {
     drawVerticalSonkEditorLines();
     drawClassicPiano();
     isStopDrawingKeys = true;
-    //console.log(isCanvasMouseDown);
     const isNotOscillator = window.audioContextOscillator === undefined;
     if (isCanvasMouseDown) {
-        //const getRgbArray = getRgbArrayFromCounter(canvasReloadingCounter);
-        //const red = getRgbArray[0];
-        //const green = getRgbArray[1];
-        //const blue = getRgbArray[2];
         const isValidPianoMousePosY = savedCanvasMouseValidPos.y >= topOfKeys && savedCanvasMouseValidPos.y <= canvas.height;
         const isMousePosLessThanOrEqualsWholeKeyDown = savedCanvasMouseValidPos.y <= (topOfKeys + wholeKeyHeight);
         const isValidMousePosY = isValidPianoMousePosY && isMousePosLessThanOrEqualsWholeKeyDown;
@@ -998,13 +996,11 @@ function drawClassicPianoAndSonkEditorLines() {
                 if (window.audioContextOscillator === undefined) {
                     createKeySoundWithKeyTh(1, keyCounter, 30);
                     window.drawnKeyIndex = keyCounter;
-                }// else {
-                //     if (savedMouseClickingPosition !== savedCanvasMouseValidPos) {
-                //         window.audioContextOscillator.stop();
-                //         window.audioContextOscillator = undefined;
-                //     }
-                //     window.savedMouseClickingPosition = savedCanvasMouseValidPos;
-                // }
+                }
+                if (window.audioContextOscillator !== undefined && window.drawnKeyIndex !== keyCounter) {
+                    window.audioContextOscillator.stop();
+                    window.audioContextOscillator = undefined;
+                }
             }
 
             function loadingHalfKeyClickingPosition(fillStyle, posX) {
@@ -1015,10 +1011,6 @@ function drawClassicPianoAndSonkEditorLines() {
                     drawKeyOfPiano("half", "", fillStyle, width, height, keyPosX, topOfKeys);
                     window.keyPosX = keyPosX;
                     setKeySound();
-                    if (isValidNumber(window.keyPosX) && window.keyPosX !== keyPosX) {
-                        window.audioContextOscillator.stop();
-                        window.audioContextOscillator = undefined;
-                    }
                 }
             }
 
@@ -1030,10 +1022,6 @@ function drawClassicPianoAndSonkEditorLines() {
                     drawKeyOfPiano("whole:" + type, sizeType, fillStyle, width, height, keyPosX, topOfKeys);
                     window.keyPosX = keyPosX;
                     setKeySound();
-                    if (isValidNumber(window.keyPosX) && window.keyPosX !== keyPosX) {
-                        window.audioContextOscillator.stop();
-                        window.audioContextOscillator = undefined;
-                    }
                 }
             }
 
@@ -1082,7 +1070,6 @@ function drawClassicPianoAndSonkEditorLines() {
                 }
             }
 
-            // const clickingKeyColor = tHex.convertRgbIntegersToHex(red, green, blue);
             const clickingKeyColor = "#e71111";
 
             loadingWholeKeyClickingPosition("right: 1", "width: 16", clickingKeyColor, 1);
@@ -1091,14 +1078,13 @@ function drawClassicPianoAndSonkEditorLines() {
             let j = 34;
             for (let counter = 0; counter < 7; j += defaultOctaveWidth, counter++) {
                 loadingKeyOctaveClickingPositions(clickingKeyColor, j);
-                // loadingWholeKeyOctaveClickingPositions(clickingKeyColor, j);
-                // loadingHalfKeyOctaveClickingPositions(clickingKeyColor, j + 11);
             }
             loadingWholeKeyClickingPosition("", "", clickingKeyColor, j);
             if (isValidKeyClickingPosition) {
                 isStopCanvasReloading = false;
                 canvasReloadingCounter++;
             }
+
         } else {
             if (!isNotOscillator) {
                 window.audioContextOscillator.stop();
@@ -1199,12 +1185,12 @@ function drawPianoSongEditor() {
     drawClassicPianoAndSonkEditorLines();
 }
 
-function createKeySoundWithKeyTh(gainValue, keyTh, endTime) {
+function createKeySoundWithKeyTh(gainValue, keyTh, time) {
     keyTh = getValidSearchTh(keyTh);
-    createKeySoundPitchWithSteps(gainValue, keyTh + 9, endTime);
+    createKeySoundPitchWithSteps(gainValue, keyTh + 9, time);
 }
 
-function createSoundWithExponentialRampToValueAtTime(gainValue, frequency, rampValue, endTime) {
+function createSoundWithExponentialRampToValueAtTime(gainValue, frequency, rampValue, time) {
     window.audioContext = new AudioContext();
     window.audioContextOscillator = window.audioContext.createOscillator();
     const context = window.audioContext;
@@ -1213,53 +1199,24 @@ function createSoundWithExponentialRampToValueAtTime(gainValue, frequency, rampV
     o.connect(g);
     g.connect(context.destination);
     g.gain.value = getValidNumber(gainValue);
-    g.gain.exponentialRampToValueAtTime(rampValue, endTime);
-    for (let i = 1000; i > 0; i--) {
-        const j = i * 0.004;
-        g.gain.setValueAtTime(12 / i / 30, j);
-        g.gain.exponentialRampToValueAtTime(rampValue, endTime + j);
-    }
+    g.gain.exponentialRampToValueAtTime(rampValue, audioContext.currentTime + time);
     o.frequency.value = getValidNumber(frequency);
     o.start(0);
 }
 
-// function createKeySound1(gainValue, frequency, endTime) {
-//     window.audioContext = new AudioContext();
-//     window.audioContextOscillator = window.audioContext.createOscillator();
-//     const context = window.audioContext;
-//     const o = window.audioContextOscillator;
-//     const g = context.createGain();
-//     o.connect(g);
-//     g.connect(context.destination);
-//     g.gain.value = getValidNumber(gainValue);
-//     g.gain.exponentialRampToValueAtTime(0.00001, endTime);
-//     o.frequency.value = getValidNumber(frequency);
-//     console.log(o.frequency.value);
-//     o.start(0);
-// }
-
-function createKeySound(gainValue, frequency, endTime) {
-    createSoundWithExponentialRampToValueAtTime(gainValue, frequency, 0.00001, endTime);
+function createKeySound(gainValue, frequency, time) {
+    createSoundWithExponentialRampToValueAtTime(gainValue, frequency, 0.00001, time);
 }
 
-function createKeySoundPitchWithSteps(gainValue, steps, endTime) {
+function createKeySoundPitchWithSteps(gainValue, steps, time) {
     const frequency = getKeySoundPitchWithSteps(steps);
-    return createKeySound(gainValue, frequency, endTime);
+    return createKeySound(gainValue, frequency, time);
 }
 
-function createKeySoundWithPitch(gainValue, octave, note, endTime) {
+function createKeySoundWithPitch(gainValue, octave, note, time) {
     const frequency = getKeySoundPitch(octave, note);
-    return createKeySound(gainValue, frequency, endTime);
+    return createKeySound(gainValue, frequency, time);
 }
-
-// function getKeySoundPitch(octave, note) {
-//     const NOTES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"];
-//     // ("A", 4) => 440
-//     // multiply by 2^(1/12) N times to get N steps higher
-//     const step = NOTES.indexOf(note);
-//     const power = Math.pow(2, (octave * 12 + step - 57) / 12);
-//     return 440 * power;
-// }
 
 function getKeySoundPitchWithSteps(steps) {
     steps = getValidSearchTh(steps);
@@ -1293,69 +1250,6 @@ function getWholeKeyTypesInOctave() {
     let value = [];
     for (let i = 0; i < 7; i++) {
         value.push(getWholeKeyTypeInOctave(i));
-    }
-    return value;
-}
-
-function getRgbArrayFromCounterIfCounterLessThanOrEquals1530(counter) {
-    let value = [0, 0, 0];
-    if (counter > 255) {
-        let newCounter = counter - 255;
-        if (counter > 510) {
-            newCounter = counter - 510;
-            if (counter > 765) {
-                newCounter = counter - 765;
-                if (counter > 1020) {
-                    newCounter = counter - 1020;
-                    if (counter > 1275) {
-                        newCounter = counter - 1275;
-                        if (counter <= 1530) {
-                            value[0] = 255;
-                            value[1] = 0;
-                            value[2] = 255 - newCounter;
-                        }
-                    } else {
-                        value[0] = newCounter;
-                        value[1] = 0;
-                        value[2] = 255;
-                    }
-                } else {
-                    value[0] = 0;
-                    value[1] = 255 - newCounter;
-                    value[2] = 255;
-                }
-            } else {
-                value[0] = 0;
-                value[1] = 255;
-                value[2] = newCounter;
-            }
-        } else {
-            value[0] = 255 - newCounter;
-            value[1] = 255;
-            value[2] = 0;
-        }
-    } else {
-        value[0] = 255;
-        value[1] = counter;
-        value[2] = 0;
-    }
-    return value;
-}
-
-function getRgbArrayFromCounter(counter) {
-    let value = [0, 0, 0];
-    let i = counter - 255;
-    if (counter > 1530) {
-        while (i > 1530) {
-            i -= 1530;
-        }
-    }
-    if (counter > 255) {
-        value = getRgbArrayFromCounterIfCounterLessThanOrEquals1530(i);
-    } else {
-        value[0] = counter;
-        value[1] = 0;
-        value[2] = 0;
     }
     return value;
 }
