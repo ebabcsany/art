@@ -5,12 +5,18 @@ window.getMousePos = (element) => ({
 });
 window.canvas = null;
 window.context = null;
-const getValidString = string => createIfAndElseAndReturns(typeof string === "string", string, "" + string);
-const getValidArray = array => createIfAndElseAndReturns(Array.isArray(array), array, []);
-const isValidNumber = number => !isNaN(number) && number !== Infinity && number !== -Infinity;
-const getValidNumber = number => createIfAndElseAndReturns(isValidNumber(number), number, 0);
-const isValidInteger = integer => isValidNumber(integer) && isStringInteger(integer);
-const getValidInteger = integer => Number.parseInt(getValidNumber(integer));
+const getValidString = value => createIfAndElseAndReturns(typeof value === "string", value, "" + value);
+const getValidArray = value => createIfAndElseAndReturns(Array.isArray(value), value, []);
+const isValidNumber = value => !isNaN(value) && value !== Infinity && value !== -Infinity;
+const getValidNumber = value => createIfAndElseAndReturns(isValidNumber(value), value, 0);
+const isValidInteger = value => isValidNumber(value) && isStringInteger(value);
+const getValidInteger = value => Number.parseInt(getValidNumber(value));
+const random = (scale, min, max) => {
+    scale = getValidNumber(scale);
+    min = getValidNumber(min);
+    max = getValidNumber(max);
+    return Math.floor(Math.random() * (max - min + scale) + min);
+};
 class StringManipulation {
     static containsSearchsCount(string, search) {
         search = getValidString(search);
@@ -135,7 +141,6 @@ class StringManipulation {
         return StringManipulation.removeSubStringWithLength(this.string, fromIndex, length);
     }
 }
-
 class StringPart extends StringManipulation {
     static subString(string, fromIndex, toIndex) {
         string = getValidString(string);
@@ -230,6 +235,8 @@ tHex.isHexColor = function (value) {
     return value !== null && isHexChars && (length === 3 || length === 6 || length === 8);
 };
 tHex.isHex = value => tHex.isHexColor(tHex.hexColor(value)) && value[0] === "#";
+tHex.getValidRgbHex = value => createIfAndElseAndReturns(tHex.isHex(value), value, "#000000");
+tHex.getValidRgbaHex = value => createIfAndElseAndReturns(tHex.isHex(value), value, "#00000000");
 tHex.isHexColorChar = function (hexColorChar) {
     return hexColorChar !== null && isCharEqualsCharacterOfText(hexColorChar, hexChars) && getValidString(hexColorChar).length === 1;
 };
@@ -261,7 +268,7 @@ tHex.getQuarterToThreeQuarterInteger = integer => getSevenEighthsInteger(integer
 tHex.validateIntegerIfIntegerBetween0And255 = function (integer) {
     let value = 0;
     integer = getValidInteger(integer);
-    if (integer >= 0 && integer <= 255) {
+    if (integer >= tHex.min && integer <= tHex.max) {
         value = integer;
     }
     return value;
@@ -269,18 +276,18 @@ tHex.validateIntegerIfIntegerBetween0And255 = function (integer) {
 tHex.validateIntegerIfIntegerBetween255And510 = function (integer) {
     let value = 0;
     integer = getValidInteger(integer);
-    if (integer >= 255 && integer <= 510) {
-        value = tHex.validateIntegerIfIntegerBetween0And255(255 - (integer - 255));
+    if (integer >= tHex.max && integer <= 510) {
+        value = tHex.validateIntegerIfIntegerBetween0And255(tHex.max - (integer - tHex.max));
     }
     return value;
 };
 tHex.validateIntegerIfIntegerBetween0And510 = function (integer) {
     let value = 0;
     integer = getValidInteger(integer);
-    if (integer >= 0 && integer <= 510) {
-        if (integer <= 255) {
+    if (integer >= tHex.min && integer <= 510) {
+        if (integer <= tHex.max) {
             value = tHex.validateIntegerIfIntegerBetween0And255(integer);
-        } else if (integer >= 255) {
+        } else if (integer >= tHex.max) {
             value = tHex.validateIntegerIfIntegerBetween255And510(integer);
         }
     }
@@ -289,7 +296,7 @@ tHex.validateIntegerIfIntegerBetween0And510 = function (integer) {
 tHex.validateIntegerIfIntegerGreaterThanOrEquals0 = function (integer) {
     let value = 0;
     integer = getValidInteger(integer);
-    if (integer >= 0) {
+    if (integer >= tHex.min) {
         let i = integer;
         if (integer > 510) {
             while (i > 510) {
@@ -329,7 +336,7 @@ tHex.convertHexToRgbArray = function (hex) {
 tHex.convertIntegerToHexPartIfIntegerBetween0And255 = function (integer) {
     let value = "";
     integer = getValidInteger(integer);
-    if (integer >= 0 && integer <= 255) {
+    if (integer >= tHex.min && integer <= tHex.max) {
         if ((integer + 1) % 16 === 0) {
             value = digitsAndLowercaseLettersAToF[((integer + 1) / 16) - 1] + "f";
         } else if ((integer + 1) % 16 !== 0) {
@@ -371,7 +378,7 @@ tHex.convertRgbaIntegersToHex = function (red, green, blue, alpha) {
     const alphaPart = tHex.convertIntegerToHexPart(alpha);
     return "#" + redPart + greenPart + bluePart + alphaPart;
 };
-tHex.convertRgbIntegersToHex = (red, green, blue) => StringPart.subStringWithToIndex(tHex.convertRgbaIntegersToHex(red, green, blue, 255), 6);
+tHex.convertRgbIntegersToHex = (red, green, blue) => StringPart.subStringWithToIndex(tHex.convertRgbaIntegersToHex(red, green, blue, tHex.max), 6);
 tHex.convertRgbaIntegersArrayToHex = function (rgbaArray) {
     rgbaArray = getValidArray(rgbaArray);
     return tHex.convertRgbaIntegersToHex(rgbaArray[0], rgbaArray[1], rgbaArray[2], rgbaArray[3]);
@@ -472,7 +479,7 @@ tHex.getReverseHex = function (hex) {
 };
 tHex.getReverseRgbaTHexWithNumberType = function (hex, type, numberType) {
     const possibleParameters = numberWithTypePossibleParameters;
-    const referenceNumber = createIfAndElseAndReturns(type === possibleParameters[0], null, createIfAndElseAndReturns(type === possibleParameters[1], 256, 0));
+    const referenceNumber = createIfAndElseAndReturns(type === possibleParameters[0], null, createIfAndElseAndReturns(type === possibleParameters[1], tHex.max + 1, 0));
     let value = "";
     if (tHex.isHex(hex) && hex.length === 9 && isObjectEqualsSomeElementOfArray(type, possibleParameters)) {
         const rgbaArray = tHex.convertHexToRgbaArray(hex);
@@ -1282,6 +1289,33 @@ function createArrayFromObjects(...elements) {
         array.push(element);
     }
     return array;
+}
+
+function createArrayFromNested2ArraysOneElements(array, elementTh) {
+    elementTh = getValidSearchTh(elementTh);
+    let value = [];
+    for (const element of getValidArray(array)) {
+        value.push(element[elementTh]);
+    }
+    return value;
+}
+
+function createArrayFromNested2ObjectsOneFields(array, fieldName) {
+    fieldName = getValidString(fieldName);
+    let value = [];
+    for (const element of getValidArray(array)) {
+        value.push(element[fieldName]);
+    }
+    return value;
+}
+
+function createArrayFromArrayEl3mentsFieldsMultiply(array, multiply) {
+    multiply = getValidInteger(multiply);
+    let value = [];
+    for (const element of getValidArray(array)) {
+        value.push(element * multiply);
+    }
+    return value;
 }
 
 function createArrayFromStringElements(string) {
@@ -2950,30 +2984,30 @@ function isArgumentValidColonCountFromArgumentsInString(string, argumentTh) {
 
 function getArgumentBeforeColonPartFromArgumentsInString(string, argumentTh) {
     const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isValidColonCount = isArgumentValidColonCountFromArgumentsInString(string, argumentTh);
+    const isContainsColon = isContainsSearchInString(string, ":");
     const colonIndex = getStringIndexOf(argument, ":");
     const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex - 1);
-    return createIfAndElseAndReturns(isValidColonCount, beforeOfColonPart, "");
+    return createIfAndElseAndReturns(isContainsColon, beforeOfColonPart, "");
 }
 
 function getArgumentAfterColonPartFromArgumentsInString(string, argumentTh) {
     const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isValidColonCount = isArgumentValidColonCountFromArgumentsInString(string, argumentTh);
+    const isContainsColon = isContainsSearchInString(string, ":");
     const colonIndex = getStringIndexOf(argument, ":");
     const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex + 1);
-    return createIfAndElseAndReturns(isValidColonCount, beforeOfColonPart, "");
+    return createIfAndElseAndReturns(isContainsColon, beforeOfColonPart, "");
 }
 
 function isArgumentNameAndColonFromArgumentsInString(string, argumentTh) {
-    const isValidColonCount = isArgumentValidColonCountFromArgumentsInString(string, argumentTh);
+    const isContainsColon = isContainsSearchInString(string, ":");
     const beforeOfColonPart = getArgumentBeforeColonPartFromArgumentsInString(string, argumentTh);
-    return isValidColonCount && isNotJustSpacesString(beforeOfColonPart);
+    return isContainsColon && isNotJustSpacesString(beforeOfColonPart);
 }
 
 function isArgumentColonAndValueFromArgumentsInString(string, argumentTh) {
-    const isValidColonCount = isArgumentValidColonCountFromArgumentsInString(string, argumentTh);
+    const isContainsColon = isContainsSearchInString(string, ":");
     const afterOfColonPart = getArgumentAfterColonPartFromArgumentsInString(string, argumentTh);
-    return isValidColonCount && isNotJustSpacesString(afterOfColonPart);
+    return isContainsColon && isNotJustSpacesString(afterOfColonPart);
 }
 
 function isArgumentValidNameAndColonFromArgumentsInString(string, argumentTh) {
