@@ -13,7 +13,7 @@ const canvasInputs = getElementById("canvas-inputs");
 const canvasColorInputTypes = [
     "border",
     "background",
-    "song-editor-lines",
+    "song-editor-stripes",
     "piano-background",
     "piano-top-most-upper-part",
     "piano-top-upper-part",
@@ -21,29 +21,26 @@ const canvasColorInputTypes = [
     "piano-top-lower-part",
     "piano-top-most-lower-part",
     "piano-whole-key",
-    "piano-half-key"
+    "piano-half-key",
+    "piano-active-part-clicking-whole-key",
+    "piano-active-part-clicking-half-key",
+    "piano-active-part-moving-bar-belonging-whole-key",
+    "piano-active-part-moving-bar-belonging-half-key"
 ];
-const canvasInputsColorInputsTypes = StringPart.subStringWithToIndex(canvasColorInputTypes, 2);
-const canvasPianoInputsColorInputsTypes = StringPart.subStringWithFromIndex(canvasColorInputTypes, 3);
-createTheDefaultCanvasColorInputFieldsAndListeners("border");
-createTheDefaultCanvasColorInputFieldsAndListeners("background");
-createTheDefaultCanvasColorInputFieldsAndListeners("song-editor-lines");
+for (const canvasColorInputType of canvasColorInputTypes) {
+    createTheDefaultCanvasColorInputFieldsAndListeners(canvasColorInputType);
+}
+const canvasInputsColorInputsTypes = subArrayWithToIndex(canvasColorInputTypes, 2);
+const canvasPianoInputsColorInputsTypes = subArray(canvasColorInputTypes, 3, 10);
+const canvasPianoActivePartInputsColorInputsTypes = subArrayWithFromIndex(canvasColorInputTypes, 11);
 const canvasPianoInputsButton = getElementById("canvas-piano-inputs-button");
 const canvasPianoInputsResetColorsPart = getElementById("canvas-piano-inputs-reset-colors-part");
 const canvasPianoInputsResetColorsButton = getElementById("canvas-piano-inputs-reset-colors-button");
 const canvasPianoInputs = getElementById("canvas-piano-inputs");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-background");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-top-most-upper-part");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-top-upper-part");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-top-upper-part-center");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-top-lower-part");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-top-most-lower-part");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-whole-key");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-half-key");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-active-part-clicking-whole-key");
-createTheDefaultCanvasColorInputFieldsAndListeners("piano-active-part-clicking-half-key");
 const backgroundColorInput = getElementById("background-color");
+const isCanvasBackgroundColorTransparentInput = getElementById("is-canvas-background-color-transparent");
 const saveChangedColorsOnCanvasInput = getElementById("save-changed-colors-on-canvas-by-modified-background-color-input-value");
+const saveCanvasInputsColors = getElementById("save-canvas-inputs-colors");
 const resetColorsOnCanvasPart = getElementById("reset-colors-on-canvas-part");
 const resetColorsOnCanvasInput = getElementById("reset-colors-on-canvas");
 const reloadingTimeInput = getElementById("reloading-time");
@@ -51,6 +48,7 @@ const reloadingTimeSubmitButton = getElementById("reloading-time-submit-button")
 const textItems = document.getElementsByTagName("text-item");
 const textItemsColorInput = document.getElementById("text-items-color");
 const defaultBackgroundColorValue = backgroundColorInput.value;
+let savedCanvasInputsColors = undefined;
 const defaultWholeKeyWidth = 16;
 const defaultWholeKeyHeight = 104;
 const defaultHalfKeyWidth = 7;
@@ -109,17 +107,22 @@ window.addEventListener("mousedown", function () {
     isCanvasClicked = false;
     isCanvasInputsButtonClicked = false;
     isCanvasPianoInputsButtonClicked = false;
-    window["isCanvasBorderColorInputClicked"] = false;
-    window["isCanvasBackgroundColorInputClicked"] = false;
-    window["isCanvasSongEditorLinesColorInputClicked"] = false;
-    window["isCanvasPianoBackgroundColorInputClicked"] = false;
-    window["isCanvasPianoTopMostUpperPartColorInputClicked"] = false;
-    window["isCanvasPianoTopUpperPartColorInputClicked"] = false;
-    window["isCanvasPianoTopUpperPartCenterColorInputClicked"] = false;
-    window["isCanvasPianoTopLowerPartColorInputClicked"] = false;
-    window["isCanvasPianoTopMostLowerPartColorInputClicked"] = false;
-    window["isCanvasPianoWholeKeyColorInputClicked"] = false;
-    window["isCanvasPianoHalfKeyColorInputClicked"] = false;
+    const getNameFromType = (type) => getCanvasColorInputClickedNameFromType(type);
+    window[getNameFromType("border")] = false;
+    window[getNameFromType("background")] = false;
+    window[getNameFromType("song-editor-stripes")] = false;
+    window[getNameFromType("piano-background")] = false;
+    window[getNameFromType("piano-top-most-upper-part")] = false;
+    window[getNameFromType("piano-top-upper-part")] = false;
+    window[getNameFromType("piano-top-upper-part-center")] = false;
+    window[getNameFromType("piano-top-lower-part")] = false;
+    window[getNameFromType("piano-top-most-lower-part")] = false;
+    window[getNameFromType("piano-whole-key")] = false;
+    window[getNameFromType("piano-half-key")] = false;
+    window[getNameFromType("piano-active-part-clicking-whole-key")] = false;
+    window[getNameFromType("piano-active-part-clicking-half-key")] = false;
+    window[getNameFromType("piano-active-part-moving-bar-belonging-whole-key")] = false;
+    window[getNameFromType("piano-active-part-moving-bar-belonging-half-key")] = false;
     isCanvasInputsResetColorsButtonMouseDown = false;
     isCanvasPianoInputsResetColorsButtonMouseDown = false;
     isCanvasMouseDown = false;
@@ -208,6 +211,15 @@ canvasPianoInputsResetColorsButton.onclick = function () {
     }
     canvasPianoInputsResetColorsPart.hidden = true;
 };
+saveCanvasInputsColors.onclick = function () {
+    const values = getCanvasInputsValues();
+    const defaultValues = getCanvasInputsDefaultValues();
+    if (saveCanvasInputsColors.checked) {
+        savedCanvasInputsColors = values;
+    } else {
+        savedCanvasInputsColors = defaultValues;
+    }
+};
 backgroundColorInput.onclick = function () {
     isWindowClicked = false;
     isBackgroundColorInputClicked = true;
@@ -244,13 +256,12 @@ reloadingTimeSubmitButton.onclick = function () {
  */
 function createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElement(element, name) {
     const fieldName = name + "Input";
-    const fieldNameWithFirstUppercaseAToZ = changeLowercaseStringFirstLetterToUppercaseWithAToZ(fieldName);
-    const fieldDefaultValueName = "default" + changeLowercaseStringFirstLetterToUppercaseWithAToZ(name) + "Value";
+    const fieldDefaultValueName = getDefaultCanvasColorInputNameFromName(name);
     const fieldResetColorPartName = name + "ResetColorPart";
     const fieldResetColorPartId = placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(fieldResetColorPartName, "-");
     window[fieldName] = element;
     window[fieldDefaultValueName] = element.value;
-    window["is" + fieldNameWithFirstUppercaseAToZ + "Clicked"] = false;
+    window[getCanvasColorInputClickedNameFromName(name)] = false;
     window[fieldResetColorPartName] = document.getElementById(fieldResetColorPartId);
     window[fieldResetColorPartName].hidden = window[fieldName].value === window[fieldDefaultValueName];
 }
@@ -262,51 +273,39 @@ function createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementById
 function createTheDefaultColorInputFieldsAndListenersWithElementId(elementId, name) {
     createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementById(elementId, name);
     const fieldName = name + "Input";
-    const fieldNameWithFirstUppercaseAToZ = changeLowercaseStringFirstLetterToUppercaseWithAToZ(fieldName);
     const fieldDefaultValueName = getDefaultCanvasColorInputNameFromName(name);
     const fieldResetColorPartName = name + "ResetColorPart";
     const fieldResetColorPartId = placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(fieldResetColorPartName, "-");
     const fieldResetColorPart = document.getElementById(fieldResetColorPartId);
     window[fieldName].onclick = function () {
         isWindowClicked = false;
-        window["is" + fieldNameWithFirstUppercaseAToZ + "Clicked"] = true;
+        window[getCanvasColorInputClickedNameFromName(name)] = true;
         saveChangedColorsOnCanvasInput.checked = false;
     };
     fieldResetColorPart.onclick = function () {
         isWindowClicked = false;
         saveChangedColorsOnCanvasInput.checked = false;
         window[fieldName].value = window[fieldDefaultValueName];
+
     }
 }
 
-function getCanvasColorInputId(type) {
-    type = getValidString(type);
-    return "canvas-" + type + "-color";
+function getCanvasInputsValues() {
+    let value = [];
+    for (let i = 0; i < canvasColorInputTypes.length; i++) {
+        const field = document.getElementById(getCanvasColorInputId(canvasColorInputTypes[i]));
+        value.push(field.value);
+    }
+    return value;
 }
 
-function getCanvasColorInputNameFromId(id) {
-    id = getValidString(id);
-    return changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs(id, "-");
-}
-
-function getCanvasColorInputNameFromType(type) {
-    const elementId = getCanvasColorInputId(type);
-    return getCanvasColorInputNameFromId(elementId);
-}
-
-function getDefaultCanvasColorInputNameFromName(name) {
-    const changedElementNameFirstLetter = changeLowercaseStringFirstLetterToUppercaseWithAToZ(name);
-    return "default" + changedElementNameFirstLetter + "Value";
-}
-
-function getDefaultCanvasColorInputNameFromId(id) {
-    const elementName = getCanvasColorInputNameFromId(id);
-    return getDefaultCanvasColorInputNameFromName(elementName);
-}
-
-function getDefaultCanvasColorInputNameFromType(type) {
-    const elementId = getCanvasColorInputId(type);
-    return getDefaultCanvasColorInputNameFromId(elementId);
+function getCanvasInputsDefaultValues() {
+    let value = [];
+    for (let i = 0; i < canvasColorInputTypes.length; i++) {
+        const field = document.getElementById(getCanvasColorInputId(canvasColorInputTypes[i]));
+        value.push(field.defaultValue);
+    }
+    return value;
 }
 
 function createTheDefaultCanvasColorInputFieldsAndListeners(type) {
@@ -315,25 +314,10 @@ function createTheDefaultCanvasColorInputFieldsAndListeners(type) {
     createTheDefaultColorInputFieldsAndListenersWithElementId(elementId, elementName);
 }
 
-function setDefaultCanvasColorInputValueFromName(name) {
-    const defaultInputValueName = getDefaultCanvasColorInputNameFromName(name);
-    window[name].value = window[defaultInputValueName];
-}
-
-function setDefaultCanvasColorInputValueFromId(id) {
-    const elementName = getCanvasColorInputNameFromId(id);
-    setDefaultCanvasColorInputValueFromName(elementName);
-}
-
-function setDefaultCanvasColorInputValueFromType(type) {
-    const elementId = getCanvasColorInputNameFromId(type);
-    setDefaultCanvasColorInputValueFromId(elementId);
-}
-
 function setCanvasInputs() {
     setDefaultCanvasColorInputValueFromType("border");
     setDefaultCanvasColorInputValueFromType("background");
-    setDefaultCanvasColorInputValueFromType("song-editor");
+    setDefaultCanvasColorInputValueFromType("song-editor-stripes");
 }
 
 function setCanvasPianoInputs() {
@@ -511,9 +495,9 @@ function fillVerticalColoredStripeWithWidthAndPartOfWidth(style, width, height, 
 }
 
 function fillOctaveOfPianoVerticalSongEditorStripes(style, width, height, partOfWidthAndStart, stripeWidth, stripeHeight) {
-    const listOfNumberOfSpacesBetweenLines = [11, 8, 10, 8, 11, 11, 8, 9, 8, 9, 8, 11];
-    const maxLength = listOfNumberOfSpacesBetweenLines.length;
-    for (let i = partOfWidthAndStart, counter = 0; counter <= maxLength; i += (counter < maxLength ? listOfNumberOfSpacesBetweenLines[counter] : 0), counter++) {
+    const listOfNumberOfSpacesBetweenStripes = [11, 8, 10, 8, 11, 11, 8, 9, 8, 9, 8, 11];
+    const maxLength = listOfNumberOfSpacesBetweenStripes.length;
+    for (let i = partOfWidthAndStart, counter = 0; counter <= maxLength; i += (counter < maxLength ? listOfNumberOfSpacesBetweenStripes[counter] : 0), counter++) {
         fillVerticalColoredStripeWithWidthAndPartOfWidth(style, width, height, i, stripeWidth, stripeHeight);
     }
 }
@@ -548,12 +532,13 @@ function getFirstAndLastKeyTypeOfPiano(sizeOrKey, keyType, width, height) {
     sizeOrKey = getValidFirstType(sizeOrKey, "size", "key");
     const wholeKeyWidth = getWholeKeyWidth(width) - partOfWidth(1);
     const wholeKeyHeight = getWholeKeyHeight(height);
-    const keyTypeArguments = getArgumentsFromStringInArray(keyType);
+    const newKeyTypeArguments = new S$ArgumentsInString(keyType);
+    const keyTypeArguments = newKeyTypeArguments.getArguments();
     const keyTypeArgumentsCount = createIfAndElseAndReturns(isEmptyString(keyType), 0, keyTypeArguments.length);
-    const firstName = getArgumentValidNameFromArgumentsInString(keyType, 1);
-    const firstValue = getArgumentValidValueFromArgumentsInString(keyType, 1);
-    const lastName = getArgumentValidNameFromArgumentsInString(keyType, 2);
-    const lastValue = getArgumentValidValueFromArgumentsInString(keyType, 2);
+    const firstName = newKeyTypeArguments.getArgumentValidName(1);
+    const firstValue = newKeyTypeArguments.getArgumentValidValue(1);
+    const lastName = newKeyTypeArguments.getArgumentValidName(2);
+    const lastValue = newKeyTypeArguments.getArgumentValidValue(2);
     let keyFirstType = getReturnIfObjectEqualsArrayFirst(sizeOrKey, ["size", wholeKeyWidth, ["key", "0", null]]);
     let keyLastType = getReturnIfObjectEqualsArrayFirst(sizeOrKey, ["size", wholeKeyHeight, ["key", "0", null]]);
     if (keyTypeArgumentsCount <= 2) {
@@ -622,7 +607,7 @@ function getWholeKeyParametersOfPiano(type, sizeType, fillStyle, width, height, 
 }
 
 function getTypeFirstName(type) {
-    const typeFirstArgumentName = getArgumentBeforeColonPartFromArgumentsInString(type);
+    const typeFirstArgumentName = new S$ArgumentsInString(type).getArgumentBeforeColonPart(1);
     const isTypeContainsColon = isContainsSearchInString(type, ":");
     const isTypeHalf = type === "half";
     const isTypeWhole = typeFirstArgumentName === "whole" && isTypeContainsColon;
@@ -631,7 +616,7 @@ function getTypeFirstName(type) {
 }
 
 function drawKeyOfPiano(type, sizeType, fillStyle, width, height, posX, posY) {
-    const isTypeFirstArgumentName = isArgumentNameAndColonFromArgumentsInString(type);
+    const isTypeFirstArgumentName = new S$ArgumentsInString(type).isArgumentNameAndColon(1);
     const sizeTypes = getFirstAndLastKeyTypeOfPiano("size", sizeType, width, height);
     const typeFirstName = getTypeFirstName(type);
     let drawnKeyParameters = {type, sizeType, fillStyle, width, height, posX, posY};
@@ -810,7 +795,7 @@ function drawKeyOctaveOfPiano(wholeKeyFillStyle, halfKeyFillStyle, width, height
     }
 }
 
-function drawClassicPianoAndSonkEditorLines() {
+function drawClassicPianoAndSonkEditorStripes() {
     isCanvasListener = true;
     loadCanvasSize();
     const width = 834;
@@ -827,7 +812,7 @@ function drawClassicPianoAndSonkEditorLines() {
     const namedModifiedColors = {
         canvasBorderColor: tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value),
         canvasBackgroundColor: backgroundColorInput.value,
-        canvasSongEditorLinesColor: tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value),
+        canvasSongEditorStripesColor: tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value),
         canvasPianoBackgroundColor: tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value),
         canvasPianoTopMostUpperPartColor: tHex.getReverseRgbQuarterToThreeQuarterHex(backgroundColorInput.value),
         canvasPianoTopUpperPartColor: tHex.getRgbEighthToSevenEighthsHex(backgroundColorInput.value),
@@ -840,7 +825,7 @@ function drawClassicPianoAndSonkEditorLines() {
     const modifiedColors = [
         namedModifiedColors.canvasBorderColor,
         namedModifiedColors.canvasBackgroundColor,
-        namedModifiedColors.canvasSongEditorLinesColor,
+        namedModifiedColors.canvasSongEditorStripesColor,
         namedModifiedColors.canvasPianoBackgroundColor,
         namedModifiedColors.canvasPianoTopMostUpperPartColor,
         namedModifiedColors.canvasPianoTopUpperPartColor,
@@ -874,15 +859,15 @@ function drawClassicPianoAndSonkEditorLines() {
         return colorValue;
     }
 
-    function drawVerticalSonkEditorLines() {
-        const linesColor = getColorWithNotSaveChangedColorsOnCanvas("canvas-song-editor-lines-color", namedModifiedColors.canvasSongEditorLinesColor);
+    function drawVerticalSonkEditorStripes() {
+        const stripesColor = getColorWithNotSaveChangedColorsOnCanvas("canvas-song-editor-stripes-color", namedModifiedColors.canvasSongEditorStripesColor);
 
         function fillVerticalColoredStripeFrom0ToPianoTop(partOfWidthAndStart) {
-            fillVerticalColoredStripeWithWidthAndPartOfWidth(linesColor, width, height, partOfWidthAndStart, 1, defaultPianoTop);
+            fillVerticalColoredStripeWithWidthAndPartOfWidth(stripesColor, width, height, partOfWidthAndStart, 1, defaultPianoTop);
         }
 
         function drawOctave(from) {
-            fillOctaveOfPianoVerticalSongEditorStripes(linesColor, width, height, from, 1, defaultPianoTop);
+            fillOctaveOfPianoVerticalSongEditorStripes(stripesColor, width, height, from, 1, defaultPianoTop);
         }
 
         fillVerticalColoredStripeFrom0ToPianoTop(0);
@@ -938,13 +923,17 @@ function drawClassicPianoAndSonkEditorLines() {
     }
 
     canvas.style.border = "1px solid" + getColorWithNotSaveChangedColorsOnCanvas("canvas-border-color", namedModifiedColors.canvasBorderColor);
-    canvas.style.backgroundColor = getColorWithNotSaveChangedColorsOnCanvas("canvas-background-color", namedModifiedColors.canvasBackgroundColor);
+    const backgroundColor = getColorWithNotSaveChangedColorsOnCanvas("canvas-background-color", namedModifiedColors.canvasBackgroundColor);
+    canvas.style.backgroundColor = backgroundColor;
     document.body.style.backgroundColor = getObjectIfEqualsObjects(backgroundColorInput.value, defaultBackgroundColorValue);
     document.getElementById("canvas-width").style.backgroundColor = canvasWidthInputBackgroundColorInput.value;
     document.getElementById("canvas-height").style.backgroundColor = canvasHeightInputBackgroundColorInput.value;
     document.getElementById("canvas-width").style.color = canvasWidthInputColorInput.value;
     document.getElementById("canvas-height").style.color = canvasHeightInputColorInput.value;
-    drawVerticalSonkEditorLines();
+    if (!isCanvasBackgroundColorTransparentInput.checked) {
+        fillColoredRect(backgroundColor, 0, 0, canvas.width, canvas.height);
+    }
+    drawVerticalSonkEditorStripes();
     drawClassicPiano();
     isStopDrawingKeys = true;
     const isNotOscillator = window.audioContextOscillator === undefined;
@@ -1182,7 +1171,7 @@ function drawPianoSongEditor() {
     canvasInputsResetColorsPart.hidden = createIfAndElseAndReturns(!canvasInputs.hidden, createIfAndElseAndReturns(canvasPianoInputs.hidden, isCanvasInputsEqualsDefaultColorIfPianoInputsHidden, isCanvasInputsEqualsDefaultColor), true);
     canvasPianoInputsResetColorsPart.hidden = createIfAndElseAndReturns(!canvasInputs.hidden && !canvasPianoInputs.hidden, isCanvasPianoInputsEqualsDefaultColor, true);
     resetColorsOnCanvasPart.hidden = isCanvasInputsEqualsDefaultColor;
-    drawClassicPianoAndSonkEditorLines();
+    drawClassicPianoAndSonkEditorStripes();
 }
 
 function createKeySoundWithKeyTh(gainValue, keyTh, time) {

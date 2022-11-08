@@ -17,20 +17,38 @@ const random = (scale, min, max) => {
     max = getValidNumber(max);
     return Math.floor(Math.random() * (max - min + scale) + min);
 };
+
 class StringManipulation {
-    static containsSearchsCount(string, search) {
-        search = getValidString(search);
+    static containsSearchCount(string, search) {
         let replace = getValidString(string);
         let counter = 0;
         while (true) {
-            if (replace.replace(search, "") === replace) {
+            const removedSearchReplace = replace.replace(getValidString(search), "");
+            if (removedSearchReplace === replace) {
                 break;
             } else {
-                replace = replace.replace(search, "");
+                replace = removedSearchReplace;
                 counter++;
             }
         }
+        return createIfAndElseAndReturns(isEmptyString(search), Infinity, counter);
+    }
+
+    static containsSearchsArrayElementsCount(string, searchsArray) {
+        searchsArray = getValidString(searchsArray);
+        let counter = 0;
+        let arrayCounter = 0;
+        while (searchsArray.length > arrayCounter) {
+            const search = searchsArray[arrayCounter];
+            const searchCount = this.containsSearchCount(string, search);
+            counter += searchCount;
+            arrayCounter++;
+        }
         return counter;
+    }
+
+    static containsSearchsCount(string, ...searchs) {
+        return this.containsSearchsArrayElementsCount(string, createArrayFromObjects(searchs));
     }
 
     static convertElementsToArray(string) {
@@ -101,46 +119,20 @@ class StringManipulation {
         this.string = getValidString(string);
     }
 
-    containsSearchsCount(search) {
-        return StringManipulation.containsSearchsCount(this.string, search);
-    }
-
-    convertElementsToArray() {
-        return StringManipulation.convertElementsToArray(this.string);
-    }
-
-    isElementsMatchSomeOfCharsInText(text) {
-        return StringManipulation.isElementsMatchSomeOfCharsInText(this.string, text);
-    }
-
-    isDigits() {
-        return StringManipulation.isDigits(this.string);
-    }
-
-    reverse() {
-        return StringManipulation.reverse(this.string);
-    }
-
-    isValidSubStringParameters(fromIndex, toIndex) {
-        return StringManipulation.isValidSubStringParameters(this.string, fromIndex, toIndex);
-    }
-
-    removeSubString(fromIndex, toIndex) {
-        return StringManipulation.removeSubString(this.string, fromIndex, toIndex);
-    }
-
-    removeSubStringWithFromIndex(fromIndex) {
-        return StringManipulation.removeSubStringWithFromIndex(this.string, fromIndex);
-    }
-
-    removeSubStringWithToIndex(toIndex) {
-        return StringManipulation.removeSubStringWithToIndex(this.string, toIndex);
-    }
-
-    removeSubStringWithLength(fromIndex, length) {
-        return StringManipulation.removeSubStringWithLength(this.string, fromIndex, length);
-    }
+    containsSearchCount = search => StringManipulation.containsSearchCount(this.string, search);
+    containsSearchsArrayElementsCount = searchsArray => StringManipulation.containsSearchsArrayElementsCount(this.string, searchsArray);
+    containsSearchsCount = (...searchs) => StringManipulation.containsSearchsCount(this.string, searchs);
+    convertElementsToArray = () => StringManipulation.convertElementsToArray(this.string);
+    isElementsMatchSomeOfCharsInText = text => StringManipulation.isElementsMatchSomeOfCharsInText(this.string, text);
+    isDigits = () => StringManipulation.isDigits(this.string);
+    reverse = () => StringManipulation.reverse(this.string);
+    isValidSubStringParameters = (fromIndex, toIndex) => StringManipulation.isValidSubStringParameters(this.string, fromIndex, toIndex);
+    removeSubString = (fromIndex, toIndex) => StringManipulation.removeSubString(this.string, fromIndex, toIndex);
+    removeSubStringWithFromIndex = fromIndex => StringManipulation.removeSubStringWithFromIndex(this.string, fromIndex);
+    removeSubStringWithToIndex = toIndex => StringManipulation.removeSubStringWithToIndex(this.string, toIndex);
+    removeSubStringWithLength = (fromIndex, length) => StringManipulation.removeSubStringWithLength(this.string, fromIndex, length);
 }
+
 class StringPart extends StringManipulation {
     static subString(string, fromIndex, toIndex) {
         string = getValidString(string);
@@ -171,26 +163,13 @@ class StringPart extends StringManipulation {
         super(string);
     }
 
-    isValidSubStringParameters(fromIndex, toIndex) {
-        return StringPart.isValidSubStringParameters(this.string, fromIndex, toIndex);
-    }
-
-    subString(fromIndex, toIndex) {
-        return StringPart.subString(this.string, fromIndex, toIndex);
-    }
-
-    subStringWithLength(fromIndex, length) {
-        return StringPart.subStringWithLength(this.string, fromIndex, length);
-    }
-
-    subStringWithFromIndex(fromIndex) {
-        return StringPart.subStringWithFromIndex(this.string, fromIndex);
-    }
-
-    subStringWithToIndex(toIndex) {
-        return StringPart.subStringWithToIndex(this.string, toIndex);
-    }
+    isValidSubStringParameters = (fromIndex, toIndex) => StringPart.isValidSubStringParameters(this.string, fromIndex, toIndex);
+    subString = (fromIndex, toIndex) => StringPart.subString(this.string, fromIndex, toIndex);
+    subStringWithLength = (fromIndex, length) => StringPart.subStringWithLength(this.string, fromIndex, length);
+    subStringWithFromIndex = fromIndex => StringPart.subStringWithFromIndex(this.string, fromIndex);
+    subStringWithToIndex = toIndex => StringPart.subStringWithToIndex(this.string, toIndex);
 }
+
 const DIGITS = '0123456789';
 const canvasWidthInputText = "canvas-width";
 const canvasHeightInputText = "canvas-height";
@@ -914,6 +893,7 @@ function getSearchCharsCountsInString(string, search) {
 
 function sqrXTh(x, xXth) {
     x = getValidNumber(x);
+    xXth = getValidNumber(xXth);
     if (xXth > 0) {
         const I = x;
         let X = x;
@@ -934,37 +914,6 @@ function sqrXTh(x, xXth) {
         }
     }
 }
-
-/*function stringNumber(stringNumberValue) {
-    window.stringNumber = stringNumber;
-    if (stringNumberValue === null || !isDigits(stringNumberValue)) {
-        window.stringNumber.value = createIfAndElseReturns(stringNumberValue === null, null, "0");
-    } else {
-        function isNumberBetweenMinAndMax(number, min, max) {
-            const validMinAndMax = validateMinAndMax(min, max);
-            number = getValidNumber(number);
-            return !(number < validMinAndMax[0] || number > validMinAndMax[1]);
-        }
-
-        function isNumberBetween0And9(number) {
-            return isNumberBetweenMinAndMax(number, 0, 9);
-        }
-
-        addOne();
-
-        function addOne() {
-            let value = "";
-            if (stringNumberValue.length === 1) {
-                value = max2DigitsOfNumberAddOne(stringNumberValue);
-            } else {
-                if (stringNumberValue.length === 2) {
-                    value = null;
-                }
-            }
-            return value;
-        }
-    }
-}*/
 
 function isEqualsObjectArrayElements(array) {
     array = getValidArray(array);
@@ -992,6 +941,37 @@ function isArrayElementsTrue(array) {
     const isEmpty = isEmptyArray(array);
     const isFirstTrue = createIfAndElseAndReturns(isEmpty, false, array[0] === true);
     return isEqualsObjectArrayElements(array) && isFirstTrue;
+}
+
+function isIntegersArray(array) {
+    let value = false;
+    if (Array.isArray(array)) {
+        const elementsIsIntegersArray = [];
+        for (const element of array) {
+            const isIntegerElement = isValidInteger(element);
+            elementsIsIntegersArray.push(isIntegerElement);
+        }
+        value = isArrayElementsTrue(elementsIsIntegersArray);
+    }
+    return value;
+}
+
+function isIncreasingIntegersArray(array) {
+    let value = false;
+    if (isIntegersArray(array)) {
+        const {length} = array;
+        let savedElement = null;
+        for (let i = 0; i < length; i++) {
+            const element = array[i];
+            if (savedElement !== null) {
+                value = element > savedElement;
+            }
+            if (i + 1 < length) {
+                savedElement = element;
+            }
+        }
+    }
+    return value;
 }
 
 function isEqualsObjects(...objects) {
@@ -1309,11 +1289,12 @@ function createArrayFromNested2ObjectsOneFields(array, fieldName) {
     return value;
 }
 
-function createArrayFromArrayEl3mentsFieldsMultiply(array, multiply) {
+function createArrayFromIntegerArrayElementsFieldsMultiply(array, multiply) {
     multiply = getValidInteger(multiply);
     let value = [];
     for (const element of getValidArray(array)) {
-        value.push(element * multiply);
+        const validIntegerElement = getValidInteger(element);
+        value.push(validIntegerElement * multiply);
     }
     return value;
 }
@@ -1413,37 +1394,6 @@ function removeElementInArray(array, index) {
     return removeSubArrayInArray(array, index, index);
 }
 
-function isIntegersArray(array) {
-    let value = false;
-    if (Array.isArray(array)) {
-        const elementsIsIntegersArray = [];
-        for (const element of array) {
-            const isIntegerElement = isValidInteger(element);
-            elementsIsIntegersArray.push(isIntegerElement);
-        }
-        value = isArrayElementsTrue(elementsIsIntegersArray);
-    }
-    return value;
-}
-
-function isIncreasingIntegersArray(array) {
-    let value = false;
-    if (isIntegersArray(array)) {
-        const {length} = array;
-        let savedElement = null;
-        for (let i = 0; i < length; i++) {
-            const element = array[i];
-            if (savedElement !== null) {
-                value = element > savedElement;
-            }
-            if (i + 1 < length) {
-                savedElement = element;
-            }
-        }
-    }
-    return value;
-}
-
 function placeNewArrayToTheArray(array, newArray, index) {
     array = getValidArray(array);
     newArray = getValidArray(newArray);
@@ -1461,11 +1411,9 @@ function placeObjectToTheArray(array, object, index) {
 
 function placeIntegerToTheIntegersArray(integersArray, integer, index) {
     index = getValidInteger(index);
-    let value = integersArray;
-    if (isIntegersArray(integersArray) && isStringInteger(integer)) {
-        value = placeObjectToTheArray(integersArray, integer, index);
-    }
-    return value;
+    const isValid = isIntegersArray(integersArray) && isStringInteger(integer);
+    const ifValid = placeObjectToTheArray(integersArray, integer, index);
+    return createIfAndElseAndReturns(isValid, ifValid, integersArray);
 }
 
 function placeIntegerToTheIncreasingIntegersArray(integersArray, integer) {
@@ -1525,7 +1473,10 @@ function getPositiveInteger(integer) {
 
 function getHalfInteger(number) {
     number = getValidNumber(number);
-    return (number + 1) % 2 === 0 ? ((number + 1) / 2) - 1 : createIfAndElseAndReturns(number % 2 === 0, number / 2, number);
+    const isDivisibleBy2 = (number + 1) % 2 === 0;
+    const ifDivisibleBy2 = ((number + 1) / 2) - 1;
+    const ifNotDivisibleBy2 = createIfAndElseAndReturns(number % 2 === 0, number / 2, number);
+    return createIfAndElseAndReturns(isDivisibleBy2, ifDivisibleBy2, ifNotDivisibleBy2);
 }
 
 function getQuarterInteger(number) {
@@ -1647,8 +1598,8 @@ function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNu
 
 function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0(positiveReferenceNumber, numberType, number) {
     positiveReferenceNumber = getValidInteger(positiveReferenceNumber);
-    number = getValidInteger(number);
-    return validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberGreaterThanOrEquals0(positiveReferenceNumber, numberType, getPositiveNumber(number));
+    number = getPositiveInteger(number);
+    return validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberGreaterThanOrEquals0(positiveReferenceNumber, numberType, number);
 }
 
 function validateIntegerWithNumberType(referenceNumber, numberType, number) {
@@ -1841,7 +1792,46 @@ function validateStartAndEndIntegers(min, max, start, end) {
 }
 
 function removeSearchInString(string, search) {
+    string = getValidString(string);
+    search = getValidString(search);
     return string.replace(search, "");
+}
+
+function replaceAllSearchInString(string, search, replace) {
+    string = getValidString(string);
+    search = getValidString(search);
+    replace = getValidString(replace);
+    const containsSearchsCount = StringManipulation.containsSearchCount(string, search);
+    let value = string;
+    for (let i = 0; i < containsSearchsCount; i++) {
+        value = value.replace(search, replace);
+    }
+    return value;
+}
+
+function replaceAllSearchsArrayElementsToReplaceArrayElementsInString(string, searchsArray, replaceArray) {
+    searchsArray = getValidArray(searchsArray);
+    replaceArray = getValidArray(replaceArray);
+    const containsSearchsCount = StringManipulation.containsSearchsArrayElementsCount(string, searchsArray);
+    let value = getValidString(string);
+    for (let i = 0; i < containsSearchsCount; i++) {
+        const search = searchsArray[i];
+        const replace = replaceArray[i];
+        value = replaceAllSearchInString(value, search, replace);
+    }
+    return value;
+}
+
+function replaceAllSearchsArrayElementsToReplaceInString(string, searchsArray, replace) {
+    string = getValidString(string);
+    searchsArray = getValidArray(searchsArray);
+    const containsSearchsCount = StringManipulation.containsSearchsArrayElementsCount(string, searchsArray);
+    let value = string;
+    for (let i = 0; i < containsSearchsCount; i++) {
+        const search = searchsArray[i];
+        value = value.replace(search, getValidString(replace));
+    }
+    return value;
 }
 
 function isValidSearchThInStringParameters(string, search, searchTh) {
@@ -1859,17 +1849,6 @@ function removeSearchThInString(string, search, searchTh) {
     const fromIndex = getSearchThIndexOfString(string, search, searchTh);
     const valueIfValid = StringManipulation.removeSubStringWithLength(string, fromIndex, search.length);
     return createIfAndElseAndReturns(isValid, valueIfValid, string);
-}
-
-function getFromIndexOfSearchTh(string, search, searchTh) {
-    string = getValidString(string);
-    search = getValidString(search);
-    searchTh = getValidSearchTh(searchTh);
-    const isValid = isValidSearchThInStringParameters(string, search, searchTh);
-    const stringManipulation = new StringManipulation(string);
-    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
-    const fromIndexSearchTh = createIfAndElseAndReturns(containsSearchsCount > 0 && containsSearchsCount >= searchTh, searchTh, -1);
-    return createIfAndElseAndReturns(isValid, getSearchThIndexOfString(string, search, fromIndexSearchTh), -1);
 }
 
 function removeAllSearchsInString(string, search) {
@@ -1967,20 +1946,21 @@ function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh
         while (counter < partTh) {
             counter++;
             if (counter < partTh) {
-                if (getStringIndexOf(disassembledString, search) > 0) {
-                    disassembledString = removedBetweenFirstAndSecondPart;
-                }
-                if (getStringIndexOf(disassembledString, search) === 0) {
-                    i += containsConsecutiveMatchingFirstSearchsCount - 1;
-                    disassembledString = removeConsecutiveMatchingFirstSearchsInString(disassembledString, search);
-                }
+                let disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
+                let isContainsMoreThan1Search = disassembledStringSearchIndex > 0;
+                disassembledString = createIfAndElseAndReturns(isContainsMoreThan1Search, removedBetweenFirstAndSecondPart, disassembledString);
+                disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
+                isContainsMoreThan1Search = disassembledStringSearchIndex > 0;
+                i += createIfAndElseAndReturns(isContainsMoreThan1Search, 0, containsConsecutiveMatchingFirstSearchsCount - 1);
+                const newDisassembledStringIfContains1Search = removeConsecutiveMatchingFirstSearchsInString(disassembledString, search);
+                disassembledString = createIfAndElseAndReturns(isContainsMoreThan1Search, disassembledString, newDisassembledStringIfContains1Search);
                 if (isEmptyString(disassembledString)) {
                     i = -1;
                     break;
                 } else {
                     stringManipulation = new StringManipulation(disassembledString);
-                    searchIndex = getStringIndexOf(disassembledString, search);
-                    removedBetweenFirstAndSecondPart = stringManipulation.removeSubStringWithToIndex(searchIndex);
+                    disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
+                    removedBetweenFirstAndSecondPart = stringManipulation.removeSubStringWithToIndex(disassembledStringSearchIndex);
                     stringManipulation = new StringManipulation(disassembledString);
                     containsConsecutiveMatchingFirstSearchsCount = containsConsecutiveMatchingFirstSearchsCountInString(disassembledString, search);
                     containsSearchsCount = stringManipulation.containsSearchsCount(search);
@@ -2744,401 +2724,245 @@ function setTimeoutFunction(before, handler, handlerAfter, timeout, after, args)
     }
 }
 
-function isValidArgumentInString(string) {
-    string = getValidString(string);
-    const {length} = string;
-    const stringManipulation = new StringManipulation(string);
-    const containsSpacesCount = stringManipulation.containsSearchsCount(" ");
-    const containsColonsCount = stringManipulation.containsSearchsCount(":");
-    const partsIndexes = getConsecutiveMatchingSearchsPartsIndexesInString(string, " ");
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(string, " ");
-    const outsidePartsString = stringifyArrayElements(outsideParts);
-    const colonIndex = getStringIndexOf(outsidePartsString, ":");
-    const isNotJustSpaces = length > containsSpacesCount;
-    const isContainsColon = containsColonsCount > 0;
-    const isValidColonCount = containsColonsCount === 1;
-    const isValidColonIndex = colonIndex > 0 && colonIndex < outsidePartsString.length - 1;
-    const isValidPartsIndexesCount = partsIndexes.length <= 4;
-    const isValidOutsidePartsCount = outsideParts.length <= 3;
-    const isValidOutsideAndSpacesPartsCount = isValidPartsIndexesCount && isValidOutsidePartsCount;
-    const isValidOutsideAndSpacesPartsAndColonCount = isValidOutsideAndSpacesPartsCount && isValidColonCount;
-    const isValid = !isEmptyString(string) && isNotJustSpaces && isValidOutsideAndSpacesPartsAndColonCount;
-    let value = false;
-    if (isValid && isContainsColon && isValidColonIndex) {
-        const valueIfOutsidePartsGreaterThan1 = createIfAndElseAndReturns(outsideParts.length > 2, outsideParts[1] === ":", true);
-        value = createIfAndElseAndReturns(outsideParts.length > 1, valueIfOutsidePartsGreaterThan1, true);
-    }
-    return value;
-}
-
-function isFirstValidArgumentOfArgumentsInString(string) {
-    const commaIndex = getStringIndexOf(string, ",");
-    const argumentPart = StringPart.subStringWithToIndex(string, commaIndex - 1);
-    return isValidArgumentInString(argumentPart);
-}
-
-function getValidArgumentNameInString(string) {
-    const colonIndex = getStringIndexOf(string, ":");
-    const argumentNamePart = StringPart.subStringWithToIndex(string, colonIndex - 1);
-    const argumentName = removeAllSearchsInString(argumentNamePart, " ");
-    return createIfAndElseAndReturns(isValidArgumentInString(string), argumentName, "");
-}
-
-function getValidArgumentValueInString(string) {
-    const colonIndex = getStringIndexOf(string, ":");
-    const argumentNamePart = StringPart.subStringWithFromIndex(string, colonIndex + 1);
-    const argumentName = removeAllSearchsInString(argumentNamePart, " ");
-    return createIfAndElseAndReturns(isValidArgumentInString(string), argumentName, "");
-}
-
-function isValidArgumentNameSearchInString(string, search) {
-    const argumentName = getValidArgumentNameInString(string);
-    return argumentName === search;
-}
-
-function isValidArgumentValueSearchInString(string, search) {
-    const argumentValue = getValidArgumentValueInString(string);
-    return argumentValue === search;
-}
-
-function isValidArgumentsInString(string) {
-    let stringPart = new StringPart(string);
-    let containsCommasCount = stringPart.containsSearchsCount(",");
-    let disassembledString = string;
-    let value = true;
-    if (containsCommasCount > 0) {
-        while (isContainsSearchInString(disassembledString, ",")) {
-            stringPart = new StringPart(disassembledString);
-            const commaIndex = getStringIndexOf(disassembledString, ",");
-            const argument = stringPart.subStringWithToIndex(disassembledString, commaIndex - 1);
-            value = value && isValidArgumentInString(argument);
-            disassembledString = stringPart.removeSubStringWithToIndex(disassembledString, commaIndex);
-            containsCommasCount--;
+/**
+ * Returns - ...;
+ * <pre>
+ *     S$ArgumentsInString.constructor(string) string format => {
+ *         one argument: {
+ *             the string first part can only contain characters other than ":,";
+ *             the string second part can only be ":";
+ *             the string third part can only contain characters other than ":,";
+ *         };
+ *         arguments separator: ",";
+ *         string: arguments;
+ *     };
+ * </pre>
+ */
+class S$ArgumentsInString {
+    static getArgument(string, argumentTh) {
+        string = getValidString(string);
+        argumentTh = getValidSearchTh(argumentTh);
+        const {length} = string;
+        const stringPart = new StringPart(string);
+        const containsCommasCount = stringPart.containsSearchsCount(",");
+        const isContainsComma = containsCommasCount > 0;
+        const firstCommaIndex = getStringIndexOf(string, ",");
+        const isValidArgumentTh = argumentTh > 1 && argumentTh <= containsCommasCount + 1;
+        const isValidNextArgumentTh = argumentTh > 1 && argumentTh + 1 <= containsCommasCount + 1;
+        const isContainsCommaToValue = argumentTh === 1 && isContainsComma;
+        const ifContainsCommaToValue = stringPart.subStringWithToIndex(firstCommaIndex - 1);
+        const ifNotContainsCommaToValue = createIfAndElseAndReturns(argumentTh === 1, string, "");
+        let value = createIfAndElseAndReturns(isContainsCommaToValue, ifContainsCommaToValue, ifNotContainsCommaToValue);
+        if (isValidArgumentTh) {
+            const commaThIndex = getSearchThIndexOfString(string, ",", argumentTh - 1);
+            const fromIndex = commaThIndex + 1;
+            const nextCommaThIndex = getSearchThIndexOfString(string, ",", argumentTh);
+            const toIndex = createIfAndElseAndReturns(isValidNextArgumentTh, nextCommaThIndex - 1, length - 1);
+            value = stringPart.subString(fromIndex, toIndex);
         }
+        return value;
     }
-    return value && isValidArgumentInString(disassembledString);
-}
 
-function containsArgumentsCountIfValidArgumentsInString(string) {
-    const stringManipulation = new StringManipulation(string);
-    const containsCommasCount = stringManipulation.containsSearchsCount(",");
-    return createIfAndElseAndReturns(isValidArgumentsInString(string), containsCommasCount + 1, 0);
-}
-
-function containsValidFirstArgumentsCountInString(string) {
-    let stringManipulation = new StringManipulation(string);
-    let containsCommasCount = stringManipulation.containsSearchsCount(",");
-    let disassembledString = getValidString(string);
-    let value = 0;
-    while (containsCommasCount > 0) {
-        const commaIndex = getStringIndexOf(disassembledString, ",");
-        const isFirstArgument = isFirstValidArgumentOfArgumentsInString(disassembledString);
-        if (isFirstArgument) {
-            value++;
-            stringManipulation = new StringManipulation(string);
-            disassembledString = stringManipulation.removeSubStringWithToIndex(disassembledString, commaIndex);
-            containsCommasCount--;
-        } else {
-            break;
+    static getArguments(string) {
+        const stringManipulation = new StringManipulation(string);
+        const containsCommasCount = stringManipulation.containsSearchsCount(",");
+        let value = [];
+        for (let i = 1; i <= containsCommasCount + 1; i++) {
+            const argument = this.getArgument(string, i);
+            value.push(argument);
         }
+        return value;
     }
-    const isLastArgument = isValidArgumentInString(disassembledString);
-    const lastArgumentCount = createIfAndElseAndReturns(isLastArgument, 1, 0);
-    return value + lastArgumentCount;
-}
 
-function containsValidArgumentsCountInString(string) {
-    let stringManipulation = new StringManipulation(string);
-    let containsCommasCount = stringManipulation.containsSearchsCount(",");
-    let disassembledString = getValidString(string);
-    let value = 0;
-    while (containsCommasCount > 0) {
-        stringManipulation = new StringManipulation(disassembledString);
-        const containsFirstArgumentsCount = containsValidFirstArgumentsCountInString(disassembledString);
-        const isContainsFirstArgument = containsFirstArgumentsCount > 0;
-        if (isContainsFirstArgument) {
-            const removableCommaCount = createIfAndElseAndReturns(containsFirstArgumentsCount <= containsCommasCount, containsFirstArgumentsCount, containsCommasCount);
-            const commaIndex = getSearchThIndexOfString(disassembledString, ",", removableCommaCount);
-            value += removableCommaCount;
-            disassembledString = stringManipulation.removeSubStringWithToIndex(commaIndex);
-            containsCommasCount -= removableCommaCount;
-        } else {
-            const firstCommaIndex = getSearchThIndexOfString(disassembledString, ",", 1);
-            disassembledString = stringManipulation.removeSubStringWithToIndex(firstCommaIndex);
-            containsCommasCount -= 1;
+    static isArgumentValidColonCount(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        return isContainsOneSearchInString(argument, ":");
+    }
+
+    static getArgumentBeforeColonPart(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const isContainsColon = isContainsSearchInString(string, ":");
+        const colonIndex = getStringIndexOf(argument, ":");
+        const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex - 1);
+        return createIfAndElseAndReturns(isContainsColon, beforeOfColonPart, "");
+    }
+
+    static getArgumentAfterColonPart(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const isContainsColon = isContainsSearchInString(string, ":");
+        const colonIndex = getStringIndexOf(argument, ":");
+        const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex + 1);
+        return createIfAndElseAndReturns(isContainsColon, beforeOfColonPart, "");
+    }
+
+    static isArgumentNameAndColon(string, argumentTh) {
+        const isContainsColon = isContainsSearchInString(string, ":");
+        const beforeOfColonPart = this.getArgumentBeforeColonPart(string, argumentTh);
+        return isContainsColon && isNotJustSpacesString(beforeOfColonPart);
+    }
+
+    static isArgumentColonAndValue(string, argumentTh) {
+        const isContainsColon = isContainsSearchInString(string, ":");
+        const afterOfColonPart = this.getArgumentAfterColonPart(string, argumentTh);
+        return isContainsColon && isNotJustSpacesString(afterOfColonPart);
+    }
+
+    static isArgumentValidNameAndColon(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const isValidColonCount = this.isArgumentValidColonCount(string, argumentTh);
+        const colonIndex = getStringIndexOf(argument, ":");
+        const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex - 1);
+        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(beforeOfColonPart, " ");
+        return isValidColonCount && outsideParts.length === 1;
+    }
+
+    static isArgumentValidColonAndValue(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const isValidColonCount = this.isArgumentValidColonCount(string, argumentTh);
+        const colonIndex = getStringIndexOf(argument, ":");
+        const afterOfColonPart = StringPart.subStringWithFromIndex(argument, colonIndex + 1);
+        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(afterOfColonPart, " ");
+        return isValidColonCount && outsideParts.length === 1;
+    }
+
+    static getArgumentNameIfValidColonCount(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const isValidColonCount = this.isArgumentValidColonCount(string, argumentTh);
+        const colonIndex = getStringIndexOf(argument, ":");
+        const valueIfValidColonCount = StringPart.subStringWithToIndex(argument, colonIndex - 1);
+        return createIfAndElseAndReturns(isValidColonCount, valueIfValidColonCount, "");
+    }
+
+    static getArgumentValueIfValidColonCount(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const isValidColonCount = this.isArgumentValidColonCount(string, argumentTh);
+        const colonIndex = getStringIndexOf(argument, ":");
+        const valueIfValidColonCount = StringPart.subStringWithFromIndex(argument, colonIndex + 1);
+        return createIfAndElseAndReturns(isValidColonCount, valueIfValidColonCount, "");
+    }
+
+    static getArgumentValidNameIfValidColonCount(string, argumentTh) {
+        const name = this.getArgumentNameIfValidColonCount(string, argumentTh);
+        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(name, " ");
+        const isOneOutsidePartsCount = outsideParts.length === 1;
+        return createIfAndElseAndReturns(isOneOutsidePartsCount, removeAllSearchsInString(name, " "), name);
+    }
+
+    static getArgumentValidValueIfValidColonCount(string, argumentTh) {
+        const value = this.getArgumentValueIfValidColonCount(string, argumentTh);
+        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(value, " ");
+        const isOneOutsidePartsCount = outsideParts.length === 1;
+        return createIfAndElseAndReturns(isOneOutsidePartsCount, removeAllSearchsInString(value, " "), value);
+    }
+
+    static isArgument2OutsideParts(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
+        return outsideParts.length === 2;
+    }
+
+    static isArgument2ValidOutsideParts(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
+        const isValidOutsidePartsCount = outsideParts.length === 2;
+        let value = false;
+        if (isValidOutsidePartsCount) {
+            const isValidFirstPart = !isContainsSearchsInString(outsideParts[0], ":");
+            const isValidLastPart = !isContainsSearchsInString(outsideParts[1], ":");
+            value = isValidFirstPart && isValidLastPart;
         }
+        return value;
     }
-    const isLastArgument = isValidArgumentInString(disassembledString);
-    const lastArgumentCount = createIfAndElseAndReturns(isLastArgument, 1, 0);
-    return value + lastArgumentCount;
-}
 
-function getValidArgumentsIndexesFromStringInArray(string) {
-    const {length} = string;
-    const stringPart = new StringPart(string);
-    const containsCommasCount = stringPart.containsSearchsCount(",");
-    const validFirstArgumentsCount = containsValidFirstArgumentsCountInString(string);
-    const isContainsFirstArgument = validFirstArgumentsCount > 0;
-    let value = createIfAndElseAndReturns(isContainsFirstArgument, [0], []);
-    for (let i = 1; i <= containsCommasCount; i++) {
-        const commaThIndex = getSearchThIndexOfString(string, ",", i);
-        const fromIndex = commaThIndex + 1;
-        const isContainsNextComma = i + 1 <= containsCommasCount;
-        const nextCommaThIndex = getSearchThIndexOfString(string, ",", i + 1);
-        const toIndex = createIfAndElseAndReturns(isContainsNextComma, nextCommaThIndex - 1, length - 1);
-        const argumentPart = stringPart.subString(fromIndex, toIndex);
-        const isArgument = isValidArgumentInString(argumentPart);
-        if (isArgument) {
-            value.push(fromIndex);
+    static getArgument2OutsidePartsIfValidOutsidePartsCount(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
+        const isValidOutsidePartsCount = outsideParts.length === 2;
+        let value = ["", ""];
+        if (isValidOutsidePartsCount) {
+            value = [outsideParts[0], outsideParts[1]];
         }
+        return value;
     }
-    return value;
-}
 
-function getValidArgumentsThsFromStringInArray(string) {
-    const commaIndex = getStringIndexOf(string, ",");
-    const containsValidArgumentsCount = containsValidArgumentsCountInString(string);
-    const validArgumentsIndexes = getValidArgumentsIndexesFromStringInArray(string);
-    const firstArgumentIndex = validArgumentsIndexes[0];
-    let value = [];
-    if (firstArgumentIndex < commaIndex) {
-        value = [1];
-        if (validArgumentsIndexes.length === containsValidArgumentsCount) {
-            validArgumentsIndexes.shift();
+    static getArgument2ValidOutsidePartsIfValidOutsidePartsCount(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
+        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
+        let value = ["", ""];
+        if (isValidOutsideParts) {
+            value = [outsideParts[0], outsideParts[1]];
         }
+        return value;
     }
-    for (const element of validArgumentsIndexes) {
-        const commaTh = getSearchThOfStringIndex(string, ",", element - 1);
-        value.push(commaTh + 1);
+
+    static getArgumentName(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const isValidNameAndColon = this.isArgumentValidNameAndColon(string, argumentTh);
+        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
+        const validName = this.getArgumentValidName(string, argumentTh);
+        const beforeColonPart = this.getArgumentBeforeColonPart(string, argumentTh);
+        const isValidNameAndColonOrOutsideParts = isValidNameAndColon || isValidOutsideParts;
+        const isContainsOneColon = isContainsOneSearchInString(argument, ":");
+        const ifValidNameAndColonOrOutsideParts = createIfAndElseAndReturns(isContainsOneColon, beforeColonPart, argument);
+        return createIfAndElseAndReturns(isValidNameAndColonOrOutsideParts, validName, ifValidNameAndColonOrOutsideParts);
     }
-    return value;
-}
 
-function getValidArgumentsFromStringInArray(string) {
-    const {length} = string;
-    const validArgumentsIndexes = getValidArgumentsIndexesFromStringInArray(string);
-    let value = [];
-    for (const element of validArgumentsIndexes) {
-        const fromIndex = element;
-        const toIndexIfContainsNextComma = getSearchIndexOrNearestFollowingSearchIndexInString(string, ",", fromIndex) - 1;
-        const isContainsNextComma = toIndexIfContainsNextComma > -1;
-        const toIndex = createIfAndElseAndReturns(isContainsNextComma, toIndexIfContainsNextComma, length - 1);
-        const argument = StringPart.subString(string, fromIndex, toIndex);
-        value.push(argument);
+    static getArgumentValue(string, argumentTh) {
+        const argument = this.getArgument(string, argumentTh);
+        const isValidColonAndValue = this.isArgumentValidColonAndValue(string, argumentTh);
+        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
+        const validValue = this.getArgumentValidName(string, argumentTh);
+        const afterColonPart = this.getArgumentBeforeColonPart(string, argumentTh);
+        const isValidColonAndValueOrOutsideParts = isValidColonAndValue || isValidOutsideParts;
+        const isContainsOneColon = isContainsOneSearchInString(argument, ":");
+        const ifValidColonAndValueOrOutsideParts = createIfAndElseAndReturns(isContainsOneColon, afterColonPart, argument);
+        return createIfAndElseAndReturns(isValidColonAndValueOrOutsideParts, validValue, ifValidColonAndValueOrOutsideParts);
     }
-    return value;
-}
 
-function getValidArgumentFromArgumentsInString(string, argumentTh) {
-    const validArgumentsThs = getValidArgumentsThsFromStringInArray(string);
-    const validArguments = getValidArgumentsFromStringInArray(string);
-    let value = "";
-    for (let i = 0; i < validArgumentsThs.length; i++) {
-        const validArgumentTh = validArgumentsThs[i];
-        if (argumentTh === validArgumentTh) {
-            value = validArguments[i];
-        }
+    static getArgumentValidName(string, argumentTh) {
+        const isValidNameAndColon = this.isArgumentValidNameAndColon(string, argumentTh);
+        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
+        const validNameIfValidColonCount = this.getArgumentValidNameIfValidColonCount(string, argumentTh);
+        const valid2Parts = this.getArgument2ValidOutsidePartsIfValidOutsidePartsCount(string, argumentTh);
+        const valueIfNotContainsColon = createIfAndElseAndReturns(isValidOutsideParts, valid2Parts[0], "");
+        return createIfAndElseAndReturns(isValidNameAndColon, validNameIfValidColonCount, valueIfNotContainsColon);
     }
-    return value;
-}
 
-function getArgumentFromArgumentsInString(string, argumentTh) {
-    string = getValidString(string);
-    argumentTh = getValidSearchTh(argumentTh);
-    const {length} = string;
-    const stringPart = new StringPart(string);
-    const containsCommasCount = stringPart.containsSearchsCount(",");
-    const isContainsComma = containsCommasCount > 0;
-    const firstCommaIndex = getStringIndexOf(string, ",");
-    const isValidArgumentTh = argumentTh > 1 && argumentTh <= containsCommasCount + 1;
-    const isValidNextArgumentTh = argumentTh > 1 && argumentTh + 1 <= containsCommasCount + 1;
-    const isContainsCommaToValue = argumentTh === 1 && isContainsComma;
-    const ifContainsCommaToValue = stringPart.subStringWithToIndex(firstCommaIndex - 1);
-    const ifNotContainsCommaToValue = createIfAndElseAndReturns(argumentTh === 1, string, "");
-    let value = createIfAndElseAndReturns(isContainsCommaToValue, ifContainsCommaToValue, ifNotContainsCommaToValue);
-    if (isValidArgumentTh) {
-        const commaThIndex = getSearchThIndexOfString(string, ",", argumentTh - 1);
-        const fromIndex = commaThIndex + 1;
-        const nextCommaThIndex = getSearchThIndexOfString(string, ",", argumentTh);
-        const toIndex = createIfAndElseAndReturns(isValidNextArgumentTh, nextCommaThIndex - 1, length - 1);
-        value = stringPart.subString(fromIndex, toIndex);
+    static getArgumentValidValue(string, argumentTh) {
+        const isValidColonAndValue = this.isArgumentValidColonAndValue(string, argumentTh);
+        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
+        const validValueIfValidColonCount = this.getArgumentValidValueIfValidColonCount(string, argumentTh);
+        const valid2Parts = this.getArgument2ValidOutsidePartsIfValidOutsidePartsCount(string, argumentTh);
+        const valueIfNotContainsColon = createIfAndElseAndReturns(isValidOutsideParts, valid2Parts[1], "");
+        return createIfAndElseAndReturns(isValidColonAndValue, validValueIfValidColonCount, valueIfNotContainsColon);
     }
-    return value;
-}
 
-function getArgumentsFromStringInArray(string) {
-    const stringManipulation = new StringManipulation(string);
-    const containsCommasCount = stringManipulation.containsSearchsCount(",");
-    let value = [];
-    for (let i = 1; i <= containsCommasCount + 1; i++) {
-        const argument = getArgumentFromArgumentsInString(string, i);
-        value.push(argument);
+    constructor(string) {
+        this.string = getValidString(string);
     }
-    return value;
-}
 
-function isArgumentValidColonCountFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    return isContainsOneSearchInString(argument, ":");
-}
-
-function getArgumentBeforeColonPartFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isContainsColon = isContainsSearchInString(string, ":");
-    const colonIndex = getStringIndexOf(argument, ":");
-    const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex - 1);
-    return createIfAndElseAndReturns(isContainsColon, beforeOfColonPart, "");
-}
-
-function getArgumentAfterColonPartFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isContainsColon = isContainsSearchInString(string, ":");
-    const colonIndex = getStringIndexOf(argument, ":");
-    const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex + 1);
-    return createIfAndElseAndReturns(isContainsColon, beforeOfColonPart, "");
-}
-
-function isArgumentNameAndColonFromArgumentsInString(string, argumentTh) {
-    const isContainsColon = isContainsSearchInString(string, ":");
-    const beforeOfColonPart = getArgumentBeforeColonPartFromArgumentsInString(string, argumentTh);
-    return isContainsColon && isNotJustSpacesString(beforeOfColonPart);
-}
-
-function isArgumentColonAndValueFromArgumentsInString(string, argumentTh) {
-    const isContainsColon = isContainsSearchInString(string, ":");
-    const afterOfColonPart = getArgumentAfterColonPartFromArgumentsInString(string, argumentTh);
-    return isContainsColon && isNotJustSpacesString(afterOfColonPart);
-}
-
-function isArgumentValidNameAndColonFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isValidColonCount = isArgumentValidColonCountFromArgumentsInString(string, argumentTh);
-    const colonIndex = getStringIndexOf(argument, ":");
-    const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex - 1);
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(beforeOfColonPart, " ");
-    return isValidColonCount && outsideParts.length === 1;
-}
-
-function isArgumentValidColonAndValueFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isValidColonCount = isArgumentValidColonCountFromArgumentsInString(string, argumentTh);
-    const colonIndex = getStringIndexOf(argument, ":");
-    const afterOfColonPart = StringPart.subStringWithFromIndex(argument, colonIndex + 1);
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(afterOfColonPart, " ");
-    return isValidColonCount && outsideParts.length === 1;
-}
-
-function getArgumentNameIfValidColonCountFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isValidColonCount = isArgumentValidColonCountFromArgumentsInString(string, argumentTh);
-    const colonIndex = getStringIndexOf(argument, ":");
-    const valueIfValidColonCount = StringPart.subStringWithToIndex(argument, colonIndex - 1);
-    return createIfAndElseAndReturns(isValidColonCount, valueIfValidColonCount, "");
-}
-
-function getArgumentValueIfValidColonCountFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isValidColonCount = isArgumentValidColonCountFromArgumentsInString(string, argumentTh);
-    const colonIndex = getStringIndexOf(argument, ":");
-    const valueIfValidColonCount = StringPart.subStringWithFromIndex(argument, colonIndex + 1);
-    return createIfAndElseAndReturns(isValidColonCount, valueIfValidColonCount, "");
-}
-
-function getArgumentValidNameIfValidColonCountFromArgumentsInString(string, argumentTh) {
-    const name = getArgumentNameIfValidColonCountFromArgumentsInString(string, argumentTh);
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(name, " ");
-    const isOneOutsidePartsCount = outsideParts.length === 1;
-    return createIfAndElseAndReturns(isOneOutsidePartsCount, removeAllSearchsInString(name, " "), name);
-}
-
-function getArgumentValidValueIfValidColonCountFromArgumentsInString(string, argumentTh) {
-    const value = getArgumentValueIfValidColonCountFromArgumentsInString(string, argumentTh);
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(value, " ");
-    const isOneOutsidePartsCount = outsideParts.length === 1;
-    return createIfAndElseAndReturns(isOneOutsidePartsCount, removeAllSearchsInString(value, " "), value);
-}
-
-function isArgument2OutsidePartsFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
-    return outsideParts.length === 2;
-}
-
-function isArgument2ValidOutsidePartsFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
-    const isValidOutsidePartsCount = outsideParts.length === 2;
-    let value = false;
-    if (isValidOutsidePartsCount) {
-        const isValidFirstPart = !isContainsSearchsInString(outsideParts[0], ":");
-        const isValidLastPart = !isContainsSearchsInString(outsideParts[1], ":");
-        value = isValidFirstPart && isValidLastPart;
-    }
-    return value;
-}
-
-function getArgument2OutsidePartsIfValidOutsidePartsCountFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
-    const isValidOutsidePartsCount = outsideParts.length === 2;
-    let value = ["", ""];
-    if (isValidOutsidePartsCount) {
-        value = [outsideParts[0], outsideParts[1]];
-    }
-    return value;
-}
-
-function getArgument2ValidOutsidePartsIfValidOutsidePartsCountFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
-    const isValidOutsideParts = isArgument2ValidOutsidePartsFromArgumentsInString(string, argumentTh);
-    let value = ["", ""];
-    if (isValidOutsideParts) {
-        value = [outsideParts[0], outsideParts[1]];
-    }
-    return value;
-}
-
-function getArgumentValidNameFromArgumentsInString(string, argumentTh) {
-    const isValidNameAndColon = isArgumentValidNameAndColonFromArgumentsInString(string, argumentTh);
-    const isValidOutsideParts = isArgument2ValidOutsidePartsFromArgumentsInString(string, argumentTh);
-    const validNameIfValidColonCount = getArgumentValidNameIfValidColonCountFromArgumentsInString(string, argumentTh);
-    const valid2Parts = getArgument2ValidOutsidePartsIfValidOutsidePartsCountFromArgumentsInString(string, argumentTh);
-    const valueIfNotContainsColon = createIfAndElseAndReturns(isValidOutsideParts, valid2Parts[0], "");
-    return createIfAndElseAndReturns(isValidNameAndColon, validNameIfValidColonCount, valueIfNotContainsColon);
-}
-
-function getArgumentValidValueFromArgumentsInString(string, argumentTh) {
-    const isValidColonAndValue = isArgumentValidColonAndValueFromArgumentsInString(string, argumentTh);
-    const isValidOutsideParts = isArgument2ValidOutsidePartsFromArgumentsInString(string, argumentTh);
-    const validValueIfValidColonCount = getArgumentValidValueIfValidColonCountFromArgumentsInString(string, argumentTh);
-    const valid2Parts = getArgument2ValidOutsidePartsIfValidOutsidePartsCountFromArgumentsInString(string, argumentTh);
-    const valueIfNotContainsColon = createIfAndElseAndReturns(isValidOutsideParts, valid2Parts[1], "");
-    return createIfAndElseAndReturns(isValidColonAndValue, validValueIfValidColonCount, valueIfNotContainsColon);
-}
-
-function getArgumentNameFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isValidNameAndColon = isArgumentValidNameAndColonFromArgumentsInString(string, argumentTh);
-    const isValidOutsideParts = isArgument2ValidOutsidePartsFromArgumentsInString(string, argumentTh);
-    const validName = getArgumentValidNameFromArgumentsInString(string, argumentTh);
-    const beforeColonPart = getArgumentBeforeColonPartFromArgumentsInString(string, argumentTh);
-    const isValidNameAndColonOrOutsideParts = isValidNameAndColon || isValidOutsideParts;
-    const isContainsOneColon = isContainsOneSearchInString(argument, ":");
-    const ifValidNameAndColonOrOutsideParts = createIfAndElseAndReturns(isContainsOneColon, beforeColonPart, argument);
-    return createIfAndElseAndReturns(isValidNameAndColonOrOutsideParts, validName, ifValidNameAndColonOrOutsideParts);
-}
-
-function getArgumentValueFromArgumentsInString(string, argumentTh) {
-    const argument = getArgumentFromArgumentsInString(string, argumentTh);
-    const isValidColonAndValue = isArgumentValidColonAndValueFromArgumentsInString(string, argumentTh);
-    const isValidOutsideParts = isArgument2ValidOutsidePartsFromArgumentsInString(string, argumentTh);
-    const validValue = getArgumentValidNameFromArgumentsInString(string, argumentTh);
-    const afterColonPart = getArgumentBeforeColonPartFromArgumentsInString(string, argumentTh);
-    const isValidColonAndValueOrOutsideParts = isValidColonAndValue || isValidOutsideParts;
-    const isContainsOneColon = isContainsOneSearchInString(argument, ":");
-    const ifValidColonAndValueOrOutsideParts = createIfAndElseAndReturns(isContainsOneColon, afterColonPart, argument);
-    return createIfAndElseAndReturns(isValidColonAndValueOrOutsideParts, validValue, ifValidColonAndValueOrOutsideParts);
+    getArgument = argumentTh => S$ArgumentsInString.getArgument(this.string, argumentTh);
+    getArguments = () => S$ArgumentsInString.getArguments(this.string);
+    isArgumentValidColonCount = argumentTh => S$ArgumentsInString.isArgumentValidColonCount(this.string, argumentTh);
+    getArgumentBeforeColonPart = argumentTh => S$ArgumentsInString.getArgumentBeforeColonPart(this.string, argumentTh);
+    getArgumentAfterColonPart = argumentTh => S$ArgumentsInString.getArgumentAfterColonPart(this.string, argumentTh);
+    isArgumentNameAndColon = argumentTh => S$ArgumentsInString.isArgumentNameAndColon(this.string, argumentTh);
+    isArgumentColonAndValue = argumentTh => S$ArgumentsInString.isArgumentColonAndValue(this.string, argumentTh);
+    isArgumentValidNameAndColon = argumentTh => S$ArgumentsInString.isArgumentValidNameAndColon(this.string, argumentTh);
+    isArgumentValidColonAndValue = argumentTh => S$ArgumentsInString.isArgumentValidColonAndValue(this.string, argumentTh);
+    getArgumentNameIfValidColonCount = argumentTh => S$ArgumentsInString.getArgumentNameIfValidColonCount(this.string, argumentTh);
+    getArgumentValueIfValidColonCount = argumentTh => S$ArgumentsInString.getArgumentValueIfValidColonCount(this.string, argumentTh);
+    getArgumentValidNameIfValidColonCount = argumentTh => S$ArgumentsInString.getArgumentValidNameIfValidColonCount(this.string, argumentTh);
+    getArgumentValidValueIfValidColonCount = argumentTh => S$ArgumentsInString.getArgumentValidValueIfValidColonCount(this.string, argumentTh);
+    isArgument2OutsideParts = argumentTh => S$ArgumentsInString.isArgument2OutsideParts(this.string, argumentTh);
+    isArgument2ValidOutsideParts = argumentTh => S$ArgumentsInString.isArgument2ValidOutsideParts(this.string, argumentTh);
+    getArgument2OutsidePartsIfValidOutsidePartsCount = argumentTh => S$ArgumentsInString.getArgument2OutsidePartsIfValidOutsidePartsCount(this.string, argumentTh);
+    getArgument2ValidOutsidePartsIfValidOutsidePartsCount = argumentTh => S$ArgumentsInString.getArgument2ValidOutsidePartsIfValidOutsidePartsCount(this.string, argumentTh);
+    getArgumentName = argumentTh => S$ArgumentsInString.getArgumentName(this.string, argumentTh);
+    getArgumentValue = argumentTh => S$ArgumentsInString.getArgumentValue(this.string, argumentTh);
+    getArgumentValidName = argumentTh => S$ArgumentsInString.getArgumentValidName(this.string, argumentTh);
+    getArgumentValidValue = argumentTh => S$ArgumentsInString.getArgumentValidValue(this.string, argumentTh);
 }
 
 function isNotJustSpacesString(string) {
