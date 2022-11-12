@@ -1,9 +1,15 @@
+import {DIGITS, getValidString, isCharEqualsCharacterOfText, isValidStringAndText} from "./script";
+import {createArrayFromObjects, isEmptyString} from "./s$ArgumentsInString";
+import {createIfAndElseAndReturns, getValidInteger, StringPart} from "./stringPart";
+
 export class StringManipulation {
     static containsSearchCount(string, search) {
-        let replace = getValidString(string);
+        string = getValidString(string);
+        search = getValidString(search);
+        let replace = string;
         let counter = 0;
         while (true) {
-            const removedSearchReplace = replace.replace(getValidString(search), "");
+            const removedSearchReplace = replace.replace(search, "");
             if (removedSearchReplace === replace) {
                 break;
             } else {
@@ -32,17 +38,20 @@ export class StringManipulation {
     }
 
     static convertElementsToArray(string) {
+        string = getValidString(string);
         let value = [];
-        for (const element of getValidString(string)) {
+        for (const element of string) {
             value.push(element);
         }
         return value;
     }
 
     static isElementsMatchSomeOfCharsInText(string, text) {
+        string = getValidString(string);
+        text = getValidString(text);
         let value = isValidStringAndText(string, text);
-        for (const element of getValidString(string)) {
-            value = value && isCharEqualsCharacterOfText(element, getValidString(text));
+        for (const element of string) {
+            value = value && isCharEqualsCharacterOfText(element, text);
         }
         return value;
     }
@@ -65,6 +74,12 @@ export class StringManipulation {
     static isValidSubStringParameters(string, fromIndex, toIndex) {
         const isValidIndexes = typeof fromIndex === "number" && typeof toIndex === "number";
         return !isEmptyString(string) && isValidIndexes;
+    }
+
+    static removeSearchInString(string, search) {
+        string = getValidString(string);
+        search = getValidString(search);
+        return string.replace(search, "");
     }
 
     static removeSubString(string, fromIndex, toIndex) {
@@ -95,6 +110,15 @@ export class StringManipulation {
         return this.removeSubString(string, fromIndex, toIndex);
     }
 
+    static isNotJustSpacesString(string) {
+        string = getValidString(string);
+        const {length} = string;
+        const stringManipulation = new StringManipulation(string);
+        const spacesCount = stringManipulation.containsSearchsCount(" ");
+        const isNotJustSpaces = length > spacesCount;
+        return !isEmptyString(string) && isNotJustSpaces;
+    }
+
     constructor(string) {
         this.string = getValidString(string);
     }
@@ -107,8 +131,10 @@ export class StringManipulation {
     isDigits = () => StringManipulation.isDigits(this.string);
     reverse = () => StringManipulation.reverse(this.string);
     isValidSubStringParameters = (fromIndex, toIndex) => StringManipulation.isValidSubStringParameters(this.string, fromIndex, toIndex);
+    removeSearchInString = (search) => StringManipulation.removeSearchInString(this.string, search);
     removeSubString = (fromIndex, toIndex) => StringManipulation.removeSubString(this.string, fromIndex, toIndex);
     removeSubStringWithFromIndex = fromIndex => StringManipulation.removeSubStringWithFromIndex(this.string, fromIndex);
     removeSubStringWithToIndex = toIndex => StringManipulation.removeSubStringWithToIndex(this.string, toIndex);
     removeSubStringWithLength = (fromIndex, length) => StringManipulation.removeSubStringWithLength(this.string, fromIndex, length);
+    isNotJustSpacesString = () => StringManipulation.isNotJustSpacesString(this.string);
 }

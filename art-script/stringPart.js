@@ -1,9 +1,5 @@
 import {StringManipulation} from "./stringManipulation";
-
-export const getValidString = value => createIfAndElseAndReturns(typeof value === "string", value, "" + value);
-export const isValidNumber = value => !isNaN(value) && value !== Infinity && value !== -Infinity;
-export const getValidNumber = value => createIfAndElseAndReturns(isValidNumber(value), value, 0);
-export const getValidInteger = value => Number.parseInt(getValidNumber(value));
+import {getValidString} from "./script";
 
 export class StringPart extends StringManipulation {
     static subString(string, fromIndex, toIndex) {

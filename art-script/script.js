@@ -1,14 +1,5 @@
 import {StringManipulation} from "./stringManipulation";
-import {getValidInteger, StringPart} from "./stringPart";
-import {
-    getConsecutiveMatchingSearchsPartsCountInString,
-    getConsecutiveMatchingSearchsPartsIndexesInString,
-    isValidSearchThInStringParameters,
-    removeConsecutiveMatchingSearchsInString,
-    removeSearchThInString,
-    validateMinAndMax
-} from "./s$ArgumentsInString";
-
+import {StringPart} from "./stringPart";
 // noinspection JSDeprecatedSymbols
 window.getMousePos = (element) => ({
     x: event.clientX - element.getBoundingClientRect().left,
@@ -21,6 +12,7 @@ export const getValidArray = value => createIfAndElseAndReturns(Array.isArray(va
 const isValidNumber = value => !isNaN(value) && value !== Infinity && value !== -Infinity;
 export const getValidNumber = value => createIfAndElseAndReturns(isValidNumber(value), value, 0);
 export const isValidInteger = value => isValidNumber(value) && isStringInteger(value);
+export const getValidInteger = value => Number.parseInt(getValidNumber(value));
 export const isEmptyString = string => getValidString(string).length === 0;
 export const getStringIndexOf = (string, search) => getValidString(string).indexOf(getValidString(search));
 export const isContainsSearchInString = (string, search) => getStringIndexOf(string, search) > -1;
@@ -925,7 +917,7 @@ function getObjectIfObjectArrayElementEqualsArrayFirst(objectsArray, equalsAndEl
     return getReturnIfObjectArrayElementEqualsArrayFirst(objectsArray, convertEqualsAndElseArrayToEqualsAndReturnsArray(equalsAndElseArray));
 }
 
-function getObjectIfEqualsObjects(a, b) {
+export function getObjectIfEqualsObjects(a, b) {
     return createIfAndElseAndReturns(a === b, b, a);
 }
 
@@ -2374,4 +2366,167 @@ export function createIfAndElseAndReturns(condition, ifTrue, ifFalse) {
     } else {
         return ifFalse;
     }
+}
+
+export function validateMinAndMax(min, max) {
+    min = getValidNumber(min);
+    max = getValidNumber(max);
+    if (max < min) {
+        const i = min;
+        min = max;
+        max = i;
+    }
+    return [min, max];
+}
+
+export function removeSearchInString(string, search) {
+    string = getValidString(string);
+    search = getValidString(search);
+    return string.replace(search, "");
+}
+
+export function isValidSearchThInStringParameters(string, search, searchTh) {
+    const stringManipulation = new StringManipulation(string);
+    const containsSearchCount = stringManipulation.containsSearchsCount(search);
+    const isValidParameters = typeof string === "string" && typeof search === "string" && typeof searchTh === "number";
+    return isValidParameters && (!isEmptyString(string) || isEmptyStrings(string, search) || containsSearchCount >= getValidSearchTh(searchTh));
+}
+
+export function removeSearchThInString(string, search, searchTh) {
+    const isValid = isValidSearchThInStringParameters(string, search, searchTh);
+    string = getValidString(string);
+    search = getValidString(search);
+    searchTh = getValidSearchTh(searchTh);
+    const fromIndex = getSearchThIndexOfString(string, search, searchTh);
+    const valueIfValid = StringManipulation.removeSubStringWithLength(string, fromIndex, search.length);
+    return createIfAndElseAndReturns(isValid, valueIfValid, string);
+}
+
+export function removeAllSearchsInString(string, search) {
+    string = getValidString(string);
+    const stringManipulation = new StringManipulation(string);
+    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
+    let value = string;
+    for (let i = 0; i < containsSearchsCount; i++) {
+        value = removeSearchInString(value, search);
+    }
+    return value;
+}
+
+function removeConsecutiveSearchsInString(string, search, fromSearchTh, toSearchTh) {
+    string = getValidString(string);
+    fromSearchTh = getValidSearchTh(fromSearchTh);
+    toSearchTh = getValidSearchTh(toSearchTh);
+    const stringManipulation = new StringManipulation(string);
+    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
+    const validFromAndToSearchTh = validateMinAndMax(fromSearchTh, toSearchTh);
+    fromSearchTh = validFromAndToSearchTh[0];
+    toSearchTh = validFromAndToSearchTh[1];
+    let value = string;
+    const max = Math.min(toSearchTh - (fromSearchTh - 1), containsSearchsCount);
+    for (let i = 0; i < max; i++) {
+        value = removeSearchThInString(value, search, fromSearchTh);
+    }
+    return value;
+}
+
+export function removeConsecutiveMatchingSearchsInString(string, search, fromSearchTh) {
+    string = getValidString(string);
+    const fromSearchThIndex = getSearchThIndexOfString(string, search, fromSearchTh);
+    const containsConsecutiveMatchingSearchsCount = containsConsecutiveMatchingSearchsCountInString(string, search, fromSearchThIndex);
+    const toSearchTh = fromSearchTh + containsConsecutiveMatchingSearchsCount - 1;
+    return removeConsecutiveSearchsInString(string, search, fromSearchTh, toSearchTh);
+}
+
+function removeConsecutiveMatchingFirstSearchsInString(string, search) {
+    return removeConsecutiveMatchingSearchsInString(string, search, 1);
+}
+
+function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh) {
+    const isValidParameters = isValidSearchThInStringParameters(string, search, partTh);
+    let stringManipulation = new StringManipulation(string);
+    let containsSearchsCount = stringManipulation.containsSearchsCount(search);
+    let isContainsSearch = containsSearchsCount > 0;
+    search = getValidString(search);
+    partTh = getValidSearchTh(partTh);
+    let value = createIfAndElseAndReturns(isValidParameters, -1, 0);
+    let counter = 0;
+    let i = getStringIndexOf(string, search);
+    if (isContainsSearch && partTh > 0) {
+        let containsConsecutiveMatchingFirstSearchsCount = containsConsecutiveMatchingFirstSearchsCountInString(string, search);
+        let disassembledString = getValidString(string);
+        stringManipulation = new StringManipulation(disassembledString);
+        let searchIndex = getStringIndexOf(disassembledString, search);
+        let removedBetweenFirstAndSecondPart = stringManipulation.removeSubStringWithToIndex(searchIndex);
+        while (counter < partTh) {
+            counter++;
+            if (counter < partTh) {
+                let disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
+                let isContainsMoreThan1Search = disassembledStringSearchIndex > 0;
+                disassembledString = createIfAndElseAndReturns(isContainsMoreThan1Search, removedBetweenFirstAndSecondPart, disassembledString);
+                disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
+                isContainsMoreThan1Search = disassembledStringSearchIndex > 0;
+                i += createIfAndElseAndReturns(isContainsMoreThan1Search, 0, containsConsecutiveMatchingFirstSearchsCount - 1);
+                const newDisassembledStringIfContains1Search = removeConsecutiveMatchingFirstSearchsInString(disassembledString, search);
+                disassembledString = createIfAndElseAndReturns(isContainsMoreThan1Search, disassembledString, newDisassembledStringIfContains1Search);
+                if (isEmptyString(disassembledString)) {
+                    i = -1;
+                    break;
+                } else {
+                    stringManipulation = new StringManipulation(disassembledString);
+                    disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
+                    removedBetweenFirstAndSecondPart = stringManipulation.removeSubStringWithToIndex(disassembledStringSearchIndex);
+                    stringManipulation = new StringManipulation(disassembledString);
+                    containsConsecutiveMatchingFirstSearchsCount = containsConsecutiveMatchingFirstSearchsCountInString(disassembledString, search);
+                    containsSearchsCount = stringManipulation.containsSearchsCount(search);
+                    isContainsSearch = containsSearchsCount > 0;
+                    i += createIfAndElseAndReturns(isContainsSearch, getStringIndexOf(disassembledString, search) + 1, 0);
+                }
+            }
+        }
+        value = i;
+    }
+    return value;
+}
+
+export function getConsecutiveMatchingSearchsPartsCountInString(string, search) {
+    string = getValidString(string);
+    search = getValidString(search);
+    let stringManipulation = new StringManipulation(string);
+    let containsSearchsCount = stringManipulation.containsSearchsCount(search);
+    let isContainsSearch = containsSearchsCount > 0;
+    let value = 0;
+    let disassembledString = string;
+    while (isContainsSearch) {
+        value++;
+        disassembledString = removeConsecutiveMatchingFirstSearchsInString(disassembledString, search);
+        stringManipulation = new StringManipulation(disassembledString);
+        containsSearchsCount = stringManipulation.containsSearchsCount(search);
+        isContainsSearch = containsSearchsCount > 0;
+    }
+    return value;
+}
+
+export function getConsecutiveMatchingSearchsPartsIndexesInString(string, search) {
+    const partsCount = getConsecutiveMatchingSearchsPartsCountInString(string, search);
+    let value = [];
+    for (let i = 1; i <= partsCount; i++) {
+        const partThIndex = getConsecutiveMatchingSearchsPartThIndexInString(string, search, i);
+        value.push(partThIndex);
+    }
+    return value;
+}
+
+function containsConsecutiveMatchingFirstSearchsCountInString(string, search) {
+    return containsConsecutiveMatchingSearchsCountInString(string, search, getStringIndexOf(string, search));
+}
+
+export function isContainsSearchsInString(string, ...searchs) {
+    return isContainsSearchArrayElementsInString(string, createArrayFromObjects(searchs));
+}
+
+export function isContainsOneSearchInString(string, search) {
+    const stringManipulation = new StringManipulation(string);
+    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
+    return containsSearchsCount === 1;
 }

@@ -1,28 +1,41 @@
 import {
+    getCanvasColorInputClickedNameFromName,
+    getCanvasColorInputClickedNameFromType, getCanvasColorInputId, getCanvasColorInputNameFromType,
+    getDefaultCanvasColorInputNameFromName, setDefaultCanvasColorInputValueFromType
+} from "./defines";
+import {
     canvasHeightInput,
-    canvasWidthInput, createArrayFromOneElement, fillColoredRect,
+    canvasWidthInput,
+    changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs,
+    changeLowercaseStringFirstLetterToUppercaseWithAToZ, createArrayFromOneElement,
+    createIfAndElseAndReturns, createSubRepeatedConnectedArraysWithLength,
+    fillColoredRect,
     getCanvasMousePos,
-    getElementById, getObjectIfObjectEqualsArrayFirst,
-    getReturnIfObjectEqualsArrayFirst, getStringIndexOf, getValidArray,
-    getValidNumber, getValidSearchTh,
-    getValidString, isContainsSearchInString, isObjectEqualsSomeElementOfString, isStringNumber,
+    getElementById,
+    getObjectIfEqualsObjects,
+    getReturnIfObjectEqualsArrayFirst,
+    getStringIndexOf,
+    getValidArray,
+    getValidInteger,
+    getValidNumber,
+    getValidSearchTh,
+    getValidString,
+    isContainsSearchInString,
+    isEmptyString,
+    isIntegersArray,
+    isObjectEqualsSomeElementOfString,
+    isStringNumber,
     isValidInteger,
     placeIntegerToTheIncreasingIntegersArray,
     placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ,
     subArray,
     subArrayWithFromIndex,
     subArrayWithToIndex,
-    threeQuarter,
+    tHex,
     validateNumber
-} from "../script";
-import {
-    getCanvasColorInputClickedNameFromName,
-    getCanvasColorInputClickedNameFromType, getCanvasColorInputId, getCanvasColorInputNameFromType,
-    getDefaultCanvasColorInputNameFromName, setDefaultCanvasColorInputValueFromType
-} from "./defines";
-import {createIfAndElseAndReturns, getValidInteger} from "../stringPart";
-import {isEmptyString, S$ArgumentsInString} from "../s$ArgumentsInString";
-import {StringManipulation} from "../stringManipulation";
+} from "../art-script/script";
+import {S$ArgumentsInString} from "../art-script/s$ArgumentsInString";
+import {StringManipulation} from "../art-script/stringManipulation";
 
 window.canvas = document.getElementById("piano-song-editor");
 window.context = canvas.getContext("2d");
