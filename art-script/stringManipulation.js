@@ -1,11 +1,10 @@
 import {
-    createArrayFromObjects,
-    DIGITS, getValidInteger,
+    createArrayFromObjects, createIfAndElseAndReturns,
+    DIGITS,
     getValidString,
     isCharEqualsCharacterOfText, isEmptyString,
     isValidStringAndText
 } from "./script.js";
-import {createIfAndElseAndReturns, StringPart} from "./stringPart.js";
 
 export class StringManipulation {
     static containsSearchCount(string, search) {
@@ -76,45 +75,6 @@ export class StringManipulation {
         return value;
     }
 
-    static isValidSubStringParameters(string, fromIndex, toIndex) {
-        const isValidIndexes = typeof fromIndex === "number" && typeof toIndex === "number";
-        return !isEmptyString(string) && isValidIndexes;
-    }
-
-    static removeSearchInString(string, search) {
-        string = getValidString(string);
-        search = getValidString(search);
-        return string.replace(search, "");
-    }
-
-    static removeSubString(string, fromIndex, toIndex) {
-        string = getValidString(string);
-        const stringPart = new StringPart(string);
-        const isValidParameters = this.isValidSubStringParameters(string, fromIndex, toIndex);
-        fromIndex = getValidInteger(fromIndex);
-        toIndex = getValidInteger(toIndex);
-        const isValid = isValidParameters && fromIndex <= toIndex;
-        const beforeFromIndex = stringPart.subStringWithToIndex(fromIndex - 1);
-        const afterToIndex = stringPart.subStringWithFromIndex(toIndex + 1);
-        return createIfAndElseAndReturns(isValid, beforeFromIndex + afterToIndex, string);
-    }
-
-    static removeSubStringWithFromIndex(string, fromIndex) {
-        string = getValidString(string);
-        return this.removeSubString(string, fromIndex, string.length - 1);
-    }
-
-    static removeSubStringWithToIndex(string, toIndex) {
-        return this.removeSubString(string, 0, toIndex);
-    }
-
-    static removeSubStringWithLength(string, fromIndex, length) {
-        fromIndex = getValidInteger(fromIndex);
-        length = getValidInteger(length);
-        const toIndex = fromIndex + createIfAndElseAndReturns(length > -1, length - 1, 0);
-        return this.removeSubString(string, fromIndex, toIndex);
-    }
-
     static isNotJustSpacesString(string) {
         string = getValidString(string);
         const {length} = string;
@@ -135,11 +95,5 @@ export class StringManipulation {
     isElementsMatchSomeOfCharsInText = text => StringManipulation.isElementsMatchSomeOfCharsInText(this.string, text);
     isDigits = () => StringManipulation.isDigits(this.string);
     reverse = () => StringManipulation.reverse(this.string);
-    isValidSubStringParameters = (fromIndex, toIndex) => StringManipulation.isValidSubStringParameters(this.string, fromIndex, toIndex);
-    removeSearchInString = (search) => StringManipulation.removeSearchInString(this.string, search);
-    removeSubString = (fromIndex, toIndex) => StringManipulation.removeSubString(this.string, fromIndex, toIndex);
-    removeSubStringWithFromIndex = fromIndex => StringManipulation.removeSubStringWithFromIndex(this.string, fromIndex);
-    removeSubStringWithToIndex = toIndex => StringManipulation.removeSubStringWithToIndex(this.string, toIndex);
-    removeSubStringWithLength = (fromIndex, length) => StringManipulation.removeSubStringWithLength(this.string, fromIndex, length);
     isNotJustSpacesString = () => StringManipulation.isNotJustSpacesString(this.string);
 }

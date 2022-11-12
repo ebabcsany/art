@@ -503,7 +503,7 @@ export function getStringCapitalLetter(string) {
 }
 
 export function removeCapitalLetterInString(string) {
-    return StringManipulation.removeSearchInString(string, getStringCapitalLetter(string));
+    return StringPart.removeSearchInString(string, getStringCapitalLetter(string));
 }
 
 export function containsCapitalLetterCountInString(string) {
@@ -1980,8 +1980,8 @@ function createOutsideAndConsecutiveMatchingSearchsPartIndexesArrayFromString(st
 
 function removeConsecutiveMatchingSearchsPartInString(string, search, partTh) {
     const isValidParameters = isValidSearchThInStringParameters(string, search, partTh);
-    const stringManipulation = new StringManipulation(string);
-    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
+    const stringPart = new StringPart(string);
+    const containsSearchsCount = stringPart.containsSearchsCount(search);
     const isContainsSearch = containsSearchsCount > 0;
     const partsCount = getConsecutiveMatchingSearchsPartsCountInString(string, search);
     const partsIndexes = getConsecutiveMatchingSearchsPartsIndexesInString(string, search);
@@ -1990,14 +1990,14 @@ function removeConsecutiveMatchingSearchsPartInString(string, search, partTh) {
     if (isValid) {
         const partIndex = partsIndexes[partTh - 1];
         const partLength = containsConsecutiveMatchingSearchsCountInString(string, search, partIndex);
-        value = stringManipulation.removeSubStringWithLength(partIndex, partLength);
+        value = stringPart.removeSubStringWithLength(partIndex, partLength);
     }
     return value;
 }
 
 function removeCharWithIndexInString(string, charIndex) {
-    const stringManipulation = new StringManipulation(string);
-    return stringManipulation.removeSubString(charIndex, charIndex);
+    const stringPart = new StringPart(string);
+    return stringPart.removeSubString(charIndex, charIndex);
 }
 
 function replaceStringFromSubString(string, fromIndex, toIndex, replace) {
@@ -2305,7 +2305,7 @@ export function getSearchThIndexOfString(string, search, searchTh) {
     if (containsSearchsCount > 0 && searchTh > 0 && searchTh <= containsSearchsCount) {
         let disassembledString = getValidString(string);
         for (let i = 1; i < searchTh; i++) {
-            disassembledString = StringManipulation.removeSearchInString(disassembledString, search);
+            disassembledString = StringPart.removeSearchInString(disassembledString, search);
         }
         const isContainsSearch = isContainsSearchInString(disassembledString, search);
         const addCountOfSearchIndex = createIfAndElseAndReturns(isContainsSearch, (searchTh * search.length) - 1, 0);
@@ -2398,7 +2398,7 @@ export function removeSearchThInString(string, search, searchTh) {
     search = getValidString(search);
     searchTh = getValidSearchTh(searchTh);
     const fromIndex = getSearchThIndexOfString(string, search, searchTh);
-    const valueIfValid = StringManipulation.removeSubStringWithLength(string, fromIndex, search.length);
+    const valueIfValid = StringPart.removeSubStringWithLength(string, fromIndex, search.length);
     return createIfAndElseAndReturns(isValid, valueIfValid, string);
 }
 
@@ -2444,7 +2444,7 @@ function removeConsecutiveMatchingFirstSearchsInString(string, search) {
 
 function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh) {
     const isValidParameters = isValidSearchThInStringParameters(string, search, partTh);
-    let stringManipulation = new StringManipulation(string);
+    let stringManipulation = new StringPart(string);
     let containsSearchsCount = stringManipulation.containsSearchsCount(search);
     let isContainsSearch = containsSearchsCount > 0;
     search = getValidString(search);
@@ -2455,7 +2455,7 @@ function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh
     if (isContainsSearch && partTh > 0) {
         let containsConsecutiveMatchingFirstSearchsCount = containsConsecutiveMatchingFirstSearchsCountInString(string, search);
         let disassembledString = getValidString(string);
-        stringManipulation = new StringManipulation(disassembledString);
+        stringManipulation = new StringPart(disassembledString);
         let searchIndex = getStringIndexOf(disassembledString, search);
         let removedBetweenFirstAndSecondPart = stringManipulation.removeSubStringWithToIndex(searchIndex);
         while (counter < partTh) {
@@ -2473,7 +2473,7 @@ function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh
                     i = -1;
                     break;
                 } else {
-                    stringManipulation = new StringManipulation(disassembledString);
+                    stringManipulation = new StringPart(disassembledString);
                     disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
                     removedBetweenFirstAndSecondPart = stringManipulation.removeSubStringWithToIndex(disassembledStringSearchIndex);
                     stringManipulation = new StringManipulation(disassembledString);

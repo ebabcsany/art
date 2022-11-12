@@ -11,8 +11,7 @@ import {
     createIfAndElseAndReturns, createSubRepeatedConnectedArraysWithLength,
     fillColoredRect,
     getCanvasMousePos,
-    getElementById,
-    getObjectIfEqualsObjects,
+    getObjectIfEqualsObjects, getObjectIfObjectEqualsArrayFirst,
     getReturnIfObjectEqualsArrayFirst,
     getStringIndexOf,
     getValidArray,
@@ -31,11 +30,12 @@ import {
     subArray,
     subArrayWithFromIndex,
     subArrayWithToIndex,
-    tHex,
+    tHex, threeQuarter,
     validateNumber
 } from "../art-script/script.js";
 import {S$ArgumentsInString} from "../art-script/s$ArgumentsInString.js";
 import {StringManipulation} from "../art-script/stringManipulation.js";
+import {StringPart} from "../art-script/stringPart.js";
 
 window.canvas = document.getElementById("piano-song-editor");
 window.context = canvas.getContext("2d");
@@ -679,7 +679,7 @@ function drawKeyOfPiano(type, sizeType, fillStyle, width, height, posX, posY) {
         keyHeight = getWholeKeyHeight(height);
         if (isTypeFirstArgumentName) {
             const colonIndex = getStringIndexOf(type, ":");
-            const validType = StringManipulation.removeSubStringWithToIndex(type, colonIndex);
+            const validType = StringPart.removeSubStringWithToIndex(type, colonIndex);
             const parameters = getWholeKeyParametersOfPiano(validType, sizeType, fillStyle, width, height, posX, posY);
             const style = parameters.style;
             const upperPartX = parameters.upperPartPosX;
@@ -1323,7 +1323,7 @@ function main(timeout) {
 }
 
 function drawPianoSongEditor() {
-    const self = this;
+    const self = drawPianoSongEditor;
     self.canvasFieldsCount = 0;
 
     if (isWindowClicked) {
