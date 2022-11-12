@@ -1,8 +1,15 @@
+import {getValidString} from "../stringPart";
+import {
+    changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs,
+    changeLowercaseStringFirstLetterToUppercaseWithAToZ,
+    placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ
+} from "../script";
+
 const setCanvasColorInputs = () => new CanvasColorInputElement();
 const setCanvasPianoColorInputs = () => new CanvasPianoColorInputElement();
 const setCanvasPianoActivePartColorInputs = () => new CanvasPianoActivePartColorInputElement();
 
-function getCanvasColorInputId(type) {
+export function getCanvasColorInputId(type) {
     type = getValidString(type);
     return "canvas-" + type + "-color";
 }
@@ -12,12 +19,12 @@ function getCanvasColorInputNameFromId(id) {
     return changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs(id, "-");
 }
 
-function getCanvasColorInputNameFromType(type) {
+export function getCanvasColorInputNameFromType(type) {
     const elementId = getCanvasColorInputId(type);
     return getCanvasColorInputNameFromId(elementId);
 }
 
-function getDefaultCanvasColorInputNameFromName(name) {
+export function getDefaultCanvasColorInputNameFromName(name) {
     const changedElementNameFirstLetter = changeLowercaseStringFirstLetterToUppercaseWithAToZ(name);
     return "default" + changedElementNameFirstLetter + "Value";
 }
@@ -32,7 +39,7 @@ function getDefaultCanvasColorInputNameFromType(type) {
     return getDefaultCanvasColorInputNameFromId(elementId);
 }
 
-function getCanvasColorInputClickedNameFromName(name) {
+export function getCanvasColorInputClickedNameFromName(name) {
     const nameWithFirstUppercaseAToZ = changeLowercaseStringFirstLetterToUppercaseWithAToZ(name);
     return "is" + nameWithFirstUppercaseAToZ + "InputClicked";
 }
@@ -42,7 +49,7 @@ function getCanvasColorInputClickedNameFromId(id) {
     return getCanvasColorInputClickedNameFromName(elementName);
 }
 
-function getCanvasColorInputClickedNameFromType(type) {
+export function getCanvasColorInputClickedNameFromType(type) {
     const elementId = getCanvasColorInputId(type);
     return getCanvasColorInputClickedNameFromId(elementId);
 }
@@ -163,7 +170,7 @@ function setDefaultCanvasColorInputValueFromId(id) {
     setDefaultCanvasColorInputValueFromName(elementName);
 }
 
-function setDefaultCanvasColorInputValueFromType(type) {
+export function setDefaultCanvasColorInputValueFromType(type) {
     const elementId = getCanvasColorInputNameFromType(type);
     setDefaultCanvasColorInputValueFromId(elementId);
 }

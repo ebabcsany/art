@@ -1,3 +1,14 @@
+import {StringManipulation} from "./stringManipulation";
+import {getValidInteger, StringPart} from "./stringPart";
+import {
+    getConsecutiveMatchingSearchsPartsCountInString,
+    getConsecutiveMatchingSearchsPartsIndexesInString,
+    isValidSearchThInStringParameters,
+    removeConsecutiveMatchingSearchsInString,
+    removeSearchThInString,
+    validateMinAndMax
+} from "./s$ArgumentsInString";
+
 // noinspection JSDeprecatedSymbols
 window.getMousePos = (element) => ({
     x: event.clientX - element.getBoundingClientRect().left,
@@ -5,12 +16,14 @@ window.getMousePos = (element) => ({
 });
 window.canvas = null;
 window.context = null;
-const getValidString = value => createIfAndElseAndReturns(typeof value === "string", value, "" + value);
-const getValidArray = value => createIfAndElseAndReturns(Array.isArray(value), value, []);
+export const getValidString = value => createIfAndElseAndReturns(typeof value === "string", value, "" + value);
+export const getValidArray = value => createIfAndElseAndReturns(Array.isArray(value), value, []);
 const isValidNumber = value => !isNaN(value) && value !== Infinity && value !== -Infinity;
-const getValidNumber = value => createIfAndElseAndReturns(isValidNumber(value), value, 0);
-const isValidInteger = value => isValidNumber(value) && isStringInteger(value);
-const getValidInteger = value => Number.parseInt(getValidNumber(value));
+export const getValidNumber = value => createIfAndElseAndReturns(isValidNumber(value), value, 0);
+export const isValidInteger = value => isValidNumber(value) && isStringInteger(value);
+export const isEmptyString = string => getValidString(string).length === 0;
+export const getStringIndexOf = (string, search) => getValidString(string).indexOf(getValidString(search));
+export const isContainsSearchInString = (string, search) => getStringIndexOf(string, search) > -1;
 const random = (scale, min, max) => {
     scale = getValidNumber(scale);
     min = getValidNumber(min);
@@ -18,169 +31,17 @@ const random = (scale, min, max) => {
     return Math.floor(Math.random() * (max - min + scale) + min);
 };
 
-class StringManipulation {
-    static containsSearchCount(string, search) {
-        let replace = getValidString(string);
-        let counter = 0;
-        while (true) {
-            const removedSearchReplace = replace.replace(getValidString(search), "");
-            if (removedSearchReplace === replace) {
-                break;
-            } else {
-                replace = removedSearchReplace;
-                counter++;
-            }
-        }
-        return createIfAndElseAndReturns(isEmptyString(search), Infinity, counter);
-    }
-
-    static containsSearchsArrayElementsCount(string, searchsArray) {
-        searchsArray = getValidString(searchsArray);
-        let counter = 0;
-        let arrayCounter = 0;
-        while (searchsArray.length > arrayCounter) {
-            const search = searchsArray[arrayCounter];
-            const searchCount = this.containsSearchCount(string, search);
-            counter += searchCount;
-            arrayCounter++;
-        }
-        return counter;
-    }
-
-    static containsSearchsCount(string, ...searchs) {
-        return this.containsSearchsArrayElementsCount(string, createArrayFromObjects(searchs));
-    }
-
-    static convertElementsToArray(string) {
-        let value = [];
-        for (const element of getValidString(string)) {
-            value.push(element);
-        }
-        return value;
-    }
-
-    static isElementsMatchSomeOfCharsInText(string, text) {
-        let value = isValidStringAndText(string, text);
-        for (const element of getValidString(string)) {
-            value = value && isCharEqualsCharacterOfText(element, getValidString(text));
-        }
-        return value;
-    }
-
-    static isDigits(string) {
-        string = getValidString(string);
-        return this.isElementsMatchSomeOfCharsInText(string, DIGITS);
-    }
-
-    static reverse(string) {
-        string = getValidString(string);
-        let value = "";
-        const {length} = string;
-        for (let i = 0; i < length; i++) {
-            value += string[length - 1 - i];
-        }
-        return value;
-    }
-
-    static isValidSubStringParameters(string, fromIndex, toIndex) {
-        const isValidIndexes = typeof fromIndex === "number" && typeof toIndex === "number";
-        return !isEmptyString(string) && isValidIndexes;
-    }
-
-    static removeSubString(string, fromIndex, toIndex) {
-        string = getValidString(string);
-        const stringPart = new StringPart(string);
-        const isValidParameters = this.isValidSubStringParameters(string, fromIndex, toIndex);
-        fromIndex = getValidInteger(fromIndex);
-        toIndex = getValidInteger(toIndex);
-        const isValid = isValidParameters && fromIndex <= toIndex;
-        const beforeFromIndex = stringPart.subStringWithToIndex(fromIndex - 1);
-        const afterToIndex = stringPart.subStringWithFromIndex(toIndex + 1);
-        return createIfAndElseAndReturns(isValid, beforeFromIndex + afterToIndex, string);
-    }
-
-    static removeSubStringWithFromIndex(string, fromIndex) {
-        string = getValidString(string);
-        return this.removeSubString(string, fromIndex, string.length - 1);
-    }
-
-    static removeSubStringWithToIndex(string, toIndex) {
-        return this.removeSubString(string, 0, toIndex);
-    }
-
-    static removeSubStringWithLength(string, fromIndex, length) {
-        fromIndex = getValidInteger(fromIndex);
-        length = getValidInteger(length);
-        const toIndex = fromIndex + createIfAndElseAndReturns(length > -1, length - 1, 0);
-        return this.removeSubString(string, fromIndex, toIndex);
-    }
-
-    constructor(string) {
-        this.string = getValidString(string);
-    }
-
-    containsSearchCount = search => StringManipulation.containsSearchCount(this.string, search);
-    containsSearchsArrayElementsCount = searchsArray => StringManipulation.containsSearchsArrayElementsCount(this.string, searchsArray);
-    containsSearchsCount = (...searchs) => StringManipulation.containsSearchsCount(this.string, searchs);
-    convertElementsToArray = () => StringManipulation.convertElementsToArray(this.string);
-    isElementsMatchSomeOfCharsInText = text => StringManipulation.isElementsMatchSomeOfCharsInText(this.string, text);
-    isDigits = () => StringManipulation.isDigits(this.string);
-    reverse = () => StringManipulation.reverse(this.string);
-    isValidSubStringParameters = (fromIndex, toIndex) => StringManipulation.isValidSubStringParameters(this.string, fromIndex, toIndex);
-    removeSubString = (fromIndex, toIndex) => StringManipulation.removeSubString(this.string, fromIndex, toIndex);
-    removeSubStringWithFromIndex = fromIndex => StringManipulation.removeSubStringWithFromIndex(this.string, fromIndex);
-    removeSubStringWithToIndex = toIndex => StringManipulation.removeSubStringWithToIndex(this.string, toIndex);
-    removeSubStringWithLength = (fromIndex, length) => StringManipulation.removeSubStringWithLength(this.string, fromIndex, length);
-}
-
-class StringPart extends StringManipulation {
-    static subString(string, fromIndex, toIndex) {
-        string = getValidString(string);
-        const isValid = this.isValidSubStringParameters(string, fromIndex, toIndex);
-        fromIndex = getValidInteger(fromIndex);
-        toIndex = getValidInteger(toIndex);
-        const substring = string.substring(fromIndex, toIndex + 1);
-        const valueIfValid = createIfAndElseAndReturns(fromIndex <= toIndex, substring, "");
-        return createIfAndElseAndReturns(isValid, valueIfValid, string);
-    }
-
-    static subStringWithLength(string, fromIndex, length) {
-        fromIndex = getValidInteger(fromIndex);
-        length = getValidInteger(length);
-        return this.subString(string, fromIndex, fromIndex + length - 1);
-    }
-
-    static subStringWithFromIndex(string, fromIndex) {
-        string = getValidString(string);
-        return this.subString(string, fromIndex, string.length - 1);
-    }
-
-    static subStringWithToIndex(string, toIndex) {
-        return this.subString(string, 0, toIndex);
-    }
-
-    constructor(string) {
-        super(string);
-    }
-
-    isValidSubStringParameters = (fromIndex, toIndex) => StringPart.isValidSubStringParameters(this.string, fromIndex, toIndex);
-    subString = (fromIndex, toIndex) => StringPart.subString(this.string, fromIndex, toIndex);
-    subStringWithLength = (fromIndex, length) => StringPart.subStringWithLength(this.string, fromIndex, length);
-    subStringWithFromIndex = fromIndex => StringPart.subStringWithFromIndex(this.string, fromIndex);
-    subStringWithToIndex = toIndex => StringPart.subStringWithToIndex(this.string, toIndex);
-}
-
-const DIGITS = '0123456789';
+export const DIGITS = '0123456789';
 const canvasWidthInputText = "canvas-width";
 const canvasHeightInputText = "canvas-height";
-const canvasWidthInput = document.getElementById(canvasWidthInputText);
-const canvasHeightInput = document.getElementById(canvasHeightInputText);
+export const canvasWidthInput = document.getElementById(canvasWidthInputText);
+export const canvasHeightInput = document.getElementById(canvasHeightInputText);
 const black = "#000000";
 const white = "#ffffff";
 const transparent = "rgba(0, 0, 0, 0)";
 const half = 1 / 2;
 const quarter = half / 2;
-const threeQuarter = half + quarter;
+export const threeQuarter = half + quarter;
 const eighth = quarter / 2;
 const threeEighths = quarter + eighth;
 const fiveEighths = half + eighth;
@@ -198,7 +59,7 @@ const hexStringLength = lowercaseLettersAToF.length;
 const numberWithNumberTypePossibleParameters = ["half", "quarter", "three-quarter", "eighth", "three-eighths", "five-eighths", "seven-eighths", "sixteenth", "three-sixteenths", "five-sixteenths", "seven-sixteenths", "nine-sixteenths", "eleven-sixteenths", "thirteen-sixteenths", "fifteen-sixteenths"];
 const minToMaxNumberWithNumberTypePossibleParameters = ["quarter to three-quarter", "eighth to seven-eighths", "three-eighths to five-eighths", "sixteenth to fifteen-sixteenths", "three-sixteenths to thirteen-sixteenths", "five-sixteenths to eleven-sixteenths", "seven-sixteenths to nine-sixteenths"];
 const numberWithTypePossibleParameters = ["number", "min to max"];
-const tHex = {};
+export const tHex = {};
 tHex.min = 0;
 tHex.max = 255;
 tHex.numberWithTypeReferenceNumber = type => createIfAndElseAndReturns(type === numberWithTypePossibleParameters[0], null, createIfAndElseAndReturns(type === numberWithTypePossibleParameters[1], 256, 0));
@@ -522,22 +383,22 @@ tHex.getReverseRgbThreeSixteenthsToThirteenSixteensHex = hex => tHex.getReverseR
 tHex.getReverseRgbFiveSixteenthsToElevenSixteensHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 5);
 tHex.getReverseRgbSevenSixteenthsToNineSixteensHex = hex => tHex.getReverseRgbTHexWithTypeIndexAndNumberTypeIndex(hex, 1, 6);
 
-function isLowercaseLetterAToZ(letter) {
+export function isLowercaseLetterAToZ(letter) {
     const isCharacterOfLowercaseLetters = isCharEqualsCharacterOfText(letter, lowercaseLettersAToZ);
     return letter !== null && isCharacterOfLowercaseLetters && getValidString(letter).length === 1;
 }
 
-function isCapitalLetterAToZ(letter) {
+export function isCapitalLetterAToZ(letter) {
     const isCharacterOfCapitalLetters = isCharEqualsCharacterOfText(letter, capitalLettersAToZ);
     return letter !== null && isCharacterOfCapitalLetters && getValidString(letter).length === 1;
 }
 
-function isLetterAToZ(letter) {
+export function isLetterAToZ(letter) {
     const isCharacterOfLetters = isCharEqualsCharacterOfText(letter, lowercaseAndCapitalLettersAToZ);
     return letter !== null && isCharacterOfLetters && getValidString(letter).length === 1;
 }
 
-function changeLowercaseLetterToUppercaseWithAToZ(letter) {
+export function changeLowercaseLetterToUppercaseWithAToZ(letter) {
     let value = letter;
     if (isLetterAToZ(letter) && isLowercaseLetterAToZ(letter)) {
         value = capitalLettersAToZ[lowercaseLettersAToZ.indexOf(letter)];
@@ -545,7 +406,7 @@ function changeLowercaseLetterToUppercaseWithAToZ(letter) {
     return value;
 }
 
-function changeLowercaseLettersToUppercaseWithAToZ(letters) {
+export function changeLowercaseLettersToUppercaseWithAToZ(letters) {
     let value = "";
     letters = getValidString(letters);
     for (const letter of letters) {
@@ -555,14 +416,14 @@ function changeLowercaseLettersToUppercaseWithAToZ(letters) {
     return value;
 }
 
-function changeLowercaseStringFirstLetterToUppercaseWithAToZ(string) {
+export function changeLowercaseStringFirstLetterToUppercaseWithAToZ(string) {
     const stringPart = new StringPart(string);
     const firstLetter = getValidString(string)[0];
     const firstPart = stringPart.subStringWithFromIndex(1);
     return changeLowercaseLetterToUppercaseWithAToZ(firstLetter) + firstPart;
 }
 
-function changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(stringArray) {
+export function changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(stringArray) {
     let value = [];
     for (const element of getValidArray(stringArray)) {
         const validElement = getValidString(element);
@@ -571,7 +432,7 @@ function changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(string
     return value;
 }
 
-function changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZ(string, search, searchTh) {
+export function changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZ(string, search, searchTh) {
     const stringPart = new StringPart(string);
     const searchThIndex = getSearchThIndexOfString(string, search, searchTh);
     const afterSearchThIndex = searchThIndex + getValidString(search).length;
@@ -582,12 +443,12 @@ function changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZ(string, sea
     return beforeLetterPart + changedLetter + afterLetterPart;
 }
 
-function changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZAndRemoveSearchTh(string, search, searchTh) {
+export function changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZAndRemoveSearchTh(string, search, searchTh) {
     const changedLetterInString = changeLowercaseStringSearchThAfterLetterToUppercaseWithAToZ(string, search, searchTh);
     return removeSearchThInString(changedLetterInString, search, searchTh);
 }
 
-function changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs(string, search) {
+export function changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs(string, search) {
     const stringManipulation = new StringManipulation(string);
     const searchsCount = stringManipulation.containsSearchsCount(search);
     let value = string;
@@ -597,7 +458,7 @@ function changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAl
     return value;
 }
 
-function changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZ(string, search) {
+export function changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZ(string, search) {
     const stringManipulation = new StringManipulation(string);
     const searchsCount = stringManipulation.containsSearchsCount(search);
     let value = string;
@@ -607,22 +468,22 @@ function changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZ(string, se
     return value;
 }
 
-function changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZAndStringifyElements(stringArray) {
+export function changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZAndStringifyElements(stringArray) {
     const changedArrayElementsFirstLetter = changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(stringArray);
     return stringifyArrayElements(changedArrayElementsFirstLetter);
 }
 
-function changeLowercaseStringsFirstLetterToUppercaseWithAToZ(...strings) {
+export function changeLowercaseStringsFirstLetterToUppercaseWithAToZ(...strings) {
     const stringArray = createArrayFromObjects(strings);
     return changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZ(stringArray);
 }
 
-function changeLowercaseStringsFirstLetterToUppercaseWithAToZAndStringifyElements(...strings) {
+export function changeLowercaseStringsFirstLetterToUppercaseWithAToZAndStringifyElements(...strings) {
     const stringArray = createArrayFromObjects(strings);
     return changeLowercaseStringArrayElementsFirstLetterToUppercaseWithAToZAndStringifyElements(stringArray);
 }
 
-function isContainsCapitalLetterInString(string) {
+export function isContainsCapitalLetterInString(string) {
     let value = false;
     for (const element of string) {
         if (isCapitalLetterAToZ(element)) {
@@ -633,7 +494,7 @@ function isContainsCapitalLetterInString(string) {
     return value;
 }
 
-function getStringCapitalLetterIndex(string) {
+export function getStringCapitalLetterIndex(string) {
     let letterIndex = -1;
     for (let i = 0; i < string.length; i++) {
         if (isCapitalLetterAToZ(string[i])) {
@@ -644,16 +505,16 @@ function getStringCapitalLetterIndex(string) {
     return letterIndex;
 }
 
-function getStringCapitalLetter(string) {
+export function getStringCapitalLetter(string) {
     const stringChar = string[getStringCapitalLetterIndex(string)];
     return createIfAndElseAndReturns(typeof stringChar === "string", stringChar, "");
 }
 
-function removeCapitalLetterInString(string) {
-    return removeSearchInString(string, getStringCapitalLetter(string));
+export function removeCapitalLetterInString(string) {
+    return StringManipulation.removeSearchInString(string, getStringCapitalLetter(string));
 }
 
-function containsCapitalLetterCountInString(string) {
+export function containsCapitalLetterCountInString(string) {
     let capitalLetterCounter = 0;
     let disassembledString = string;
     while (isContainsCapitalLetterInString(disassembledString)) {
@@ -663,11 +524,11 @@ function containsCapitalLetterCountInString(string) {
     return capitalLetterCounter;
 }
 
-function isContainsCapitalLetterCountInString(string, capitalLetterCount) {
+export function isContainsCapitalLetterCountInString(string, capitalLetterCount) {
     return containsCapitalLetterCountInString(string) >= validateNumberWithMin(capitalLetterCount, 0);
 }
 
-function getStringCapitalLetterThIndex(string, capitalLetterTh) {
+export function getStringCapitalLetterThIndex(string, capitalLetterTh) {
     string = getValidString(string);
     capitalLetterTh = getValidSearchTh(capitalLetterTh);
     const capitalLetterCount = containsCapitalLetterCountInString(string);
@@ -686,7 +547,7 @@ function getStringCapitalLetterThIndex(string, capitalLetterTh) {
     return value;
 }
 
-function changeUppercaseLetterToLowercaseWithAToZ(letter) {
+export function changeUppercaseLetterToLowercaseWithAToZ(letter) {
     let value = letter;
     if (isLetterAToZ(letter) && isCapitalLetterAToZ(letter)) {
         value = lowercaseLettersAToZ[capitalLettersAToZ.indexOf(letter)];
@@ -694,7 +555,7 @@ function changeUppercaseLetterToLowercaseWithAToZ(letter) {
     return value;
 }
 
-function changeUppercaseLettersToLowercaseWithAToZ(letters) {
+export function changeUppercaseLettersToLowercaseWithAToZ(letters) {
     let value = "";
     for (const letter of getValidString(letters)) {
         const lowercaseLetter = changeUppercaseLetterToLowercaseWithAToZ(letter);
@@ -703,14 +564,14 @@ function changeUppercaseLettersToLowercaseWithAToZ(letters) {
     return value;
 }
 
-function changeUppercaseStringFirstLetterToLowercaseWithAToZ(string) {
+export function changeUppercaseStringFirstLetterToLowercaseWithAToZ(string) {
     const stringPart = new StringPart(string);
     const firstLetter = getValidString(string)[0];
     const afterFirstLetterPart = stringPart.subStringWithFromIndex(1);
     return changeUppercaseLetterToLowercaseWithAToZ(firstLetter) + afterFirstLetterPart;
 }
 
-function changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZ(stringArray) {
+export function changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZ(stringArray) {
     let value = [];
     for (const element of getValidArray(stringArray)) {
         const validElement = getValidString(element);
@@ -719,7 +580,7 @@ function changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZ(string
     return value;
 }
 
-function changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZ(string, search, searchTh) {
+export function changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZ(string, search, searchTh) {
     const stringPart = new StringPart(string);
     const searchThIndex = getSearchThIndexOfString(string, search, searchTh);
     const afterSearchThIndex = searchThIndex + getValidString(search).length;
@@ -730,7 +591,7 @@ function changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZ(string, sea
     return beforeLetterPart + changedLetter + afterLetterPart;
 }
 
-function changeStringUppercaseLetterThToLowercaseWithAToZ(string, capitalLetterTh) {
+export function changeStringUppercaseLetterThToLowercaseWithAToZ(string, capitalLetterTh) {
     const stringPart = new StringPart(string);
     const capitalLetterThIndex = getStringCapitalLetterThIndex(string, capitalLetterTh);
     const beforeLetterThIndex = capitalLetterThIndex - 1;
@@ -742,7 +603,7 @@ function changeStringUppercaseLetterThToLowercaseWithAToZ(string, capitalLetterT
     return beforeLetterPart + changedLetter + afterLetterPart;
 }
 
-function placeStringCapitalLetterThBeforeToPlace(string, capitalLetterTh, place) {
+export function placeStringCapitalLetterThBeforeToPlace(string, capitalLetterTh, place) {
     string = getValidString(string);
     capitalLetterTh = getValidSearchTh(capitalLetterTh);
     const capitalLetterThIndex = getStringCapitalLetterThIndex(string, capitalLetterTh);
@@ -750,7 +611,7 @@ function placeStringCapitalLetterThBeforeToPlace(string, capitalLetterTh, place)
     return createIfAndElseAndReturns(capitalLetterTh > 0, placedBeforeLetterTh, string);
 }
 
-function placeStringAllCapitalLetterThBeforeToPlace(string, place) {
+export function placeStringAllCapitalLetterThBeforeToPlace(string, place) {
     let value = string;
     for (let i = 1; i <= containsCapitalLetterCountInString(string); i++) {
         value = placeStringCapitalLetterThBeforeToPlace(value, i, place);
@@ -758,12 +619,12 @@ function placeStringAllCapitalLetterThBeforeToPlace(string, place) {
     return value;
 }
 
-function placeStringCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(string, capitalLetterTh, place) {
+export function placeStringCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(string, capitalLetterTh, place) {
     const placedBeforeLetterTh = placeStringCapitalLetterThBeforeToPlace(string, capitalLetterTh, place);
     return changeStringUppercaseLetterThToLowercaseWithAToZ(placedBeforeLetterTh);
 }
 
-function placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(string, place) {
+export function placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ(string, place) {
     const capitalLetterCount = containsCapitalLetterCountInString(string);
     let value = string;
     for (let i = 1; i <= capitalLetterCount; i++) {
@@ -772,7 +633,7 @@ function placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToL
     return value;
 }
 
-function getStringCapitalLetterThToNextSearch(string, capitalLetterTh) {
+export function getStringCapitalLetterThToNextSearch(string, capitalLetterTh) {
     capitalLetterTh = getValidSearchTh(capitalLetterTh);
     const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(capitalLetterTh > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, capitalLetterTh));
     const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((capitalLetterTh + 1) > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, getValidSearchTh(capitalLetterTh) + 1) - 1);
@@ -781,15 +642,15 @@ function getStringCapitalLetterThToNextSearch(string, capitalLetterTh) {
     return StringPart.subString(string, searchedStringStartIndex, searchedStringEndIndex);
 }
 
-function isStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, capitalLetterTh, afterSearch) {
+export function isStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, capitalLetterTh, afterSearch) {
     return getStringCapitalLetterThToNextSearch(string, capitalLetterTh) === getValidString(afterSearch);
 }
 
-function getStringAfterSearchIfStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, searchTh, afterSearch) {
+export function getStringAfterSearchIfStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, searchTh, afterSearch) {
     return createIfAndElseAndReturns(isStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, searchTh, afterSearch), afterSearch, "");
 }
 
-function replaceStringCapitalLetterThToNextSearch(string, capitalLetterTh, replace) {
+export function replaceStringCapitalLetterThToNextSearch(string, capitalLetterTh, replace) {
     capitalLetterTh = getValidSearchTh(capitalLetterTh);
     const stringPart = new StringPart(string);
     const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(capitalLetterTh > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, capitalLetterTh) - 1);
@@ -801,7 +662,7 @@ function replaceStringCapitalLetterThToNextSearch(string, capitalLetterTh, repla
     return beforeReplacePart + getValidString(replace) + afterReplacePart;
 }
 
-function getStringAfterOfSearchThToNextSearch(string, search, searchTh) {
+export function getStringAfterOfSearchThToNextSearch(string, search, searchTh) {
     searchTh = getValidSearchTh(searchTh);
     const stringManipulation = new StringManipulation(string);
     const containsSearchsCount = stringManipulation.containsSearchsCount(search);
@@ -812,11 +673,11 @@ function getStringAfterOfSearchThToNextSearch(string, search, searchTh) {
     return StringPart.subString(string, searchedStringStartIndex, searchedStringEndIndex);
 }
 
-function isStringAfterOfSearchThToNextSearchEqualsAfterSearch(string, search, searchTh, afterSearch) {
+export function isStringAfterOfSearchThToNextSearchEqualsAfterSearch(string, search, searchTh, afterSearch) {
     return getStringAfterOfSearchThToNextSearch(string, search, searchTh) === getValidString(afterSearch);
 }
 
-function replaceStringAfterOfSearchThToNextSearch(string, search, searchTh, replace) {
+export function replaceStringAfterOfSearchThToNextSearch(string, search, searchTh, replace) {
     searchTh = getValidSearchTh(searchTh);
     const stringPart = new StringPart(string);
     const stringManipulation = new StringManipulation(string);
@@ -830,12 +691,12 @@ function replaceStringAfterOfSearchThToNextSearch(string, search, searchTh, repl
     return beforeReplacePart + getValidString(replace) + afterReplacePart;
 }
 
-function changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZAndRemoveSearchTh(string, search, searchTh) {
+export function changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZAndRemoveSearchTh(string, search, searchTh) {
     const changedLetter = changeUppercaseStringSearchThAfterLetterToLowercaseWithAToZ(string, search, searchTh);
     return removeSearchThInString(changedLetter, search, searchTh);
 }
 
-function changeUppercaseStringAllSearchAfterLetterToLowercaseWithAToZAndRemoveAllSearchs(string, search) {
+export function changeUppercaseStringAllSearchAfterLetterToLowercaseWithAToZAndRemoveAllSearchs(string, search) {
     const stringManipulation = new StringManipulation(string);
     const containsSearchsCount = stringManipulation.containsSearchsCount(search);
     let value = string;
@@ -845,7 +706,7 @@ function changeUppercaseStringAllSearchAfterLetterToLowercaseWithAToZAndRemoveAl
     return value;
 }
 
-function changeUppercaseStringAllSearchAfterLetterToLowercaseWithAToZ(string, search) {
+export function changeUppercaseStringAllSearchAfterLetterToLowercaseWithAToZ(string, search) {
     const stringManipulation = new StringManipulation(string);
     const containsSearchsCount = stringManipulation.containsSearchsCount(search);
     let value = string;
@@ -855,22 +716,22 @@ function changeUppercaseStringAllSearchAfterLetterToLowercaseWithAToZ(string, se
     return value;
 }
 
-function changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZAndStringifyElements(stringArray) {
+export function changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZAndStringifyElements(stringArray) {
     const changedElementsFirstLetter = changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZ(stringArray);
     return stringifyArrayElements(changedElementsFirstLetter);
 }
 
-function changeUppercaseStringsFirstLetterToLowercaseWithAToZ(...strings) {
+export function changeUppercaseStringsFirstLetterToLowercaseWithAToZ(...strings) {
     const stringArray = createArrayFromObjects(strings);
     return changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZ(stringArray);
 }
 
-function changeUppercaseStringsFirstLetterToLowercaseWithAToZAndStringifyElements(...strings) {
+export function changeUppercaseStringsFirstLetterToLowercaseWithAToZAndStringifyElements(...strings) {
     const stringArray = createArrayFromObjects(strings);
     return changeUppercaseStringArrayElementsFirstLetterToLowercaseWithAToZAndStringifyElements(stringArray);
 }
 
-function getSearchsCountsInString(string, searchStringArray) {
+export function getSearchsCountsInString(string, searchStringArray) {
     searchStringArray = getValidArray(searchStringArray);
     let value = [];
     for (const element of searchStringArray) {
@@ -881,7 +742,7 @@ function getSearchsCountsInString(string, searchStringArray) {
     return value;
 }
 
-function getSearchCharsCountsInString(string, search) {
+export function getSearchCharsCountsInString(string, search) {
     let value = [];
     for (const element of search) {
         const stringManipulation = new StringManipulation(string);
@@ -943,7 +804,7 @@ function isArrayElementsTrue(array) {
     return isEqualsObjectArrayElements(array) && isFirstTrue;
 }
 
-function isIntegersArray(array) {
+export function isIntegersArray(array) {
     let value = false;
     if (Array.isArray(array)) {
         const elementsIsIntegersArray = [];
@@ -982,19 +843,11 @@ function getObjectWithConditionalBoolean(condition, ifTrue, ifFalse) {
     return condition ? ifTrue : ifFalse;
 }
 
-function createIfAndElseAndReturns(condition, ifTrue, ifFalse) {
-    if (condition) {
-        return ifTrue;
-    } else {
-        return ifFalse;
-    }
-}
-
 function getReturnIfArrayFirstTrue(equalsAndReturnsArray) {
     return getReturnIfObjectEqualsArrayFirst(true, equalsAndReturnsArray);
 }
 
-function getReturnIfObjectEqualsArrayFirst(object, equalsAndReturnsArray) {
+export function getReturnIfObjectEqualsArrayFirst(object, equalsAndReturnsArray) {
     equalsAndReturnsArray = getValidArray(equalsAndReturnsArray);
     let value = equalsAndReturnsArray;
     if (equalsAndReturnsArray.length === 3) {
@@ -1064,7 +917,7 @@ function convertEqualsAndElseArrayToEqualsAndReturnsArray(equalsAndElseArray) {
     return value;
 }
 
-function getObjectIfObjectEqualsArrayFirst(object, equalsAndElseArray) {
+export function getObjectIfObjectEqualsArrayFirst(object, equalsAndElseArray) {
     return getReturnIfObjectEqualsArrayFirst(object, convertEqualsAndElseArrayToEqualsAndReturnsArray(equalsAndElseArray));
 }
 
@@ -1076,6 +929,14 @@ function getObjectIfEqualsObjects(a, b) {
     return createIfAndElseAndReturns(a === b, b, a);
 }
 
+export function createArrayFromObjects(...elements) {
+    let array = [];
+    for (const element of elements) {
+        array.push(element);
+    }
+    return array;
+}
+
 function isStringAllCharsEqualsDigitsAndLength(string, length) {
     const stringManipulation = new StringManipulation(string);
     if (string === null) {
@@ -1085,7 +946,7 @@ function isStringAllCharsEqualsDigitsAndLength(string, length) {
     return isDigits && string.length === getValidInteger(length);
 }
 
-function isStringNumber(string) {
+export function isStringNumber(string) {
     string = getValidString(string);
     const stringManipulation = new StringManipulation(string);
     const containsDotCount = stringManipulation.containsSearchsCount(".");
@@ -1174,7 +1035,7 @@ function isValidCharAndText(char, text) {
     return !isEmptyStrings(char, text) && getValidString(char).length === 1;
 }
 
-function isValidStringAndText(string, text) {
+export function isValidStringAndText(string, text) {
     return isEmptyStrings(string, text) || isEmptyString(string) || !isEmptyString(text);
 }
 
@@ -1182,7 +1043,7 @@ function isValidArrayAndElementsInArray(array, elementsInArray) {
     return isEmptyArrays(array, elementsInArray) || isEmptyArray(array) || !isEmptyArray(elementsInArray);
 }
 
-function isCharEqualsCharacterOfText(char, text) {
+export function isCharEqualsCharacterOfText(char, text) {
     let value = isValidCharAndText(char, text);
     for (const element of getValidString(text)) {
         value = getValidString(char) === element;
@@ -1213,7 +1074,7 @@ function isArrayAllElementsEqualsMatchSomeOfElementsInEqualsArray(array, equalsA
     return value;
 }
 
-function isObjectEqualsSomeElementOfString(object, string) {
+export function isObjectEqualsSomeElementOfString(object, string) {
     return isObjectEqualsSomeElementOfArray(object, createArrayFromStringElements(getValidString(string)));
 }
 
@@ -1263,14 +1124,6 @@ function createEmptyArraysInArray(arraysCount) {
     return value;
 }
 
-function createArrayFromObjects(...elements) {
-    let array = [];
-    for (const element of elements) {
-        array.push(element);
-    }
-    return array;
-}
-
 function createArrayFromNested2ArraysOneElements(array, elementTh) {
     elementTh = getValidSearchTh(elementTh);
     let value = [];
@@ -1315,7 +1168,7 @@ function stringifyArrayElements(array) {
     return value;
 }
 
-function createArrayOfOneElement(element, length) {
+export function createArrayFromOneElement(element, length) {
     let array = [];
     for (let i = 0; i < getValidInteger(length); i++) {
         array.push(element);
@@ -1323,8 +1176,115 @@ function createArrayOfOneElement(element, length) {
     return array;
 }
 
+function getRepeatedConnectedArraysCountFromLength(array, length) {
+    array = getValidArray(array);
+    length = getValidInteger(length);
+    let value = 0;
+    let i = 0;
+    while (i < length) {
+        if (i < (length - array.length)) {
+            i += array.length;
+            value++;
+        } else {
+            value++;
+            break;
+        }
+    }
+    return value;
+}
+
+export function getRepeatedConnectedArraysLengthFromSubArraysCount(array, arraysCount, fromIndex, toIndex) {
+    array = getValidArray(array);
+    arraysCount = validateIntegerWithMin(arraysCount, 0);
+    fromIndex = validateInteger(fromIndex, 0, array.length - 1);
+    toIndex = validateInteger(toIndex, 0, array.length - 1);
+    let value = 0;
+    if (arraysCount > 0 && fromIndex <= toIndex) {
+        const firstSubArrayLength = array.length - 1 - fromIndex;
+        if (arraysCount > 1) {
+            const lastSubArrayLength = array.length - 1 - toIndex;
+            for (let i = 0; i < arraysCount; i++) {
+                if (i > 0) {
+                    if (i < arraysCount - 1) {
+                        value += array.length;
+                    } else {
+                        value += lastSubArrayLength;
+                    }
+                } else {
+                    value += firstSubArrayLength;
+                }
+            }
+        } else if (fromIndex < toIndex) {
+            value = firstSubArrayLength;
+        }
+    }
+    return value;
+}
+
+function getLastArrayLengthFromRepeatedConnectedArraysCountFromLength(array, length) {
+    array = getValidArray(array);
+    length = getValidInteger(length);
+    const repeatedConnectedArraysCount = getRepeatedConnectedArraysCountFromLength(array, length);
+    const wholeArraysLengthIfNotJustWholeArrays = array.length * (repeatedConnectedArraysCount - 1);
+    let value = 0;
+    if (length > 0) {
+        value = createIfAndElseAndReturns(isValidInteger(length / array.length), array.length, length - wholeArraysLengthIfNotJustWholeArrays);
+    }
+    return value;
+}
+
+function getLastArrayFromRepeatedConnectedArraysFromLength(array, length) {
+    array = getValidArray(array);
+    length = getValidInteger(length);
+    const lastArrayLength = getLastArrayLengthFromRepeatedConnectedArraysCountFromLength(array, length);
+    let value = [];
+    if (length > 0) {
+        const toIndex = lastArrayLength - 1;
+        value = subArrayWithToIndex(array, toIndex);
+    }
+    return value;
+}
+
+function createSubRepeatedConnectedArrays(array, arraysCount, fromIndex, toIndex) {
+    array = getValidArray(array);
+    arraysCount = getValidInteger(arraysCount);
+    fromIndex = getValidInteger(fromIndex);
+    toIndex = getValidInteger(toIndex);
+    let value = [];
+    if (arraysCount > 0) {
+        if (arraysCount > 1) {
+            for (let i = 0; i < arraysCount; i++) {
+                const addableArrayIfIGreaterThan0 = createIfAndElseAndReturns(i < arraysCount - 1, array, subArrayWithToIndex(array, toIndex));
+                let addableArray = createIfAndElseAndReturns(i > 0, addableArrayIfIGreaterThan0, subArrayWithFromIndex(array, fromIndex));
+                value = addNewArrayToAfterOfTheArray(value, addableArray);
+            }
+        } else {
+            value = subArray(array, fromIndex, toIndex);
+        }
+    }
+    return value;
+}
+
+function createRepeatedConnectedArraysWithFromIndex(array, arraysCount, fromIndex) {
+    array = getValidArray(array);
+    arraysCount = getValidInteger(arraysCount);
+    fromIndex = getValidInteger(fromIndex);
+    const lastArrayLength = getLastArrayLengthFromRepeatedConnectedArraysCountFromLength(array, length);
+    return createSubRepeatedConnectedArrays(array, arraysCount, fromIndex, array.length - 1);
+}
+
+export function createSubRepeatedConnectedArraysWithLength(array, length, fromIndex, toIndex) {
+    const arraysCount = getRepeatedConnectedArraysCountFromLength(array, length);
+    return createSubRepeatedConnectedArrays(array, arraysCount, fromIndex, toIndex);
+}
+
+function createRepeatedConnectedArraysWithLength(array, length, fromIndex, toIndex) {
+    const arraysCount = getRepeatedConnectedArraysCountFromLength(array, length);
+    return createSubRepeatedConnectedArrays(array, arraysCount, fromIndex, toIndex);
+}
+
 function createStringOfOneSearch(search, length) {
-    return stringifyArrayElements(createArrayOfOneElement(search, length));
+    return stringifyArrayElements(createArrayFromOneElement(search, length));
 }
 
 function addNumberArrayElements(numberArray) {
@@ -1359,7 +1319,7 @@ function subarray(array, fromIndex, toIndex) {
     return value;
 }
 
-function subArray(array, fromIndex, toIndex) {
+export function subArray(array, fromIndex, toIndex) {
     let value = [];
     array = getValidArray(array);
     fromIndex = getValidInteger(fromIndex);
@@ -1370,11 +1330,11 @@ function subArray(array, fromIndex, toIndex) {
     return value;
 }
 
-function subArrayWithFromIndex(array, fromIndex) {
+export function subArrayWithFromIndex(array, fromIndex) {
     return subArray(array, fromIndex, array.length - 1);
 }
 
-function subArrayWithToIndex(array, toIndex) {
+export function subArrayWithToIndex(array, toIndex) {
     return subArray(array, 0, toIndex);
 }
 
@@ -1416,7 +1376,7 @@ function placeIntegerToTheIntegersArray(integersArray, integer, index) {
     return createIfAndElseAndReturns(isValid, ifValid, integersArray);
 }
 
-function placeIntegerToTheIncreasingIntegersArray(integersArray, integer) {
+export function placeIntegerToTheIncreasingIntegersArray(integersArray, integer) {
     const isEmpty = isEmptyArray(integersArray);
     const isValidIntegersArray = isIntegersArray(integersArray);
     const isValidIncreasingIntegersArray = isIncreasingIntegersArray(integersArray);
@@ -1739,17 +1699,6 @@ function validateIntegerWithMax(integer, max) {
     return getValidInteger(validateNumberWithMax(integer, max));
 }
 
-function validateMinAndMax(min, max) {
-    min = getValidNumber(min);
-    max = getValidNumber(max);
-    if (max < min) {
-        const i = min;
-        min = max;
-        max = i;
-    }
-    return [min, max];
-}
-
 function validateMinAndMaxIntegers(min, max) {
     min = getValidInteger(min);
     max = getValidInteger(max);
@@ -1761,7 +1710,7 @@ function validateMinAndMaxIntegers(min, max) {
     return [min, max];
 }
 
-function validateNumber(number, min, max) {
+export function validateNumber(number, min, max) {
     number = getValidNumber(number);
     const validMinAndMax = validateMinAndMax(min, max);
     min = validMinAndMax[0];
@@ -1789,12 +1738,6 @@ function validateStartAndEndIntegers(min, max, start, end) {
     start = validateInteger(start, min, max);
     end = validateInteger(end, min, max);
     return [start, end];
-}
-
-function removeSearchInString(string, search) {
-    string = getValidString(string);
-    search = getValidString(search);
-    return string.replace(search, "");
 }
 
 function replaceAllSearchInString(string, search, replace) {
@@ -1834,63 +1777,6 @@ function replaceAllSearchsArrayElementsToReplaceInString(string, searchsArray, r
     return value;
 }
 
-function isValidSearchThInStringParameters(string, search, searchTh) {
-    const stringManipulation = new StringManipulation(string);
-    const containsSearchCount = stringManipulation.containsSearchsCount(search);
-    const isValidParameters = typeof string === "string" && typeof search === "string" && typeof searchTh === "number";
-    return isValidParameters && (!isEmptyString(string) || isEmptyStrings(string, search) || containsSearchCount >= getValidSearchTh(searchTh));
-}
-
-function removeSearchThInString(string, search, searchTh) {
-    const isValid = isValidSearchThInStringParameters(string, search, searchTh);
-    string = getValidString(string);
-    search = getValidString(search);
-    searchTh = getValidSearchTh(searchTh);
-    const fromIndex = getSearchThIndexOfString(string, search, searchTh);
-    const valueIfValid = StringManipulation.removeSubStringWithLength(string, fromIndex, search.length);
-    return createIfAndElseAndReturns(isValid, valueIfValid, string);
-}
-
-function removeAllSearchsInString(string, search) {
-    string = getValidString(string);
-    const stringManipulation = new StringManipulation(string);
-    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
-    let value = string;
-    for (let i = 0; i < containsSearchsCount; i++) {
-        value = removeSearchInString(value, search);
-    }
-    return value;
-}
-
-function removeConsecutiveSearchsInString(string, search, fromSearchTh, toSearchTh) {
-    string = getValidString(string);
-    fromSearchTh = getValidSearchTh(fromSearchTh);
-    toSearchTh = getValidSearchTh(toSearchTh);
-    const stringManipulation = new StringManipulation(string);
-    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
-    const validFromAndToSearchTh = validateMinAndMax(fromSearchTh, toSearchTh);
-    fromSearchTh = validFromAndToSearchTh[0];
-    toSearchTh = validFromAndToSearchTh[1];
-    let value = string;
-    const max = Math.min(toSearchTh - (fromSearchTh - 1), containsSearchsCount);
-    for (let i = 0; i < max; i++) {
-        value = removeSearchThInString(value, search, fromSearchTh);
-    }
-    return value;
-}
-
-function removeConsecutiveMatchingSearchsInString(string, search, fromSearchTh) {
-    string = getValidString(string);
-    const fromSearchThIndex = getSearchThIndexOfString(string, search, fromSearchTh);
-    const containsConsecutiveMatchingSearchsCount = containsConsecutiveMatchingSearchsCountInString(string, search, fromSearchThIndex);
-    const toSearchTh = fromSearchTh + containsConsecutiveMatchingSearchsCount - 1;
-    return removeConsecutiveSearchsInString(string, search, fromSearchTh, toSearchTh);
-}
-
-function removeConsecutiveMatchingFirstSearchsInString(string, search) {
-    return removeConsecutiveMatchingSearchsInString(string, search, 1);
-}
-
 function removeConsecutiveReverseMatchingSearchsInString(string, search, fromSearchTh) {
     string = getValidString(string);
     const fromSearchThIndex = getSearchThIndexOfString(string, search, fromSearchTh);
@@ -1923,114 +1809,6 @@ function getSearchsIndexesInString(string, search) {
                 }
             }
         }
-    }
-    return value;
-}
-
-function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh) {
-    const isValidParameters = isValidSearchThInStringParameters(string, search, partTh);
-    let stringManipulation = new StringManipulation(string);
-    let containsSearchsCount = stringManipulation.containsSearchsCount(search);
-    let isContainsSearch = containsSearchsCount > 0;
-    search = getValidString(search);
-    partTh = getValidSearchTh(partTh);
-    let value = createIfAndElseAndReturns(isValidParameters, -1, 0);
-    let counter = 0;
-    let i = getStringIndexOf(string, search);
-    if (isContainsSearch && partTh > 0) {
-        let containsConsecutiveMatchingFirstSearchsCount = containsConsecutiveMatchingFirstSearchsCountInString(string, search);
-        let disassembledString = getValidString(string);
-        stringManipulation = new StringManipulation(disassembledString);
-        let searchIndex = getStringIndexOf(disassembledString, search);
-        let removedBetweenFirstAndSecondPart = stringManipulation.removeSubStringWithToIndex(searchIndex);
-        while (counter < partTh) {
-            counter++;
-            if (counter < partTh) {
-                let disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
-                let isContainsMoreThan1Search = disassembledStringSearchIndex > 0;
-                disassembledString = createIfAndElseAndReturns(isContainsMoreThan1Search, removedBetweenFirstAndSecondPart, disassembledString);
-                disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
-                isContainsMoreThan1Search = disassembledStringSearchIndex > 0;
-                i += createIfAndElseAndReturns(isContainsMoreThan1Search, 0, containsConsecutiveMatchingFirstSearchsCount - 1);
-                const newDisassembledStringIfContains1Search = removeConsecutiveMatchingFirstSearchsInString(disassembledString, search);
-                disassembledString = createIfAndElseAndReturns(isContainsMoreThan1Search, disassembledString, newDisassembledStringIfContains1Search);
-                if (isEmptyString(disassembledString)) {
-                    i = -1;
-                    break;
-                } else {
-                    stringManipulation = new StringManipulation(disassembledString);
-                    disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
-                    removedBetweenFirstAndSecondPart = stringManipulation.removeSubStringWithToIndex(disassembledStringSearchIndex);
-                    stringManipulation = new StringManipulation(disassembledString);
-                    containsConsecutiveMatchingFirstSearchsCount = containsConsecutiveMatchingFirstSearchsCountInString(disassembledString, search);
-                    containsSearchsCount = stringManipulation.containsSearchsCount(search);
-                    isContainsSearch = containsSearchsCount > 0;
-                    i += createIfAndElseAndReturns(isContainsSearch, getStringIndexOf(disassembledString, search) + 1, 0);
-                }
-            }
-        }
-        value = i;
-    }
-    return value;
-}
-
-function getConsecutiveMatchingSearchsPartsCountInString(string, search) {
-    string = getValidString(string);
-    search = getValidString(search);
-    let stringManipulation = new StringManipulation(string);
-    let containsSearchsCount = stringManipulation.containsSearchsCount(search);
-    let isContainsSearch = containsSearchsCount > 0;
-    let value = 0;
-    let disassembledString = string;
-    while (isContainsSearch) {
-        value++;
-        disassembledString = removeConsecutiveMatchingFirstSearchsInString(disassembledString, search);
-        stringManipulation = new StringManipulation(disassembledString);
-        containsSearchsCount = stringManipulation.containsSearchsCount(search);
-        isContainsSearch = containsSearchsCount > 0;
-    }
-    return value;
-}
-
-function getConsecutiveMatchingSearchsPartsIndexesInString(string, search) {
-    const partsCount = getConsecutiveMatchingSearchsPartsCountInString(string, search);
-    let value = [];
-    for (let i = 1; i <= partsCount; i++) {
-        const partThIndex = getConsecutiveMatchingSearchsPartThIndexInString(string, search, i);
-        value.push(partThIndex);
-    }
-    return value;
-}
-
-function getConsecutiveMatchingSearchsPartsSearchsCountsInString(string, search) {
-    const partsIndexes = getConsecutiveMatchingSearchsPartsIndexesInString(string, search);
-    let value = [];
-    for (const element of partsIndexes) {
-        const containsPartSearchsCount = containsConsecutiveMatchingSearchsCountInString(string, search, element);
-        value.push(containsPartSearchsCount);
-    }
-    return value;
-}
-
-function createConsecutiveMatchingSearchsPartsIndexAndCountArraysInArrayFromString(string, search) {
-    const partsCount = getConsecutiveMatchingSearchsPartsCountInString(string, search);
-    const partsIndexes = getConsecutiveMatchingSearchsPartsIndexesInString(string, search);
-    const partsSearchsCounts = getConsecutiveMatchingSearchsPartsSearchsCountsInString(string, search);
-    let value = [];
-    for (let i = 0; i < partsCount; i++) {
-        value.push([partsIndexes[i], partsSearchsCounts[i]]);
-    }
-    return value;
-}
-
-function createConsecutiveMatchingSearchsPartsIndexAndEndIndexArraysInArrayFromString(string, search) {
-    const partsIndexAndCountArraysInArray = createConsecutiveMatchingSearchsPartsIndexAndCountArraysInArrayFromString(string, search);
-    let value = [];
-    for (let i = 0; i < partsIndexAndCountArraysInArray.length; i++) {
-        const indexAndCountArrays = partsIndexAndCountArraysInArray;
-        const index = indexAndCountArrays[i][0];
-        const count = indexAndCountArrays[i][1];
-        value.push([index, index + count - 1]);
     }
     return value;
 }
@@ -2109,7 +1887,40 @@ function getSearchIndexOrNearestPreviousSearchIndexInString(string, search, inde
     return value;
 }
 
-function getOutsideOfConsecutiveMatchingSearchsPartsFromString(string, search) {
+function getConsecutiveMatchingSearchsPartsSearchsCountsInString(string, search) {
+    const partsIndexes = getConsecutiveMatchingSearchsPartsIndexesInString(string, search);
+    let value = [];
+    for (const element of partsIndexes) {
+        const containsPartSearchsCount = containsConsecutiveMatchingSearchsCountInString(string, search, element);
+        value.push(containsPartSearchsCount);
+    }
+    return value;
+}
+
+function createConsecutiveMatchingSearchsPartsIndexAndCountArraysInArrayFromString(string, search) {
+    const partsCount = getConsecutiveMatchingSearchsPartsCountInString(string, search);
+    const partsIndexes = getConsecutiveMatchingSearchsPartsIndexesInString(string, search);
+    const partsSearchsCounts = getConsecutiveMatchingSearchsPartsSearchsCountsInString(string, search);
+    let value = [];
+    for (let i = 0; i < partsCount; i++) {
+        value.push([partsIndexes[i], partsSearchsCounts[i]]);
+    }
+    return value;
+}
+
+export function createConsecutiveMatchingSearchsPartsIndexAndEndIndexArraysInArrayFromString(string, search) {
+    const partsIndexAndCountArraysInArray = createConsecutiveMatchingSearchsPartsIndexAndCountArraysInArrayFromString(string, search);
+    let value = [];
+    for (let i = 0; i < partsIndexAndCountArraysInArray.length; i++) {
+        const indexAndCountArrays = partsIndexAndCountArraysInArray;
+        const index = indexAndCountArrays[i][0];
+        const count = indexAndCountArrays[i][1];
+        value.push([index, index + count - 1]);
+    }
+    return value;
+}
+
+export function getOutsideOfConsecutiveMatchingSearchsPartsFromString(string, search) {
     let stringPart = new StringPart(string);
     const containsSearchsCount = stringPart.containsSearchsCount(search);
     const isContainsSearch = containsSearchsCount > 0;
@@ -2247,54 +2058,6 @@ function drawDiagonalColoredLineRightAndUp(style, moveX, moveY, length) {
     drawColoredLine(style, moveX, moveY, moveX + length, moveY - length);
 }
 
-function drawDiagonalBlackLineLeftAndDown(moveX, moveY, length) {
-    drawBlackLine(moveX, moveY, moveX - length, moveY + length);
-}
-
-function drawDiagonalBlackLineLeftAndUp(moveX, moveY, length) {
-    drawBlackLine(moveX, moveY, moveX - length, moveY - length);
-}
-
-function drawDiagonalBlackLineRightAndDown(moveX, moveY, length) {
-    drawBlackLine(moveX, moveY, moveX + length, moveY + length);
-}
-
-function drawDiagonalBlackLineRightAndUp(moveX, moveY, length) {
-    drawBlackLine(moveX, moveY, moveX + length, moveY - length);
-}
-
-function drawDiagonalWhiteLineLeftAndDown(moveX, moveY, length) {
-    drawWhiteLine(moveX, moveY, moveX - length, moveY + length);
-}
-
-function drawDiagonalWhiteLineLeftAndUp(moveX, moveY, length) {
-    drawWhiteLine(moveX, moveY, moveX - length, moveY - length);
-}
-
-function drawDiagonalWhiteLineRightAndDown(moveX, moveY, length) {
-    drawWhiteLine(moveX, moveY, moveX + length, moveY + length);
-}
-
-function drawDiagonalWhiteLineRightAndUp(moveX, moveY, length) {
-    drawWhiteLine(moveX, moveY, moveX + length, moveY - length);
-}
-
-function drawDiagonalTransparentLineLeftAndDown(moveX, moveY, length) {
-    drawTransparentLine(moveX, moveY, moveX - length, moveY + length);
-}
-
-function drawDiagonalTransparentLineLeftAndUp(moveX, moveY, length) {
-    drawTransparentLine(moveX, moveY, moveX - length, moveY - length);
-}
-
-function drawDiagonalTransparentLineRightAndDown(moveX, moveY, length) {
-    drawTransparentLine(moveX, moveY, moveX + length, moveY + length);
-}
-
-function drawDiagonalTransparentLineRightAndUp(moveX, moveY, length) {
-    drawTransparentLine(moveX, moveY, moveX + length, moveY - length);
-}
-
 function drawHorizontalLine(moveX, lineX, posY) {
     drawLine(moveX, posY, lineX, posY);
 }
@@ -2309,30 +2072,6 @@ function drawHorizontalColoredLine(style, moveX, lineX, posY) {
 
 function drawVerticalColoredLine(style, posX, moveY, lineY) {
     drawColoredLine(style, posX, moveY, posX, lineY);
-}
-
-function drawHorizontalBlackLine(moveX, lineX, posY) {
-    drawBlackLine(moveX, posY, lineX, posY);
-}
-
-function drawVerticalBlackLine(posX, moveY, lineY) {
-    drawBlackLine(posX, moveY, posX, lineY);
-}
-
-function drawHorizontalWhiteLine(moveX, lineX, posY) {
-    drawWhiteLine(moveX, posY, lineX, posY);
-}
-
-function drawVerticalWhiteLine(posX, moveY, lineY) {
-    drawWhiteLine(posX, moveY, posX, lineY);
-}
-
-function drawHorizontalTransparentLine(moveX, lineX, posY) {
-    drawTransparentLine(moveX, posY, lineX, posY);
-}
-
-function drawVerticalTransparentLine(posX, moveY, lineY) {
-    drawTransparentLine(posX, moveY, posX, lineY);
 }
 
 function fillHorizontalRectWithCoordinates(fromX, posY, toX, height) {
@@ -2350,10 +2089,6 @@ function fillHorizontalOneHighRectWithCoordinates(fromX, toX, posY) {
 
 function fillHorizontalOneHighColoredRectWithCoordinates(style, fromX, toX, posY) {
     fillHorizontalColoredRectWithCoordinates(style, fromX, posY, toX, 1);
-}
-
-function begin() {
-    context.beginPath();
 }
 
 function defaultMoveTo(moveX, moveY) {
@@ -2439,7 +2174,7 @@ function strokeColoredLine(style, moveX, moveY, lineX, lineY) {
 }
 
 function drawLine(moveX, moveY, lineX, lineY) {
-    begin();
+    context.beginPath();
     strokeLine(moveX, moveY, lineX, lineY);
 }
 
@@ -2448,38 +2183,14 @@ function drawColoredLine(style, moveX, moveY, lineX, lineY) {
     drawLine(moveX, moveY, lineX, lineY);
 }
 
-function drawBlackLine(moveX, moveY, lineX, lineY) {
-    drawColoredLine(black, moveX, moveY, lineX, lineY);
-}
-
-function drawWhiteLine(moveX, moveY, lineX, lineY) {
-    drawColoredLine(white, moveX, moveY, lineX, lineY);
-}
-
-function drawTransparentLine(moveX, moveY, lineX, lineY) {
-    drawColoredLine(transparent, moveX, moveY, lineX, lineY);
-}
-
 function fillRect(x, y, width, height) {
-    begin();
+    context.beginPath();
     defaultFillRect(x, y, width, height);
 }
 
-function fillColoredRect(style, x, y, width, height) {
+export function fillColoredRect(style, x, y, width, height) {
     defaultFillStyle(style);
     fillRect(x, y, width, height);
-}
-
-function fillBlackRect(x, y, width, height) {
-    fillColoredRect(black, x, y, width, height);
-}
-
-function fillWhiteRect(x, y, width, height) {
-    fillColoredRect(white, x, y, width, height);
-}
-
-function fillTransparentRect(x, y, width, height) {
-    fillColoredRect(transparent, x, y, width, height);
 }
 
 function fillRectWithCoordinates(fromX, fromY, toX, toY) {
@@ -2491,100 +2202,28 @@ function fillColoredRectWithCoordinates(style, fromX, fromY, toX, toY) {
     fillRectWithCoordinates(fromX, fromY, toX, toY);
 }
 
-function fillBlackRectWithCoordinates(fromX, fromY, toX, toY) {
-    fillColoredRectWithCoordinates(black, fromX, fromY, toX, toY);
-}
-
-function fillWhiteRectWithCoordinates(fromX, fromY, toX, toY) {
-    fillColoredRectWithCoordinates(white, fromX, fromY, toX, toY);
-}
-
-function fillTransparentRectWithCoordinates(fromX, fromY, toX, toY) {
-    fillColoredRectWithCoordinates(transparent, fromX, fromY, toX, toY);
-}
-
-function getReverseHex(hex) {
-    return tHex.getReverseHex(hex);
-}
-
-function getElementById(elementId) {
+export function getElementById(elementId) {
     return document.getElementById(elementId);
 }
 
-function getCanvasMousePos() {
+export function getCanvasMousePos() {
     return window.getMousePos(canvas);
-}
-
-function countBorderTextWithMin(text, count) {
-    return "(" + text + " = " + count + ") the " + text + " value must be greater than or equal to " + 0;
-}
-
-function countBordersText(text, count, min, max) {
-    return "(" + text + " = " + count + ") the " + text + " value must be between " + min + " and " + max;
-}
-
-function isEmptyString(string) {
-    return getValidString(string).length === 0;
 }
 
 function isEmptyArray(array) {
     return getValidArray(array).length === 0;
 }
 
-function isEmptyStrings(...strings) {
-    let value = strings.length > 0;
-    for (const element of strings) {
-        value = value && isEmptyString(element);
-    }
-    return value;
-}
-
 function isEmptyArrays(...array) {
     let value = array.length > 0;
-    for (const element of array) {
+    array.forEach(element => {
         value = value && isEmptyArray(element);
-    }
+    });
     return value;
-}
-
-function getStringIndexOf(string, search) {
-    return getValidString(string).indexOf(getValidString(search));
 }
 
 function getArrayIndexOf(array, search) {
     return getValidArray(array).indexOf(search);
-}
-
-function getValidSearchTh(searchTh) {
-    if (!Number.isSafeInteger(searchTh) && !isValidNumber(Number(searchTh))) {
-        searchTh = 1;
-    } else {
-        if (searchTh <= 0) {
-            searchTh = 0;
-        } else {
-            searchTh = getValidInteger(searchTh);
-        }
-    }
-    return searchTh;
-}
-
-function getSearchThIndexOfString(string, search, searchTh) {
-    search = getValidString(search);
-    searchTh = getValidSearchTh(searchTh);
-    const stringManipulation = new StringManipulation(string);
-    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
-    let value = -1;
-    if (containsSearchsCount > 0 && searchTh > 0 && searchTh <= containsSearchsCount) {
-        let disassembledString = getValidString(string);
-        for (let i = 1; i < searchTh; i++) {
-            disassembledString = removeSearchInString(disassembledString, search);
-        }
-        const isContainsSearch = isContainsSearchInString(disassembledString, search);
-        const addCountOfSearchIndex = createIfAndElseAndReturns(isContainsSearch, (searchTh * search.length) - 1, 0);
-        const ifContainsSearch = getStringIndexOf(disassembledString, search) + addCountOfSearchIndex;
-        value = createIfAndElseAndReturns(isContainsSearch, ifContainsSearch, value) - (search.length - 1);
-    }
-    return value;
 }
 
 function getSearchThOfStringIndex(string, search, index) {
@@ -2608,26 +2247,6 @@ function getSearchThOfStringIndex(string, search, index) {
         }
     }
     return value;
-}
-
-function containsConsecutiveMatchingSearchsCountInString(string, search, firstSearchIndex) {
-    string = getValidString(string);
-    search = getValidString(search);
-    let value = 0;
-    let i = getValidInteger(firstSearchIndex);
-    while (i < string.length) {
-        if (StringPart.subString(string, i, i + search.length - 1) === search) {
-            i += search.length;
-            value++;
-        } else {
-            break;
-        }
-    }
-    return value;
-}
-
-function containsConsecutiveMatchingFirstSearchsCountInString(string, search) {
-    return containsConsecutiveMatchingSearchsCountInString(string, search, getStringIndexOf(string, search));
 }
 
 function containsConsecutiveReverseMatchingSearchsCountInString(string, search, lastSearchIndex) {
@@ -2661,34 +2280,12 @@ function getConsecutiveMatchingDigitsCountInString(string, startIndex) {
     return value;
 }
 
-function isContainsSearchInString(string, search) {
-    return getStringIndexOf(string, search) > -1;
-}
-
-function isContainsSearchArrayElementsInString(string, searchArray) {
-    let value = true;
-    for (const element of getValidArray(searchArray)) {
-        value = value && isContainsSearchInString(string, element);
-    }
-    return value;
-}
-
 function isContainsSearchStringElementsInString(string, searchString) {
     return isContainsSearchArrayElementsInString(string, createArrayFromStringElements(searchString));
 }
 
-function isContainsSearchsInString(string, ...searchs) {
-    return isContainsSearchArrayElementsInString(string, createArrayFromObjects(searchs));
-}
-
 function isContainsSearchInArray(array, search) {
     return getArrayIndexOf(array, search) > -1;
-}
-
-function isContainsOneSearchInString(string, search) {
-    const stringManipulation = new StringManipulation(string);
-    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
-    return containsSearchsCount === 1;
 }
 
 function isContainsSearchCharOnIndexInString(string, searchChar, index) {
@@ -2707,269 +2304,74 @@ function isContainsOneSearchOnIndexInElements(search, index, ...elements) {
     return isContainsOneSearchOnIndexInArray(createArrayFromObjects(elements), search, index);
 }
 
-function setTimeoutFunction(before, handler, handlerAfter, timeout, after, args) {
-    if (typeof before === "function") {
-        before();
-    }
-    window.setTimeout(function () {
-        if (typeof handler === "function") {
-            handler();
-        }
-        if (typeof handlerAfter === "boolean" && handlerAfter === true) {
-            setTimeoutFunction(before, handler, timeout, after, args);
-        }
-    }, timeout, args);
-    if (typeof after === "function") {
-        after();
-    }
-}
-
-/**
- * Returns - ...;
- * <pre>
- *     S$ArgumentsInString.constructor(string) string format => {
- *         one argument: {
- *             the string first part can only contain characters other than ":,";
- *             the string second part can only be ":";
- *             the string third part can only contain characters other than ":,";
- *         };
- *         arguments separator: ",";
- *         string: arguments;
- *     };
- * </pre>
- */
-class S$ArgumentsInString {
-    static getArgument(string, argumentTh) {
-        string = getValidString(string);
-        argumentTh = getValidSearchTh(argumentTh);
-        const {length} = string;
-        const stringPart = new StringPart(string);
-        const containsCommasCount = stringPart.containsSearchsCount(",");
-        const isContainsComma = containsCommasCount > 0;
-        const firstCommaIndex = getStringIndexOf(string, ",");
-        const isValidArgumentTh = argumentTh > 1 && argumentTh <= containsCommasCount + 1;
-        const isValidNextArgumentTh = argumentTh > 1 && argumentTh + 1 <= containsCommasCount + 1;
-        const isContainsCommaToValue = argumentTh === 1 && isContainsComma;
-        const ifContainsCommaToValue = stringPart.subStringWithToIndex(firstCommaIndex - 1);
-        const ifNotContainsCommaToValue = createIfAndElseAndReturns(argumentTh === 1, string, "");
-        let value = createIfAndElseAndReturns(isContainsCommaToValue, ifContainsCommaToValue, ifNotContainsCommaToValue);
-        if (isValidArgumentTh) {
-            const commaThIndex = getSearchThIndexOfString(string, ",", argumentTh - 1);
-            const fromIndex = commaThIndex + 1;
-            const nextCommaThIndex = getSearchThIndexOfString(string, ",", argumentTh);
-            const toIndex = createIfAndElseAndReturns(isValidNextArgumentTh, nextCommaThIndex - 1, length - 1);
-            value = stringPart.subString(fromIndex, toIndex);
-        }
-        return value;
-    }
-
-    static getArguments(string) {
-        const stringManipulation = new StringManipulation(string);
-        const containsCommasCount = stringManipulation.containsSearchsCount(",");
-        let value = [];
-        for (let i = 1; i <= containsCommasCount + 1; i++) {
-            const argument = this.getArgument(string, i);
-            value.push(argument);
-        }
-        return value;
-    }
-
-    static isArgumentValidColonCount(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        return isContainsOneSearchInString(argument, ":");
-    }
-
-    static getArgumentBeforeColonPart(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const isContainsColon = isContainsSearchInString(string, ":");
-        const colonIndex = getStringIndexOf(argument, ":");
-        const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex - 1);
-        return createIfAndElseAndReturns(isContainsColon, beforeOfColonPart, "");
-    }
-
-    static getArgumentAfterColonPart(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const isContainsColon = isContainsSearchInString(string, ":");
-        const colonIndex = getStringIndexOf(argument, ":");
-        const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex + 1);
-        return createIfAndElseAndReturns(isContainsColon, beforeOfColonPart, "");
-    }
-
-    static isArgumentNameAndColon(string, argumentTh) {
-        const isContainsColon = isContainsSearchInString(string, ":");
-        const beforeOfColonPart = this.getArgumentBeforeColonPart(string, argumentTh);
-        return isContainsColon && isNotJustSpacesString(beforeOfColonPart);
-    }
-
-    static isArgumentColonAndValue(string, argumentTh) {
-        const isContainsColon = isContainsSearchInString(string, ":");
-        const afterOfColonPart = this.getArgumentAfterColonPart(string, argumentTh);
-        return isContainsColon && isNotJustSpacesString(afterOfColonPart);
-    }
-
-    static isArgumentValidNameAndColon(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const isValidColonCount = this.isArgumentValidColonCount(string, argumentTh);
-        const colonIndex = getStringIndexOf(argument, ":");
-        const beforeOfColonPart = StringPart.subStringWithToIndex(argument, colonIndex - 1);
-        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(beforeOfColonPart, " ");
-        return isValidColonCount && outsideParts.length === 1;
-    }
-
-    static isArgumentValidColonAndValue(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const isValidColonCount = this.isArgumentValidColonCount(string, argumentTh);
-        const colonIndex = getStringIndexOf(argument, ":");
-        const afterOfColonPart = StringPart.subStringWithFromIndex(argument, colonIndex + 1);
-        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(afterOfColonPart, " ");
-        return isValidColonCount && outsideParts.length === 1;
-    }
-
-    static getArgumentNameIfValidColonCount(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const isValidColonCount = this.isArgumentValidColonCount(string, argumentTh);
-        const colonIndex = getStringIndexOf(argument, ":");
-        const valueIfValidColonCount = StringPart.subStringWithToIndex(argument, colonIndex - 1);
-        return createIfAndElseAndReturns(isValidColonCount, valueIfValidColonCount, "");
-    }
-
-    static getArgumentValueIfValidColonCount(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const isValidColonCount = this.isArgumentValidColonCount(string, argumentTh);
-        const colonIndex = getStringIndexOf(argument, ":");
-        const valueIfValidColonCount = StringPart.subStringWithFromIndex(argument, colonIndex + 1);
-        return createIfAndElseAndReturns(isValidColonCount, valueIfValidColonCount, "");
-    }
-
-    static getArgumentValidNameIfValidColonCount(string, argumentTh) {
-        const name = this.getArgumentNameIfValidColonCount(string, argumentTh);
-        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(name, " ");
-        const isOneOutsidePartsCount = outsideParts.length === 1;
-        return createIfAndElseAndReturns(isOneOutsidePartsCount, removeAllSearchsInString(name, " "), name);
-    }
-
-    static getArgumentValidValueIfValidColonCount(string, argumentTh) {
-        const value = this.getArgumentValueIfValidColonCount(string, argumentTh);
-        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(value, " ");
-        const isOneOutsidePartsCount = outsideParts.length === 1;
-        return createIfAndElseAndReturns(isOneOutsidePartsCount, removeAllSearchsInString(value, " "), value);
-    }
-
-    static isArgument2OutsideParts(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
-        return outsideParts.length === 2;
-    }
-
-    static isArgument2ValidOutsideParts(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
-        const isValidOutsidePartsCount = outsideParts.length === 2;
-        let value = false;
-        if (isValidOutsidePartsCount) {
-            const isValidFirstPart = !isContainsSearchsInString(outsideParts[0], ":");
-            const isValidLastPart = !isContainsSearchsInString(outsideParts[1], ":");
-            value = isValidFirstPart && isValidLastPart;
-        }
-        return value;
-    }
-
-    static getArgument2OutsidePartsIfValidOutsidePartsCount(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
-        const isValidOutsidePartsCount = outsideParts.length === 2;
-        let value = ["", ""];
-        if (isValidOutsidePartsCount) {
-            value = [outsideParts[0], outsideParts[1]];
-        }
-        return value;
-    }
-
-    static getArgument2ValidOutsidePartsIfValidOutsidePartsCount(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const outsideParts = getOutsideOfConsecutiveMatchingSearchsPartsFromString(argument, " ");
-        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
-        let value = ["", ""];
-        if (isValidOutsideParts) {
-            value = [outsideParts[0], outsideParts[1]];
-        }
-        return value;
-    }
-
-    static getArgumentName(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const isValidNameAndColon = this.isArgumentValidNameAndColon(string, argumentTh);
-        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
-        const validName = this.getArgumentValidName(string, argumentTh);
-        const beforeColonPart = this.getArgumentBeforeColonPart(string, argumentTh);
-        const isValidNameAndColonOrOutsideParts = isValidNameAndColon || isValidOutsideParts;
-        const isContainsOneColon = isContainsOneSearchInString(argument, ":");
-        const ifValidNameAndColonOrOutsideParts = createIfAndElseAndReturns(isContainsOneColon, beforeColonPart, argument);
-        return createIfAndElseAndReturns(isValidNameAndColonOrOutsideParts, validName, ifValidNameAndColonOrOutsideParts);
-    }
-
-    static getArgumentValue(string, argumentTh) {
-        const argument = this.getArgument(string, argumentTh);
-        const isValidColonAndValue = this.isArgumentValidColonAndValue(string, argumentTh);
-        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
-        const validValue = this.getArgumentValidName(string, argumentTh);
-        const afterColonPart = this.getArgumentBeforeColonPart(string, argumentTh);
-        const isValidColonAndValueOrOutsideParts = isValidColonAndValue || isValidOutsideParts;
-        const isContainsOneColon = isContainsOneSearchInString(argument, ":");
-        const ifValidColonAndValueOrOutsideParts = createIfAndElseAndReturns(isContainsOneColon, afterColonPart, argument);
-        return createIfAndElseAndReturns(isValidColonAndValueOrOutsideParts, validValue, ifValidColonAndValueOrOutsideParts);
-    }
-
-    static getArgumentValidName(string, argumentTh) {
-        const isValidNameAndColon = this.isArgumentValidNameAndColon(string, argumentTh);
-        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
-        const validNameIfValidColonCount = this.getArgumentValidNameIfValidColonCount(string, argumentTh);
-        const valid2Parts = this.getArgument2ValidOutsidePartsIfValidOutsidePartsCount(string, argumentTh);
-        const valueIfNotContainsColon = createIfAndElseAndReturns(isValidOutsideParts, valid2Parts[0], "");
-        return createIfAndElseAndReturns(isValidNameAndColon, validNameIfValidColonCount, valueIfNotContainsColon);
-    }
-
-    static getArgumentValidValue(string, argumentTh) {
-        const isValidColonAndValue = this.isArgumentValidColonAndValue(string, argumentTh);
-        const isValidOutsideParts = this.isArgument2ValidOutsideParts(string, argumentTh);
-        const validValueIfValidColonCount = this.getArgumentValidValueIfValidColonCount(string, argumentTh);
-        const valid2Parts = this.getArgument2ValidOutsidePartsIfValidOutsidePartsCount(string, argumentTh);
-        const valueIfNotContainsColon = createIfAndElseAndReturns(isValidOutsideParts, valid2Parts[1], "");
-        return createIfAndElseAndReturns(isValidColonAndValue, validValueIfValidColonCount, valueIfNotContainsColon);
-    }
-
-    constructor(string) {
-        this.string = getValidString(string);
-    }
-
-    getArgument = argumentTh => S$ArgumentsInString.getArgument(this.string, argumentTh);
-    getArguments = () => S$ArgumentsInString.getArguments(this.string);
-    isArgumentValidColonCount = argumentTh => S$ArgumentsInString.isArgumentValidColonCount(this.string, argumentTh);
-    getArgumentBeforeColonPart = argumentTh => S$ArgumentsInString.getArgumentBeforeColonPart(this.string, argumentTh);
-    getArgumentAfterColonPart = argumentTh => S$ArgumentsInString.getArgumentAfterColonPart(this.string, argumentTh);
-    isArgumentNameAndColon = argumentTh => S$ArgumentsInString.isArgumentNameAndColon(this.string, argumentTh);
-    isArgumentColonAndValue = argumentTh => S$ArgumentsInString.isArgumentColonAndValue(this.string, argumentTh);
-    isArgumentValidNameAndColon = argumentTh => S$ArgumentsInString.isArgumentValidNameAndColon(this.string, argumentTh);
-    isArgumentValidColonAndValue = argumentTh => S$ArgumentsInString.isArgumentValidColonAndValue(this.string, argumentTh);
-    getArgumentNameIfValidColonCount = argumentTh => S$ArgumentsInString.getArgumentNameIfValidColonCount(this.string, argumentTh);
-    getArgumentValueIfValidColonCount = argumentTh => S$ArgumentsInString.getArgumentValueIfValidColonCount(this.string, argumentTh);
-    getArgumentValidNameIfValidColonCount = argumentTh => S$ArgumentsInString.getArgumentValidNameIfValidColonCount(this.string, argumentTh);
-    getArgumentValidValueIfValidColonCount = argumentTh => S$ArgumentsInString.getArgumentValidValueIfValidColonCount(this.string, argumentTh);
-    isArgument2OutsideParts = argumentTh => S$ArgumentsInString.isArgument2OutsideParts(this.string, argumentTh);
-    isArgument2ValidOutsideParts = argumentTh => S$ArgumentsInString.isArgument2ValidOutsideParts(this.string, argumentTh);
-    getArgument2OutsidePartsIfValidOutsidePartsCount = argumentTh => S$ArgumentsInString.getArgument2OutsidePartsIfValidOutsidePartsCount(this.string, argumentTh);
-    getArgument2ValidOutsidePartsIfValidOutsidePartsCount = argumentTh => S$ArgumentsInString.getArgument2ValidOutsidePartsIfValidOutsidePartsCount(this.string, argumentTh);
-    getArgumentName = argumentTh => S$ArgumentsInString.getArgumentName(this.string, argumentTh);
-    getArgumentValue = argumentTh => S$ArgumentsInString.getArgumentValue(this.string, argumentTh);
-    getArgumentValidName = argumentTh => S$ArgumentsInString.getArgumentValidName(this.string, argumentTh);
-    getArgumentValidValue = argumentTh => S$ArgumentsInString.getArgumentValidValue(this.string, argumentTh);
-}
-
-function isNotJustSpacesString(string) {
-    string = getValidString(string);
-    const {length} = string;
+export function getSearchThIndexOfString(string, search, searchTh) {
+    search = getValidString(search);
+    searchTh = getValidSearchTh(searchTh);
     const stringManipulation = new StringManipulation(string);
-    const spacesCount = stringManipulation.containsSearchsCount(" ");
-    const isNotJustSpaces = length > spacesCount;
-    return !isEmptyString(string) && isNotJustSpaces;
+    const containsSearchsCount = stringManipulation.containsSearchsCount(search);
+    let value = -1;
+    if (containsSearchsCount > 0 && searchTh > 0 && searchTh <= containsSearchsCount) {
+        let disassembledString = getValidString(string);
+        for (let i = 1; i < searchTh; i++) {
+            disassembledString = StringManipulation.removeSearchInString(disassembledString, search);
+        }
+        const isContainsSearch = isContainsSearchInString(disassembledString, search);
+        const addCountOfSearchIndex = createIfAndElseAndReturns(isContainsSearch, (searchTh * search.length) - 1, 0);
+        const ifContainsSearch = getStringIndexOf(disassembledString, search) + addCountOfSearchIndex;
+        value = createIfAndElseAndReturns(isContainsSearch, ifContainsSearch, value) - (search.length - 1);
+    }
+    return value;
+}
+
+export function isContainsSearchArrayElementsInString(string, searchArray) {
+    let value = true;
+    for (const element of getValidArray(searchArray)) {
+        value = value && isContainsSearchInString(string, element);
+    }
+    return value;
+}
+
+export function containsConsecutiveMatchingSearchsCountInString(string, search, firstSearchIndex) {
+    string = getValidString(string);
+    search = getValidString(search);
+    let value = 0;
+    let i = getValidInteger(firstSearchIndex);
+    while (i < string.length) {
+        if (StringPart.subString(string, i, i + search.length - 1) === search) {
+            i += search.length;
+            value++;
+        } else {
+            break;
+        }
+    }
+    return value;
+}
+
+export function getValidSearchTh(searchTh) {
+    if (!Number.isSafeInteger(searchTh) && !isValidNumber(Number(searchTh))) {
+        searchTh = 1;
+    } else {
+        if (searchTh <= 0) {
+            searchTh = 0;
+        } else {
+            searchTh = getValidInteger(searchTh);
+        }
+    }
+    return searchTh;
+}
+
+export function isEmptyStrings(...strings) {
+    let value = strings.length > 0;
+    strings.forEach(element => {
+        value = value && isEmptyString(element);
+    });
+    return value;
+}
+
+export function createIfAndElseAndReturns(condition, ifTrue, ifFalse) {
+    if (condition) {
+        return ifTrue;
+    } else {
+        return ifFalse;
+    }
 }
