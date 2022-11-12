@@ -1,5 +1,5 @@
-import {StringManipulation} from "./stringManipulation";
-import {StringPart} from "./stringPart";
+import {StringManipulation} from "./stringManipulation.js";
+import {StringPart} from "./stringPart.js";
 // noinspection JSDeprecatedSymbols
 window.getMousePos = (element) => ({
     x: event.clientX - element.getBoundingClientRect().left,

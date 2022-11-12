@@ -1,9 +1,8 @@
-import {getValidString} from "../stringPart";
 import {
     changeLowercaseStringAllSearchAfterLetterToUppercaseWithAToZAndRemoveAllSearchs,
-    changeLowercaseStringFirstLetterToUppercaseWithAToZ,
+    changeLowercaseStringFirstLetterToUppercaseWithAToZ, getValidString,
     placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ
-} from "../script";
+} from "../art-script/script.js";
 
 const setCanvasColorInputs = () => new CanvasColorInputElement();
 const setCanvasPianoColorInputs = () => new CanvasPianoColorInputElement();

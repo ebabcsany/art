@@ -1,5 +1,5 @@
-import {StringManipulation} from "./stringManipulation";
-import {getValidString} from "./script";
+import {StringManipulation} from "./stringManipulation.js";
+import {getValidString} from "./script.js";
 
 export class StringPart extends StringManipulation {
     static subString(string, fromIndex, toIndex) {

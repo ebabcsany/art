@@ -2,7 +2,7 @@ import {
     getCanvasColorInputClickedNameFromName,
     getCanvasColorInputClickedNameFromType, getCanvasColorInputId, getCanvasColorInputNameFromType,
     getDefaultCanvasColorInputNameFromName, setDefaultCanvasColorInputValueFromType
-} from "./defines";
+} from "./defines.js";
 import {
     canvasHeightInput,
     canvasWidthInput,
@@ -33,22 +33,22 @@ import {
     subArrayWithToIndex,
     tHex,
     validateNumber
-} from "../art-script/script";
-import {S$ArgumentsInString} from "../art-script/s$ArgumentsInString";
-import {StringManipulation} from "../art-script/stringManipulation";
+} from "../art-script/script.js";
+import {S$ArgumentsInString} from "../art-script/s$ArgumentsInString.js";
+import {StringManipulation} from "../art-script/stringManipulation.js";
 
 window.canvas = document.getElementById("piano-song-editor");
 window.context = canvas.getContext("2d");
-const canvasMousePositionXSpan = getElementById("canvas-mouse-position-x");
-const canvasMousePositionYSpan = getElementById("canvas-mouse-position-y");
-const canvasWidthInputBackgroundColorInput = getElementById("canvas-width-input-background-color");
-const canvasHeightInputBackgroundColorInput = getElementById("canvas-height-input-background-color");
-const canvasWidthInputColorInput = getElementById("canvas-width-input-color");
-const canvasHeightInputColorInput = getElementById("canvas-height-input-color");
-const canvasInputsButton = getElementById("canvas-inputs-button");
-const canvasInputsResetColorsPart = getElementById("canvas-inputs-reset-colors-part");
-const canvasInputsResetColorsButton = getElementById("canvas-inputs-reset-colors-button");
-const canvasInputs = getElementById("canvas-inputs");
+const canvasMousePositionXSpan = document.getElementById("canvas-mouse-position-x");
+const canvasMousePositionYSpan = document.getElementById("canvas-mouse-position-y");
+const canvasWidthInputBackgroundColorInput = document.getElementById("canvas-width-input-background-color");
+const canvasHeightInputBackgroundColorInput = document.getElementById("canvas-height-input-background-color");
+const canvasWidthInputColorInput = document.getElementById("canvas-width-input-color");
+const canvasHeightInputColorInput = document.getElementById("canvas-height-input-color");
+const canvasInputsButton = document.getElementById("canvas-inputs-button");
+const canvasInputsResetColorsPart = document.getElementById("canvas-inputs-reset-colors-part");
+const canvasInputsResetColorsButton = document.getElementById("canvas-inputs-reset-colors-button");
+const canvasInputs = document.getElementById("canvas-inputs");
 const canvasColorInputTypes = [
     "border",
     "background",
@@ -72,18 +72,18 @@ for (const canvasColorInputType of canvasColorInputTypes) {
 const canvasInputsColorInputsTypes = subArrayWithToIndex(canvasColorInputTypes, 2);
 const canvasPianoInputsColorInputsTypes = subArray(canvasColorInputTypes, 3, 10);
 const canvasPianoActivePartInputsColorInputsTypes = subArrayWithFromIndex(canvasColorInputTypes, 11);
-const canvasPianoInputsButton = getElementById("canvas-piano-inputs-button");
-const canvasPianoInputsResetColorsPart = getElementById("canvas-piano-inputs-reset-colors-part");
-const canvasPianoInputsResetColorsButton = getElementById("canvas-piano-inputs-reset-colors-button");
-const canvasPianoInputs = getElementById("canvas-piano-inputs");
-const backgroundColorInput = getElementById("background-color");
-const isCanvasBackgroundColorTransparentInput = getElementById("is-canvas-background-color-transparent");
-const saveChangedColorsOnCanvasInput = getElementById("save-changed-colors-on-canvas-by-modified-background-color-input-value");
-const saveCanvasInputsColors = getElementById("save-canvas-inputs-colors");
-const resetColorsOnCanvasPart = getElementById("reset-colors-on-canvas-part");
-const resetColorsOnCanvasInput = getElementById("reset-colors-on-canvas");
-const reloadingTimeInput = getElementById("reloading-time");
-const reloadingTimeSubmitButton = getElementById("reloading-time-submit-button");
+const canvasPianoInputsButton = document.getElementById("canvas-piano-inputs-button");
+const canvasPianoInputsResetColorsPart = document.getElementById("canvas-piano-inputs-reset-colors-part");
+const canvasPianoInputsResetColorsButton = document.getElementById("canvas-piano-inputs-reset-colors-button");
+const canvasPianoInputs = document.getElementById("canvas-piano-inputs");
+const backgroundColorInput = document.getElementById("background-color");
+const isCanvasBackgroundColorTransparentInput = document.getElementById("is-canvas-background-color-transparent");
+const saveChangedColorsOnCanvasInput = document.getElementById("save-changed-colors-on-canvas-by-modified-background-color-input-value");
+const saveCanvasInputsColors = document.getElementById("save-canvas-inputs-colors");
+const resetColorsOnCanvasPart = document.getElementById("reset-colors-on-canvas-part");
+const resetColorsOnCanvasInput = document.getElementById("reset-colors-on-canvas");
+const reloadingTimeInput = document.getElementById("reloading-time");
+const reloadingTimeSubmitButton = document.getElementById("reloading-time-submit-button");
 const textItems = document.getElementsByTagName("text-item");
 const textItemsColorInput = document.getElementById("text-items-color");
 const defaultBackgroundColorValue = backgroundColorInput.value;

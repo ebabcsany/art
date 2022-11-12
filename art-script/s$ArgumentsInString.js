@@ -1,5 +1,5 @@
-import {createIfAndElseAndReturns, StringPart} from "./stringPart";
-import {StringManipulation} from "./stringManipulation";
+import {createIfAndElseAndReturns, StringPart} from "./stringPart.js";
+import {StringManipulation} from "./stringManipulation.js";
 import {
     getOutsideOfConsecutiveMatchingSearchsPartsFromString,
     getSearchThIndexOfString,
@@ -7,7 +7,7 @@ import {
     getValidSearchTh,
     getValidString, isContainsOneSearchInString,
     isContainsSearchInString, isContainsSearchsInString, isEmptyString, removeAllSearchsInString
-} from "./script";
+} from "./script.js";
 
 /**
  * Returns - ...;

@@ -1,6 +1,11 @@
-import {DIGITS, getValidString, isCharEqualsCharacterOfText, isValidStringAndText} from "./script";
-import {createArrayFromObjects, isEmptyString} from "./s$ArgumentsInString";
-import {createIfAndElseAndReturns, getValidInteger, StringPart} from "./stringPart";
+import {
+    createArrayFromObjects,
+    DIGITS, getValidInteger,
+    getValidString,
+    isCharEqualsCharacterOfText, isEmptyString,
+    isValidStringAndText
+} from "./script.js";
+import {createIfAndElseAndReturns, StringPart} from "./stringPart.js";
 
 export class StringManipulation {
     static containsSearchCount(string, search) {
