@@ -1,0 +1,24 @@
+{
+  "name": "piano-song-editor",
+  "version": "0.0.1",
+  "description": "Piano song editor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@git.jetbrains.space/hinfox/art-piano-song/art.git"
+  },
+  "keywords": [
+    "piano",
+    "song",
+    "editor",
+    "art"
+  ],
+  "author": "Ervin Babcsany <ervin@hinfox.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "cypress": "^11.0.1"
+  }
+}
