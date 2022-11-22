@@ -53,7 +53,7 @@ export function getCanvasColorInputClickedNameFromType(type) {
     return getCanvasColorInputClickedNameFromId(elementId);
 }
 
-class CanvasColorInputElement extends HTMLParagraphElement {
+class CanvasColorInputElement extends HTMLInputElement {
     static getCanvasColorInputs(qualifiedName) {
         return document.getElementsByTagName(qualifiedName);
     }
@@ -103,7 +103,7 @@ class CanvasColorInputElement extends HTMLParagraphElement {
     }
 }
 
-class CanvasPianoColorInputElement extends HTMLParagraphElement {
+class CanvasPianoColorInputElement extends HTMLInputElement {
     static getCanvasPianoColorInputInnerHTMLWithType(type, color) {
         const elementId = getCanvasColorInputId("piano-" + type);
         return CanvasColorInputElement.getCanvasColorInputInnerHTML(type, elementId, color);
@@ -131,7 +131,7 @@ class CanvasPianoColorInputElement extends HTMLParagraphElement {
     }
 }
 
-class CanvasPianoActivePartColorInputElement extends HTMLParagraphElement {
+class CanvasPianoActivePartColorInputElement extends HTMLInputElement {
     static getCanvasPianoActivePartColorInputInnerHTMLWithType(type, color) {
         const elementId = getCanvasColorInputId("piano-active-part-" + type);
         return CanvasColorInputElement.getCanvasColorInputInnerHTML(type, elementId, color);
@@ -174,9 +174,9 @@ export function setDefaultCanvasColorInputValueFromType(type) {
     setDefaultCanvasColorInputValueFromId(elementId);
 }
 
-customElements.define("canvas-color-input", CanvasColorInputElement, {extends: "p"});
-customElements.define("canvas-piano-color-input", CanvasPianoColorInputElement, {extends: "p"});
-customElements.define("canvas-piano-active-part-color-input", CanvasPianoActivePartColorInputElement, {extends: "p"});
+customElements.define("canvas-color-input", CanvasColorInputElement, {extends: "input"});
+customElements.define("canvas-piano-color-input", CanvasPianoColorInputElement, {extends: "input"});
+customElements.define("canvas-piano-active-part-color-input", CanvasPianoActivePartColorInputElement, {extends: "input"});
 setCanvasColorInputs();
 setCanvasPianoColorInputs();
 setCanvasPianoActivePartColorInputs();
