@@ -53,6 +53,11 @@ export function getCanvasColorInputClickedNameFromType(type) {
     return getCanvasColorInputClickedNameFromId(elementId);
 }
 
+/**
+ * <strong>(</strong>In {@link HTMLElement HTML} code<strong>)</strong>
+ * <p><code style="color: #000000">(</code>from <code>&lt;{@link CanvasColorInputElement canvas-color-input} value="<code style="color: #3f5fef">{@link PaymentCurrencyAmount#value #000000}</code>"><code style="color: #7f008f">{@link Function#name example}</code>&lt;{@link CanvasColorInputElement canvas-color-input}></code><code style="color: #000000">)</code></p>
+ * <p><code style="color: #000000">(</code>to <code>&lt;{@link CanvasColorInputElement canvas-color-input} value="<code style="color: #3f5fef">{@link PaymentCurrencyAmount#value #000000}</code>">&lt;p>&lt;text-item style="color: #000000"><code style="color: #7f008f">{@link Function#name example}</code>-color:&lt;/text-item>&lt;label for="canvas-<code style="color: #7f008f">{@link Function#name example}</code>-color">&lt;/label>&lt;input id="canvas-<code style="color: #7f008f">{@link Function#name example}</code>-color" name="canvas-<code style="color: #7f008f">{@link Function#name example}</code>-color" type="color" value="<code style="color: #3f5fef">{@link PaymentCurrencyAmount#value #000000}</code>">&lt;span id="canvas-<code style="color: #7f008f">{@link Function#name example}</code>-color-reset-color-part" hidden="">&lt;text-item style="color: #000000">-&lt;/text-item>&lt;button id="canvas-<code style="color: #7f008f">{@link Function#name example}</code>-color-reset-color-button" name="canvas-<code style="color: #7f008f">{@link Function#name example}</code>-color-reset-color-button">reset-color&lt;/button>&lt;/span>&lt;/p>&lt;/{@link CanvasColorInputElement canvas-color-input}></code><code style="color: #000000">)</code></p>
+ */
 class CanvasColorInputElement extends HTMLParagraphElement {
     static getCanvasColorInputs(qualifiedName) {
         return document.getElementsByTagName(qualifiedName);
