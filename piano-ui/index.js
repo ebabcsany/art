@@ -98,6 +98,7 @@ const defaultWholeKeyHeightOfPiano = 104;
 const defaultHalfKeyWidth = 7;
 const defaultHalfKeyHeight = 68;
 const defaultWholeOctaveWidth = 112;
+const defaultWholeOctavesCount = 7;
 const keySoundPitchesArray = [];
 const keyBetweenSoundsSpacesArray = [];
 let drawnKeyIndex = -1;
@@ -291,9 +292,6 @@ reloadingTimeSubmitButton.onmouseup = function () {
 };
 reloadingTimeSubmitButton.onclick = function () {
     isWindowClicked = false;
-    const soundVolume = getKeySoundVolumeWithSteps(1, 100);
-    console.log(soundVolume);
-    createKeySoundPitchWithSteps(soundVolume, 63, 30);
     const isEmpty = isEmptyString(reloadingTimeInput.value);
     const reloadingTime = createIfAndElseAndReturns(isEmpty, 10, reloadingTimeInput.value);
     main(reloadingTime);
