@@ -98,6 +98,7 @@ const defaultWholeKeyHeightOfPiano = 104;
 const defaultHalfKeyWidth = 7;
 const defaultHalfKeyHeight = 68;
 const defaultWholeOctaveWidth = 112;
+const defaultWholeOctavesCount = 7;
 const keySoundPitchesArray = [];
 const keyBetweenSoundsSpacesArray = [];
 let drawnKeyIndex = -1;
@@ -291,9 +292,6 @@ reloadingTimeSubmitButton.onmouseup = function () {
 };
 reloadingTimeSubmitButton.onclick = function () {
     isWindowClicked = false;
-    const soundVolume = getKeySoundVolumeWithSteps(1, 100);
-    console.log(soundVolume);
-    createKeySoundPitchWithSteps(soundVolume, 63, 30);
     const isEmpty = isEmptyString(reloadingTimeInput.value);
     const reloadingTime = createIfAndElseAndReturns(isEmpty, 10, reloadingTimeInput.value);
     main(reloadingTime);
@@ -1195,12 +1193,13 @@ function getClickingWholeKeyParametersOfPiano({keyLeftType, keyRightType, keyWid
     const rightTypeValue = getDefaultWholeKeyShapeX(rightType, width);
     const leftTypePosX = posX + leftTypeValue;
     const rightTypePosX = posX + wholeKeyWidth - rightTypeValue;
-    const upperPartDownPosY = topOfKeys + halfKeyHeight + getPartOfWidth(width, 1);
+    const upperPartDownPosY = topOfKeys + halfKeyHeight;
     return {
+        keyWidth,
         leftTypePosX: leftTypePosX,
         rightTypePosX: rightTypePosX,
         upperPartDownPosY: upperPartDownPosY,
-        lowerPartDownPosY: topOfKeys + keyHeight
+        lowerPartDownPosY: topOfKeys + getPartOfHeightWithResizedCanvas(width, height, keyHeight)
     }
 }
 
@@ -1208,6 +1207,7 @@ function isValidWholeKeyClickingMousePosition({keyLeftType, keyRightType, keyWid
     const partOfWidth = value => getPartOfWidth(width, value);
     const keyType = {keyLeftType, keyRightType, keyWidth, keyHeight};
     const parameters = getClickingWholeKeyParametersOfPiano(keyType, width, height, partOfWidthPosX);
+    const wholeKeyWidth = parameters.keyWidth;
     const leftTypePosX = parameters.leftTypePosX;
     const rightTypePosX = parameters.rightTypePosX;
     const upperPartDownPosY = parameters.upperPartDownPosY;
@@ -1215,7 +1215,7 @@ function isValidWholeKeyClickingMousePosition({keyLeftType, keyRightType, keyWid
     const isMousePosYLessThanOrEqualsHalfKeyDownPosY = savedCanvasMouseValidPos.y <= upperPartDownPosY;
     const isMousePosYLessThanOrEqualsWholeKeyDownPosY = savedCanvasMouseValidPos.y <= lowerPartDownPosY;
     const ifMousePosYLessThanOrEqualsHalfKeyDownPosY = savedCanvasMouseValidPos.x >= leftTypePosX && savedCanvasMouseValidPos.x <= rightTypePosX;
-    const ifMousePosYGreaterThanHalfKeyDownPosY = savedCanvasMouseValidPos.x >= partOfWidth(partOfWidthPosX) && savedCanvasMouseValidPos.x <= partOfWidth(partOfWidthPosX + 15);
+    const ifMousePosYGreaterThanHalfKeyDownPosY = savedCanvasMouseValidPos.x >= partOfWidth(partOfWidthPosX) && savedCanvasMouseValidPos.x <= partOfWidth(partOfWidthPosX + wholeKeyWidth);
     const ifMousePosYLessThanOrEqualsWholeKeyDownPosY = createIfAndElseAndReturns(isMousePosYLessThanOrEqualsHalfKeyDownPosY, ifMousePosYLessThanOrEqualsHalfKeyDownPosY, ifMousePosYGreaterThanHalfKeyDownPosY);
     return createIfAndElseAndReturns(isMousePosYLessThanOrEqualsWholeKeyDownPosY, ifMousePosYLessThanOrEqualsWholeKeyDownPosY, false);
 }
