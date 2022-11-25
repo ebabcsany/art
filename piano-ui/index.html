@@ -31,17 +31,17 @@
                 <canvas-piano-color-input value="#000000">half-key</canvas-piano-color-input>
                 <p><button id="canvas-piano-active-part-inputs-button" name="canvas-piano-active-part-inputs-button">active-part-inputs</button><span id="canvas-piano-active-part-inputs-reset-colors-part" hidden> <text-item>-</text-item> <button id="canvas-piano-active-part-inputs-reset-colors-button" name="canvas-piano-active-part-inputs-reset-colors-button">reset-colors</button></span></p>
                 <div style="margin-left: 30px" id="canvas-piano-active-part-inputs" hidden>
-                    <canvas-piano-active-part-color-input value="#dfdfdf">clicking-whole-key</canvas-piano-active-part-color-input>
-                    <canvas-piano-active-part-color-input value="#000000">clicking-half-key</canvas-piano-active-part-color-input>
-                    <canvas-piano-active-part-color-input value="#000000">moving-bar-belonging-whole-key</canvas-piano-active-part-color-input>
-                    <canvas-piano-active-part-color-input value="#000000">moving-bar-belonging-half-key</canvas-piano-active-part-color-input>
+                    <canvas-piano-active-part-color-input value="#e71111">clicking-whole-key</canvas-piano-active-part-color-input>
+                    <canvas-piano-active-part-color-input value="#e71111">clicking-half-key</canvas-piano-active-part-color-input>
+                    <canvas-piano-active-part-color-input value="#000000" hidden>moving-bar-belonging-whole-key</canvas-piano-active-part-color-input>
+                    <canvas-piano-active-part-color-input value="#000000" hidden>moving-bar-belonging-half-key</canvas-piano-active-part-color-input>
                 </div>
             </div>
         </div>
         <p><text-item>is-canvas-background-color-transparent:</text-item> <label for="is-canvas-background-color-transparent"></label><input id="is-canvas-background-color-transparent" name="is-canvas-background-color-transparent" type="checkbox" checked/></p>
-        <p><text-item>save-canvas-inputs-colors:</text-item> <label for="save-canvas-inputs-colors"></label><input id="save-canvas-inputs-colors" name="save-canvas-inputs-colors" type="checkbox"></p>
-        <p><text-item>text-items-color:</text-item> <label for="text-items-color"></label><input id="text-items-color" name="text-items-color" type="color" value="#000000"></p>
-        <p><text-item>background-color:</text-item> <label for="background-color"></label><input id="background-color" name="background-color" type="color" value="#ffffff"></p>
+        <p><text-item>save-canvas-inputs-colors:</text-item> <label for="save-canvas-inputs-colors"></label><input id="save-canvas-inputs-colors" name="save-canvas-inputs-colors" type="checkbox"><span id="save-canvas-inputs-colors-part" hidden> <text-item>-</text-item> <button id="save-canvas-inputs-colors-button" name="save-canvas-inputs-colors-button">save</button><span id="set-canvas-inputs-colors-part" hidden> <text-item>-</text-item> <button id="set-canvas-inputs-colors-button" name="set-canvas-inputs-colors-button">set</button></span></span></p>
+        <p><text-item>text-items-color:</text-item> <label for="text-items-color"></label><input id="text-items-color" name="text-items-color" type="color" value="#000000"><span id="text-items-color-reset-color-part" hidden> <text-item>-</text-item> <button id="text-items-color-reset-color-button" name="text-items-color-reset-color-button">reset-color</button></span></p>
+        <p><text-item>background-color:</text-item> <label for="background-color"></label><input id="background-color" name="background-color" type="color" value="#ffffff"><span id="background-color-reset-color-part" hidden> <text-item>-</text-item> <button id="background-color-reset-color-button" name="background-color-reset-color-button">reset-color</button></span></p>
         <p><text-item>save-changed-colors-on-canvas-by-modified-background-color:</text-item> <label for="save-changed-colors-on-canvas-by-modified-background-color-input-value"></label><input id="save-changed-colors-on-canvas-by-modified-background-color-input-value" name="save-changed-colors-on-canvas-by-modified-background-color-input-value" type="checkbox"><span id="reset-colors-on-canvas-part" hidden> <text-item>-</text-item> <button id="reset-colors-on-canvas" name="reset-colors-on-canvas">reset-colors</button></span></p>
         <p><text-item>reloading-time:</text-item> <label for="reloading-time"></label><input id="reloading-time" name="reloading-time" type="number"> <button id="reloading-time-submit-button" name="reloading-time-submit-button">submit</button></p>
         <script src="index.js" type="module"></script>

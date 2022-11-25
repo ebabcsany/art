@@ -161,7 +161,7 @@ class CanvasPianoActivePartColorInputElement extends HTMLInputElement {
 
 function setDefaultCanvasColorInputValueFromName(name) {
     const defaultInputValueName = getDefaultCanvasColorInputNameFromName(name);
-    window[name].value = window[defaultInputValueName];
+    window[name + "Input"].value = window[defaultInputValueName];
 }
 
 function setDefaultCanvasColorInputValueFromId(id) {
