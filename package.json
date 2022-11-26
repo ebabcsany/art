@@ -18,7 +18,7 @@
   ],
   "author": "Ervin Babcsany <ervin@hinfox.com>",
   "license": "SEE LICENSE IN LICENSE",
-  "dependencies": {
+  "devDependencies": {
     "cypress": "^11.0.1"
   }
 }
