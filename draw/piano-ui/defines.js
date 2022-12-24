@@ -1,5 +1,4 @@
 import {
-    createIfAndElseAndReturns,
     getValidString,
     isEmptyString,
     placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ
@@ -10,7 +9,7 @@ import {StringPart} from "../../art-script/stringPart.js";
 export function getCanvasColorInputId(type) {
     type = getValidString(type);
     const isTypeEmpty = isEmptyString(type);
-    const validType = type + createIfAndElseAndReturns(isTypeEmpty, "", "-");
+    const validType = type + (isTypeEmpty ? "" : "-");
     return "canvas-" + validType + "color";
 }
 
@@ -107,12 +106,12 @@ export function getCanvasColorInputClickedNameFromType(type) {
 class CanvasColorElement extends HTMLElement {
     static ifValidType(type) {
         const isTypeEmpty = isEmptyString(type);
-        return createIfAndElseAndReturns(isTypeEmpty, "", "-");
+        return isTypeEmpty ? "" : "-";
     }
 
     static getValidType(type) {
         const isTypeString = typeof type === "string";
-        return createIfAndElseAndReturns(!isTypeString || isEmptyString(type), "", getValidString(type));
+        return !isTypeString || isEmptyString(type) ? "" : getValidString(type);
     }
 
     static getValidTypeValue(value, type) {
@@ -154,7 +153,7 @@ class CanvasColorElement extends HTMLElement {
         const ifTextType = CanvasColorElement.getValidTypeValue(text, "before");
         const thisIdIfTypeEmpty = getCanvasColorInputId(text);
         const thisIdIfTypeNotEmpty = getCanvasColorInputId(type + ifTextType);
-        const thisId = createIfAndElseAndReturns(isEmptyString(type), thisIdIfTypeEmpty, thisIdIfTypeNotEmpty);
+        const thisId = isEmptyString(type) ? thisIdIfTypeEmpty : thisIdIfTypeNotEmpty;
         const thisResetColorId = thisId + "-reset-color";
         const firstParagraphItem = document.createElement('p');
         const firstTextItem = document.createElement('text-item');

@@ -6,7 +6,8 @@ import {
     getCanvasColorInputIdFromName,
     getCanvasColorInputNameFromId,
     getCanvasColorInputNameFromType,
-    getCanvasColorInputTypeFromId, getDefaultCanvasColorInputNameFromId,
+    getCanvasColorInputTypeFromId,
+    getDefaultCanvasColorInputNameFromId,
     getDefaultCanvasColorInputNameFromName,
     setDefaultCanvasColorInputValueFromType
 } from "./defines.js";
@@ -15,7 +16,6 @@ import {
     canvasHeightInput,
     canvasWidthInput,
     createArrayFromOneElement,
-    createIfAndElseAndReturns,
     createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength,
     fillColoredRect,
     getArrayElementsWithIndexesArray,
@@ -38,7 +38,7 @@ import {
     isObjectEqualsSomeElementOfObjects,
     isObjectEqualsSomeElementOfString,
     isValidInteger,
-    placeIntegerToTheIncreasingIntegersArray, replaceNewArrayToTheArray,
+    placeIntegerToTheIncreasingIntegersArray,
     subArray,
     subArrayWithFromIndex,
     subArrayWithToIndex,
@@ -442,7 +442,7 @@ saveCanvasInputsColorsButton.onclick = function () {
     isWindowClicked = false;
     const values = getCanvasInputsValues();
     const defaultValues = getCanvasInputsDefaultValues();
-    savedCanvasInputsColors = createIfAndElseAndReturns(saveCanvasInputsColors.checked, values, defaultValues);
+    savedCanvasInputsColors = saveCanvasInputsColors.checked ? values : defaultValues;
     saveCanvasInputsColorsButton.hidden = true;
     savedCanvasInputsColorsPart.hidden = false;
     setCanvasInputsColorsPart.hidden = false;
@@ -516,31 +516,19 @@ setColorsFromFile.onclick = function () {
             if (isValid) {
                 settedFileContent = content;
                 const savedFileContent = tHex.getValidRgbHexsArray(content);
-                savedCanvasInputsColors = createIfAndElseAndReturns(
-                    content.length <= defaultCanvasColorValues.length,
-                    addNewArrayToAfterOfTheArray(
-                        savedFileContent,
-                        subArrayWithFromIndex(
-                            defaultCanvasColorValues,
-                            content.length
-                        )
-                    ),
-                    subArrayWithToIndex(
-                        savedFileContent,
-                        defaultCanvasColorValues.length - 1
+                savedCanvasInputsColors = content.length <= defaultCanvasColorValues.length ? addNewArrayToAfterOfTheArray(
+                    savedFileContent,
+                    subArrayWithFromIndex(
+                        defaultCanvasColorValues,
+                        content.length
                     )
+                ) : subArrayWithToIndex(
+                    savedFileContent,
+                    defaultCanvasColorValues.length - 1
                 );
             } else {
                 settedFileContent = [];
-                error = createIfAndElseAndReturns(
-                    isContainsOpenOrClosingBracket,
-                    createIfAndElseAndReturns(
-                        Array.isArray(content),
-                        errorStrings[0] + errorStrings[1] + " (use an array of square brackets)",
-                        errorStrings[0] + errorStrings[1]
-                    ),
-                    errorStrings[0] + errorStrings[3]
-                );
+                error = isContainsOpenOrClosingBracket ? Array.isArray(content) ? errorStrings[0] + errorStrings[1] + " (use an array of square brackets)" : errorStrings[0] + errorStrings[1] : errorStrings[0] + errorStrings[3];
             }
             if (isValid) {
                 setColorsFromFile.hidden = true;
@@ -587,7 +575,7 @@ reloadingTimeSubmitButton.onmouseup = function () {
 reloadingTimeSubmitButton.onclick = function () {
     isWindowClicked = false;
     const isEmpty = isEmptyString(reloadingTimeInput.value);
-    const reloadingTime = createIfAndElseAndReturns(isEmpty, 10, reloadingTimeInput.value);
+    const reloadingTime = isEmpty ? 10 : reloadingTimeInput.value;
     main(reloadingTime);
 };
 let isCanvasInterval = false;
@@ -760,8 +748,8 @@ function loadCanvasSize() {
     if (!isCanvasWidthInputFocus && !isCanvasHeightInputFocus) {
         setCanvasSize(Math.min(innerWidth, innerHeight) * threeQuarter);
     } else {
-        const newCanvasWidth = createIfAndElseAndReturns(isCanvasWidthInputFocus, canvasWidth, innerWidth * threeQuarter);
-        const newCanvasHeight = createIfAndElseAndReturns(isCanvasHeightInputFocus, canvasHeight, innerHeight * threeQuarter);
+        const newCanvasWidth = isCanvasWidthInputFocus ? canvasWidth : innerWidth * threeQuarter;
+        const newCanvasHeight = isCanvasHeightInputFocus ? canvasHeight : innerHeight * threeQuarter;
         setCanvasWidth(newCanvasWidth);
         setCanvasHeight(newCanvasHeight);
     }
@@ -855,13 +843,13 @@ function getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidth(outOfCanvasHeig
     outOfCanvasHeightOfDivider = getValidNumber(outOfCanvasHeightOfDivider);
     const partOfHeight = getValidNumber(canvas.height * (1 - (1 / outOfCanvasHeightOfDivider)));
     const valuePart = getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthThenPartOfWidthOrElsePartOfHeight(outOfCanvasHeightOfDivider, partOfHeight);
-    return createIfAndElseAndReturns(outOfCanvasHeightOfDivider >= 1, valuePart, canvas.height);
+    return outOfCanvasHeightOfDivider >= 1 ? valuePart : canvas.height;
 }
 
 function getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, partOfHeightOfCanvas) {
     height = validateIntegerWithMin(height, 0);
     const valuePart = getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidth(getValidNumber(height / (height - getValidNumber(partOfHeightOfCanvas))));
-    return createIfAndElseAndReturns(partOfHeightOfCanvas < height, valuePart, canvas.height);
+    return partOfHeightOfCanvas < height ? valuePart : canvas.height;
 }
 
 function getTopOfPianoKeys(height) {
@@ -921,19 +909,19 @@ class KeyParametersOfPiano {
     }
 
     getValidWholeKeyType(value) {
-        return createIfAndElseAndReturns(this.isValidWholeKeyType(value), value, "0");
+        return this.isValidWholeKeyType(value) ? value : "0";
     }
 
     constructor(keyType, fillStyle, width, height, posX, posY) {
         keyType = Object.create(keyType);
-        const keyLeftType = createIfAndElseAndReturns(this.isValidWholeKeyType(keyType.left), keyType.left, undefined);
-        const keyRightType = createIfAndElseAndReturns(this.isValidWholeKeyType(keyType.right), keyType.right, undefined);
+        const keyLeftType = this.isValidWholeKeyType(keyType.left) ? keyType.left : undefined;
+        const keyRightType = this.isValidWholeKeyType(keyType.right) ? keyType.right : undefined;
         const isKeyTypesUndefined = keyLeftType === undefined && keyRightType === undefined;
-        const typeIfTypeInKeyTypeUndefined = createIfAndElseAndReturns(isKeyTypesUndefined, "half", "whole");
+        const typeIfTypeInKeyTypeUndefined = isKeyTypesUndefined ? "half" : "whole";
         const keyWidth = validateNumberWithMin(keyType.width, 0);
         const keyHeight = validateNumberWithMin(keyType.height, 0);
         this.keyParameters = {keyType, fillStyle, width, height, posX, posY};
-        this.type = createIfAndElseAndReturns(keyType.type === undefined, typeIfTypeInKeyTypeUndefined, keyType.type);
+        this.type = keyType.type === undefined ? typeIfTypeInKeyTypeUndefined : keyType.type;
         this.keyType = {
             default: keyType,
             type: this.type,
@@ -963,7 +951,7 @@ class KeyParametersOfPiano {
 
     getParameters(type) {
         const isValidType = isObjectEqualsSomeElementOfObjects(type, "whole", "half");
-        type = createIfAndElseAndReturns(isValidType, type, this.type);
+        type = isValidType ? type : this.type;
         let value = this.keyParameters;
         if (type === "whole") {
             this.type = "whole";
@@ -978,8 +966,8 @@ class KeyParametersOfPiano {
             let keyHeight = this.keyType.height;
             const isValidKeyWidth = isValidInteger(keyWidth);
             const isValidKeyHeight = isValidInteger(keyHeight);
-            const validKeyWidth = createIfAndElseAndReturns(getValidInteger(keyWidth) < 0, 0, keyWidth);
-            const validKeyHeight = createIfAndElseAndReturns(getValidInteger(keyHeight) < 0, 0, keyHeight);
+            const validKeyWidth = getValidInteger(keyWidth) < 0 ? 0 : keyWidth;
+            const validKeyHeight = getValidInteger(keyHeight) < 0 ? 0 : keyHeight;
             const keyType = this.keyType;
             keyType.width = 15;
             keyType.height = 104;
@@ -987,8 +975,8 @@ class KeyParametersOfPiano {
             keyType.defaultHeight = getPartOfHeightWithResizedCanvas(width, height, keyType.height);
             keyLeftType = this.getValidWholeKeyType(keyLeftType);
             keyRightType = this.getValidWholeKeyType(keyRightType);
-            keyWidth = createIfAndElseAndReturns(isValidKeyWidth, validKeyWidth, keyType.width);
-            keyHeight = createIfAndElseAndReturns(isValidKeyHeight, validKeyHeight, keyType.height);
+            keyWidth = isValidKeyWidth ? validKeyWidth : keyType.width;
+            keyHeight = isValidKeyHeight ? validKeyHeight : keyType.height;
             const defaultLeftPart = getDefaultWholeKeyShapeX(keyLeftType, width);
             const defaultRightPart = getDefaultWholeKeyShapeX(keyRightType, width);
             const leftPart = getWholeKeyShapeX(keyLeftType);
@@ -1001,8 +989,8 @@ class KeyParametersOfPiano {
             keyType.rightPart = rightPart;
             const defaultUpperPartHeight = 68;
 
-            const wholeKeyWidth = createIfAndElseAndReturns(keyWidth === keyType.width, keyWidth, 15);
-            const wholeKeyHeight = createIfAndElseAndReturns(keyHeight === keyType.height, keyHeight, 104);
+            const wholeKeyWidth = keyWidth === keyType.width ? keyWidth : 15;
+            const wholeKeyHeight = keyHeight === keyType.height ? keyHeight : 104;
             const canBeAddedWidthPart = keyWidth - wholeKeyWidth;
             const canBeAddedHeightPart = keyHeight - wholeKeyHeight;
             const leftShapeXPart = posX + leftPart;
@@ -1011,9 +999,9 @@ class KeyParametersOfPiano {
             const upperPartWidth = defaultUpperPartWidth + canBeAddedWidthPart;
             const lowerPartWidth = wholeKeyWidth + canBeAddedWidthPart;
             const defaultLowerPartHeight = wholeKeyHeight - defaultUpperPartHeight - 1;
-            const upperPartHeightIfGreaterThanMinusWholeKeyHeight = createIfAndElseAndReturns(canBeAddedHeightPart >= -defaultLowerPartHeight, wholeKeyHeight, wholeKeyHeight + canBeAddedHeightPart);
-            const upperPartHeight = createIfAndElseAndReturns(canBeAddedHeightPart > -wholeKeyHeight, upperPartHeightIfGreaterThanMinusWholeKeyHeight, 0);
-            const lowerPartHeight = createIfAndElseAndReturns(canBeAddedHeightPart > -defaultLowerPartHeight, defaultLowerPartHeight + canBeAddedHeightPart, 0);
+            const upperPartHeightIfGreaterThanMinusWholeKeyHeight = canBeAddedHeightPart >= -defaultLowerPartHeight ? wholeKeyHeight : wholeKeyHeight + canBeAddedHeightPart;
+            const upperPartHeight = canBeAddedHeightPart > -wholeKeyHeight ? upperPartHeightIfGreaterThanMinusWholeKeyHeight : 0;
+            const lowerPartHeight = canBeAddedHeightPart > -defaultLowerPartHeight ? defaultLowerPartHeight + canBeAddedHeightPart : 0;
 
             const defaultLeftShapeXPart = getPartOfWidth(width, leftShapeXPart);
             const lowerPartUpPart = getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, lowerPartUp);
@@ -1101,7 +1089,7 @@ class KeyOfPiano extends KeyParametersOfPiano {
 
     draw(type) {
         const isValidType = isObjectEqualsSomeElementOfObjects(type, "whole", "half");
-        type = createIfAndElseAndReturns(isValidType, type, this.type);
+        type = isValidType ? type : this.type;
         const key = this;
 
         function draw() {
@@ -1207,7 +1195,7 @@ function getDefaultHalfKeyThPosXInOctave(partOfWidthAndStart, numberOfSpacesArra
     if (isIntegersArray(numberOfSpacesArray) && isValidKeyTh) {
         for (let i = 1; i <= keyTh; i++) {
             const spacesPart = numberOfSpacesArray[i - 1];
-            value += createIfAndElseAndReturns(i < keyTh, spacesPart, 0);
+            value += i < keyTh ? spacesPart : 0;
         }
     }
     return value;
@@ -1304,7 +1292,7 @@ function getDefaultOctaveKeyPosXOfPiano(octaveStartPosX, keyTh) {
             }
             const halfKeyPosX = getDefaultHalfKeyThPosXInOctave(halfKeyOctaveStart, numberOfSpacesBetweenHalfKeys, halfKeyCounter);
             const wholeKeyPosX = getDefaultWholeKeyThPosXInOctave(octaveStartPosX, wholeKeyCounter);
-            const posX = createIfAndElseAndReturns(isWholeFirstType, wholeKeyPosX, halfKeyPosX);
+            const posX = isWholeFirstType ? wholeKeyPosX : halfKeyPosX;
             if (th === keyTh) {
                 value = posX;
                 break;
@@ -1422,7 +1410,7 @@ function getKeyOctavePosXsOfPiano(partOfWidthAndStart) {
             }
             isWholeFirstType = isKeyOctaveFirstType(counter + counter1, "whole");
         }
-        const validPos = createIfAndElseAndReturns(isWholeFirstType, i, i1);
+        const validPos = isWholeFirstType ? i : i1;
         value.push(validPos);
         savedFirstTypeIndex++;
     }
@@ -1647,15 +1635,15 @@ function getPianoNextToEachOtherKeysParameters(width, height, posX, posY, {
         } else {
             normalStartKeyIndexFromOctave = 0;
         }
-        connectedNormalKeysCount = createIfAndElseAndReturns(isLastKeyHalf, remainedKeysCount, remainedKeysCount - 1);
+        connectedNormalKeysCount = isLastKeyHalf ? remainedKeysCount : remainedKeysCount - 1;
     } else {
-        connectedNormalKeysCount = createIfAndElseAndReturns(isLastKeyHalf, keysCount, keysCount - 1);
+        connectedNormalKeysCount = isLastKeyHalf ? keysCount : keysCount - 1;
     }
     const connectedNormalKeysTypesArray = createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength(keyTypesInOctave, normalStartKeyIndexFromOctave, connectedNormalKeysCount);
     const keysPosXsArray = getDefaultNextToEachOtherKeysPosXsInOctaves(keyPosX - firstOctaveStartToFirstKeyIndexPosX, defaultNormalStartKeyIndexFromOctave, keysCount - i);
-    const lastNormalKeyTh = createIfAndElseAndReturns(isLastKeyHalf, keysCount, keysCount - 1);
+    const lastNormalKeyTh = isLastKeyHalf ? keysCount : keysCount - 1;
     while (i < lastNormalKeyTh) {
-        const outOfKeyIndex = createIfAndElseAndReturns(isStartKeyWholeFromOctave, 1, 0);
+        const outOfKeyIndex = isStartKeyWholeFromOctave ? 1 : 0;
         const newKeyPosX = keysPosXsArray[i - outOfKeyIndex];
         keyPosX = newKeyPosX;
         const newKeyFillStyle = keysFillStyles[i];
@@ -1679,7 +1667,7 @@ function getPianoNextToEachOtherKeysParameters(width, height, posX, posY, {
         const lastKeyTypeLeft = getWholeKeyShapeX(lastKeyType.left);
         const beforeLastKeyTypeWidth = getValidInteger(beforeLastKeyType.width);
         const isBeforeLastKeyHalf = getValidString(beforeLastKeyType.type) === "half";
-        keyPosX += createIfAndElseAndReturns(isBeforeLastKeyHalf, beforeLastKeyTypeWidth - lastKeyTypeLeft + 1, beforeLastKeyTypeWidth + 1 - lastKeyTypeLeft);
+        keyPosX += isBeforeLastKeyHalf ? beforeLastKeyTypeWidth - lastKeyTypeLeft + 1 : beforeLastKeyTypeWidth + 1 - lastKeyTypeLeft;
         const newKeyParameters = {
             canvasPartsCount,
             pos: {
@@ -1792,15 +1780,15 @@ function drawKeysFromKeysParametersOfPiano(keysParameters) {
 
 function getClickingWholeKeyParametersOfPiano(keyType, width, height, partOfWidthPosX) {
     const isValidKeyType = value => isObjectEqualsSomeElementOfString(value, "0123");
-    const getValidKeyType = value => createIfAndElseAndReturns(isValidKeyType(value), value, "0");
+    const getValidKeyType = value => isValidKeyType(value) ? value : "0";
     let keyWidth = keyType.width;
     let keyHeight = keyType.height;
     const isValidKeyWidth = isValidInteger(keyWidth);
     const isValidKeyHeight = isValidInteger(keyHeight);
-    const validKeyWidth = createIfAndElseAndReturns(getValidInteger(keyWidth) < 0, 0, keyWidth);
-    const validKeyHeight = createIfAndElseAndReturns(getValidInteger(keyHeight) < 0, 0, keyHeight);
-    keyWidth = createIfAndElseAndReturns(isValidKeyWidth, validKeyWidth, 15);
-    keyHeight = createIfAndElseAndReturns(isValidKeyHeight, validKeyHeight, 104);
+    const validKeyWidth = getValidInteger(keyWidth) < 0 ? 0 : keyWidth;
+    const validKeyHeight = getValidInteger(keyHeight) < 0 ? 0 : keyHeight;
+    keyWidth = isValidKeyWidth ? validKeyWidth : 15;
+    keyHeight = isValidKeyHeight ? validKeyHeight : 104;
     partOfWidthPosX = getValidInteger(partOfWidthPosX);
     const posX = getPartOfWidth(width, partOfWidthPosX);
     const topOfKeys = getTopOfPianoKeys(height);
@@ -1834,8 +1822,8 @@ function isValidWholeKeyClickingMousePosition(keyType, width, height, partOfWidt
     const isMousePosYLessThanOrEqualsWholeKeyDownPosY = savedCanvasMouseValidPos.y <= lowerPartDownPosY;
     const ifMousePosYLessThanOrEqualsHalfKeyDownPosY = savedCanvasMouseValidPos.x >= leftTypePosX && savedCanvasMouseValidPos.x <= rightTypePosX;
     const ifMousePosYGreaterThanHalfKeyDownPosY = savedCanvasMouseValidPos.x >= partOfWidth(partOfWidthPosX) && savedCanvasMouseValidPos.x <= partOfWidth(partOfWidthPosX + wholeKeyWidth);
-    const ifMousePosYLessThanOrEqualsWholeKeyDownPosY = createIfAndElseAndReturns(isMousePosYLessThanOrEqualsHalfKeyDownPosY, ifMousePosYLessThanOrEqualsHalfKeyDownPosY, ifMousePosYGreaterThanHalfKeyDownPosY);
-    return createIfAndElseAndReturns(isMousePosYLessThanOrEqualsWholeKeyDownPosY, ifMousePosYLessThanOrEqualsWholeKeyDownPosY, false);
+    const ifMousePosYLessThanOrEqualsWholeKeyDownPosY = isMousePosYLessThanOrEqualsHalfKeyDownPosY ? ifMousePosYLessThanOrEqualsHalfKeyDownPosY : ifMousePosYGreaterThanHalfKeyDownPosY;
+    return isMousePosYLessThanOrEqualsWholeKeyDownPosY ? ifMousePosYLessThanOrEqualsWholeKeyDownPosY : false;
 }
 
 function isValidHalfKeyClickingMousePosition(width, height, posX) {
@@ -1854,11 +1842,7 @@ function getColorWithNotSaveChangedColorsOnCanvasOfPiano(fieldNameWithWordsSepar
     );
     const inputString = validName + "Input";
     let colorValue = window[inputString].value;
-    window[inputString].value = colorValue = createIfAndElseAndReturns(
-        saveChangedColorsOnCanvasInput.checked,
-        modifiedColor,
-        colorValue
-    );
+    window[inputString].value = colorValue = saveChangedColorsOnCanvasInput.checked ? modifiedColor : colorValue;
     return colorValue;
 }
 
@@ -2139,16 +2123,16 @@ function drawPianoSongEditor() {
     const isCanvasPianoAndActivePartInputsEqualsDefaultColor = isJustCanvasPianoInputsEqualsDefaultColor && isCanvasPianoActivePartInputsEqualsDefaultColor;
     const isJustCanvasAndPianoInputsEqualsDefaultColor = isJustCanvasInputsEqualsDefaultColor && isJustCanvasPianoInputsEqualsDefaultColor;
     const isCanvasInputsEqualsDefaultColor = isAllCanvasFields();
-    const ifCanvasAndPianoInputsVisibleOfJustCanvasInputs = createIfAndElseAndReturns(canvasPianoActivePartInputs.hidden, isJustCanvasAndPianoInputsEqualsDefaultColor, isCanvasInputsEqualsDefaultColor);
-    const ifCanvasInputsVisibleOfJustCanvasInputs = createIfAndElseAndReturns(canvasPianoInputs.hidden, isJustCanvasInputsEqualsDefaultColor, ifCanvasAndPianoInputsVisibleOfJustCanvasInputs);
-    const ifCanvasAndPianoInputsVisibleOfJustCanvasAndPianoInputs = createIfAndElseAndReturns(canvasPianoActivePartInputs.hidden, isJustCanvasPianoInputsEqualsDefaultColor, isCanvasPianoAndActivePartInputsEqualsDefaultColor);
-    canvasInputsResetColorsPart.hidden = createIfAndElseAndReturns(canvasInputs.hidden, true, ifCanvasInputsVisibleOfJustCanvasInputs);
-    canvasPianoInputsResetColorsPart.hidden = createIfAndElseAndReturns(canvasInputs.hidden || canvasPianoInputs.hidden, true, ifCanvasAndPianoInputsVisibleOfJustCanvasAndPianoInputs);
-    canvasPianoActivePartInputsResetColorsPart.hidden = createIfAndElseAndReturns(canvasInputs.hidden || canvasPianoInputs.hidden || canvasPianoActivePartInputs.hidden, true, isCanvasPianoActivePartInputsEqualsDefaultColor);
+    const ifCanvasAndPianoInputsVisibleOfJustCanvasInputs = canvasPianoActivePartInputs.hidden ? isJustCanvasAndPianoInputsEqualsDefaultColor : isCanvasInputsEqualsDefaultColor;
+    const ifCanvasInputsVisibleOfJustCanvasInputs = canvasPianoInputs.hidden ? isJustCanvasInputsEqualsDefaultColor : ifCanvasAndPianoInputsVisibleOfJustCanvasInputs;
+    const ifCanvasAndPianoInputsVisibleOfJustCanvasAndPianoInputs = canvasPianoActivePartInputs.hidden ? isJustCanvasPianoInputsEqualsDefaultColor : isCanvasPianoAndActivePartInputsEqualsDefaultColor;
+    canvasInputsResetColorsPart.hidden = canvasInputs.hidden ? true : ifCanvasInputsVisibleOfJustCanvasInputs;
+    canvasPianoInputsResetColorsPart.hidden = canvasInputs.hidden || canvasPianoInputs.hidden ? true : ifCanvasAndPianoInputsVisibleOfJustCanvasAndPianoInputs;
+    canvasPianoActivePartInputsResetColorsPart.hidden = canvasInputs.hidden || canvasPianoInputs.hidden || canvasPianoActivePartInputs.hidden ? true : isCanvasPianoActivePartInputsEqualsDefaultColor;
     resetColorsOnCanvasPart.hidden = isCanvasInputsEqualsDefaultColor;
     const isAllCanvasFieldsEqualsSavedCanvasColors = isAllCanvasFieldsSaved();
     if (savedDefaultCanvasInputsColors === undefined || isAllCanvasFieldsEqualsSavedCanvasColors) {
-        savedDefaultCanvasInputsColors = createIfAndElseAndReturns(saveCanvasInputsColors.checked, values, definedValues);
+        savedDefaultCanvasInputsColors = saveCanvasInputsColors.checked ? values : definedValues;
     }
     if (isCanvasInterval) {
         drawClassicPianoAndSongEditorStripes();
@@ -2281,8 +2265,8 @@ function getKeyTypesInOctave() {
     let wholeKeyCounter = 0;
     for (let i = 0; i < 12; i++) {
         const isWholeFirstType = isKeyOctaveFirstType(i, "whole");
-        wholeKeyCounter += createIfAndElseAndReturns(isWholeFirstType, 1, 0);
-        const wholeKeyType = createIfAndElseAndReturns(isWholeFirstType, getWholeKeyTypeInOctave(wholeKeyCounter - 1), null);
+        wholeKeyCounter += isWholeFirstType ? 1 : 0;
+        const wholeKeyType = isWholeFirstType ? getWholeKeyTypeInOctave(wholeKeyCounter - 1) : null;
         const halfKeyType = {
             type: "half",
             left: undefined,
@@ -2290,7 +2274,7 @@ function getKeyTypesInOctave() {
             width: 7,
             height: 68
         };
-        const keyType = createIfAndElseAndReturns(isWholeFirstType, wholeKeyType, halfKeyType);
+        const keyType = isWholeFirstType ? wholeKeyType : halfKeyType;
         value.push(keyType);
     }
     return value;

@@ -1,4 +1,4 @@
-import {createIfAndElseAndReturns, getValidInteger, getValidString, isEmptyString, isTypes} from "./script.js";
+import {getValidInteger, getValidString, isEmptyString, isTypes} from "./script.js";
 
 export class StringPart {
     /**
@@ -25,8 +25,8 @@ export class StringPart {
         fromIndex = getValidInteger(fromIndex);
         toIndex = getValidInteger(toIndex);
         const substring = string.substring(fromIndex, toIndex + 1);
-        const valueIfValid = createIfAndElseAndReturns(fromIndex <= toIndex, substring, "");
-        return createIfAndElseAndReturns(isValid, valueIfValid, string);
+        const valueIfValid = fromIndex <= toIndex ? substring : "";
+        return isValid ? valueIfValid : string;
     }
 
     static subStringWithLength(string, fromIndex, length) {

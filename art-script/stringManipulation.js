@@ -1,6 +1,4 @@
 import {
-    createArrayFromObjects,
-    createIfAndElseAndReturns,
     DIGITS,
     getConsecutiveMatchingSearchsPartsCountInString,
     getConsecutiveMatchingSearchsPartsIndexesInString,
@@ -67,7 +65,7 @@ export class StringManipulation {
                 counter++;
             }
         }
-        return createIfAndElseAndReturns(isEmptyString(search), Infinity, counter);
+        return isEmptyString(search) ? Infinity : counter;
     }
 
     static isNotJustSpaces(string) {
@@ -92,7 +90,7 @@ export class StringManipulation {
     }
 
     static containsSearchsCount(string, ...searchs) {
-        return this.containsSearchsArrayElementsCount(string, createArrayFromObjects(searchs));
+        return this.containsSearchsArrayElementsCount(string, searchs);
     }
 
     static containsConsecutiveMatchingSearchsCount(string, search, firstSearchIndex) {
@@ -119,7 +117,7 @@ export class StringManipulation {
         string = getValidString(string);
         const isStringFirstSearch = string[0] === search;
         const consecutiveMatchingFirstSearchsCount = this.containsConsecutiveMatchingFirstSearchsCount(string, search);
-        return createIfAndElseAndReturns(isStringFirstSearch, consecutiveMatchingFirstSearchsCount, 0);
+        return isStringFirstSearch ? consecutiveMatchingFirstSearchsCount : 0;
     }
 
     static containsConsecutiveReverseMatchingSearchsCount(string, search, lastSearchIndex) {
@@ -143,7 +141,7 @@ export class StringManipulation {
     }
 
     static isContainsSearchs(string, ...searchs) {
-        return isContainsSearchArrayElementsInString(string, createArrayFromObjects(searchs));
+        return isContainsSearchArrayElementsInString(string, searchs);
     }
 
     static isContainsOneSearch(string, search) {
@@ -153,7 +151,7 @@ export class StringManipulation {
 
     static isContainsOneSearchs(string, ...searchs) {
         let value = false;
-        const searchsArray = createArrayFromObjects(searchs);
+        const searchsArray = searchs;
         if (isEmptyArray(searchsArray)) {
             value = true;
             for (const element of searchs) {
@@ -234,9 +232,9 @@ export class StringManipulation {
                 disassembledString = this.removeSearch(disassembledString, search);
             }
             const isContainsSearch = this.isContainsSearch(disassembledString, search);
-            const addCountOfSearchIndex = createIfAndElseAndReturns(isContainsSearch, (searchTh * search.length) - 1, 0);
+            const addCountOfSearchIndex = isContainsSearch ? (searchTh * search.length) - 1 : 0;
             const ifContainsSearch = getStringIndexOf(disassembledString, search) + addCountOfSearchIndex;
-            value = createIfAndElseAndReturns(isContainsSearch, ifContainsSearch, value) - (search.length - 1);
+            value = (isContainsSearch ? ifContainsSearch : value) - (search.length - 1);
         }
         return value;
     }
@@ -272,7 +270,7 @@ export class StringManipulation {
         const isValid = isValidParameters && fromIndex <= toIndex;
         const beforeFromIndex = stringPart.subStringWithToIndex(fromIndex - 1);
         const afterToIndex = stringPart.subStringWithFromIndex(toIndex + 1);
-        return createIfAndElseAndReturns(isValid, beforeFromIndex + afterToIndex, string);
+        return isValid ? beforeFromIndex + afterToIndex : string;
     }
 
     static removeSubStringWithFromIndex(string, fromIndex) {
@@ -287,7 +285,7 @@ export class StringManipulation {
     static removeSubStringWithLength(string, fromIndex, length) {
         fromIndex = getValidInteger(fromIndex);
         length = getValidInteger(length);
-        const toIndex = fromIndex + createIfAndElseAndReturns(length > -1, length - 1, 0);
+        const toIndex = fromIndex + (length > -1 ? length - 1 : 0);
         return this.removeSubString(string, fromIndex, toIndex);
     }
 
@@ -303,16 +301,12 @@ export class StringManipulation {
         string = getValidString(string);
         search = getValidString(search);
         searchTh = getValidSearchTh(searchTh);
-        const validPosition = createIfAndElseAndReturns(
-            arguments[3] === undefined,
-            0,
-            getValidInteger(arguments[3])
-        );
+        const validPosition = arguments[3] === undefined ? 0 : getValidInteger(arguments[3]);
         const fromIndex = this.getSearchThIndex(string, search, searchTh);
-        const position = createIfAndElseAndReturns(fromIndex > -1, validPosition, -1);
+        const position = fromIndex > -1 ? validPosition : -1;
         const length = getValidInteger(search.length);
         const valueIfValid = this.removeSubStringWithLength(string, fromIndex + position, length);
-        return createIfAndElseAndReturns(isValid, valueIfValid, string);
+        return isValid ? valueIfValid : string;
     }
 
     static removeAfterSearchTh(string, search, searchTh) {
@@ -337,7 +331,7 @@ export class StringManipulation {
 
     static removeAllSearchs(string, ...searchs) {
         string = getValidString(string);
-        const searchsArray = createArrayFromObjects(searchs);
+        const searchsArray = searchs;
         const onceOccurringSearchsArray = getValidOnceOccurringObjectsArray(searchsArray);
         let value = string;
         for (const element of onceOccurringSearchsArray) {
@@ -502,11 +496,7 @@ export class StringManipulation {
         static getOneSquareBracketsIndex(string) {
             string = getValidString(string);
             const isFromThUndefined = typeof arguments[1] === "undefined";
-            const fromTh = createIfAndElseAndReturns(
-                typeof arguments[1] === "undefined",
-                0,
-                getValidInteger(arguments[1])
-            );
+            const fromTh = typeof arguments[1] === "undefined" ? 0 : getValidInteger(arguments[1]);
             const openingBracketIndex = this.getSearchThIndex(string, "[", fromTh);
             const newString = StringPart.subStringWithFromIndex(string, openingBracketIndex);
             const isFirstBrackets = this.isFirstSquareBrackets(newString);
@@ -532,11 +522,7 @@ export class StringManipulation {
         static getOneNestingSquareBracketsIndexAndBrackets(string) {
             string = getValidString(string);
             const isOneBracketsIndexUndefined = typeof arguments[1] === "undefined";
-            const oneBracketsIndex = createIfAndElseAndReturns(
-                isOneBracketsIndexUndefined,
-                this.getOneSquareBracketsIndex(string),
-                validateIntegerWithMin(arguments[1], 0)
-            );
+            const oneBracketsIndex = isOneBracketsIndexUndefined ? this.getOneSquareBracketsIndex(string) : validateIntegerWithMin(arguments[1], 0);
             const openingBracketIndex = string.indexOf("[");
             const closingBracketIndex = string.indexOf("]");
             const stringFirst = StringPart.subStringWithToIndex(string, oneBracketsIndex);
@@ -665,39 +651,23 @@ export class StringManipulation {
             const remainingOpeningBracketsCount = validateIntegerWithMin(arguments[2], 0);
             const remainingClosingBracketsCount = validateIntegerWithMin(arguments[3], 0);
             const isEqualsRemainingBracketsCounts = remainingOpeningBracketsCount === remainingClosingBracketsCount;
-            return createIfAndElseAndReturns(
-                typeof bracketsCount === "undefined",
-                createIfAndElseAndReturns(
-                    is3And4ThArgumentsUndefined,
-                    undefined,
-                    createIfAndElseAndReturns(
-                        is3ThArgumentUndefined || is4ThArgumentUndefined,
-                        getReturnsArrayElementIfObjectNotEqualsArrayElement(
-                            undefined,
-                            [
-                                arguments[2],
-                                arguments[3],
-                            ],
-                            [
-                                remainingOpeningBracketsCount,
-                                remainingClosingBracketsCount,
-                                undefined
-                            ]
-                        ),
-                        createIfAndElseAndReturns(
-                            isEqualsRemainingBracketsCounts,
-                            remainingOpeningBracketsCount,
-                            Math.min(
-                                remainingOpeningBracketsCount,
-                                remainingClosingBracketsCount
-                            )
-                        )
-                    )
-                ),
-                validateIntegerWithMin(
-                    bracketsCount,
-                    0
-                )
+            return typeof bracketsCount === "undefined" ? is3And4ThArgumentsUndefined ? undefined : is3ThArgumentUndefined || is4ThArgumentUndefined ? getReturnsArrayElementIfObjectNotEqualsArrayElement(
+                undefined,
+                [
+                    arguments[2],
+                    arguments[3],
+                ],
+                [
+                    remainingOpeningBracketsCount,
+                    remainingClosingBracketsCount,
+                    undefined
+                ]
+            ) : isEqualsRemainingBracketsCounts ? remainingOpeningBracketsCount : Math.min(
+                remainingOpeningBracketsCount,
+                remainingClosingBracketsCount
+            ) : validateIntegerWithMin(
+                bracketsCount,
+                0
             );
         }
 
@@ -954,13 +924,11 @@ export class StringManipulation {
                     }
 
                     static stringsFirstToUppercaseWithAToZ(...strings) {
-                        const stringsArray = createArrayFromObjects(strings);
-                        return letter.lowercase.stringsArrayElementsFirstToUppercaseWithAToZ(stringsArray);
+                        return letter.lowercase.stringsArrayElementsFirstToUppercaseWithAToZ(strings);
                     }
 
                     static stringsFirstToUppercaseWithAToZAndStringifyElements(...strings) {
-                        const stringsArray = createArrayFromObjects(strings);
-                        return this.stringsArrayElementsFirstToUppercaseWithAToZAndStringifyElements(stringsArray);
+                        return this.stringsArrayElementsFirstToUppercaseWithAToZAndStringifyElements(strings);
                     }
                 };
 
@@ -1002,13 +970,11 @@ export class StringManipulation {
                     }
 
                     static stringsFirstToLowercaseWithAToZ(...strings) {
-                        const stringArray = createArrayFromObjects(strings);
-                        return this.stringArrayElementsFirstToLowercaseWithAToZ(stringArray);
+                        return this.stringArrayElementsFirstToLowercaseWithAToZ(strings);
                     }
 
                     static stringsFirstToLowercaseWithAToZAndStringifyElements(...strings) {
-                        const stringArray = createArrayFromObjects(strings);
-                        return this.stringArrayElementsFirstToLowercaseWithAToZAndStringifyElements(stringArray);
+                        return this.stringArrayElementsFirstToLowercaseWithAToZAndStringifyElements(strings);
                     }
                 };
             };

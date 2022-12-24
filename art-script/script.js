@@ -9,11 +9,11 @@ window.canvas = null;
 window.canvasContext = null;
 
 export function getValidString(value) {
-    return createIfAndElseAndReturns(typeof value === "string", value, "" + value);
+    return typeof value === "string" ? value : "" + value;
 }
 
 export function getValidArray(value) {
-    return createIfAndElseAndReturns(Array.isArray(value), value, []);
+    return Array.isArray(value) ? value : [];
 }
 
 function isValidNumber(value) {
@@ -21,7 +21,7 @@ function isValidNumber(value) {
 }
 
 export function getValidNumber(value) {
-    return createIfAndElseAndReturns(isValidNumber(value), value, 0);
+    return isValidNumber(value) ? value : 0;
 }
 
 export function isValidInteger(value) {
@@ -77,7 +77,7 @@ const numberWithTypePossibleParameters = ["number", "min to max"];
 export const tHex = {};
 tHex.min = 0;
 tHex.max = 255;
-tHex.numberWithTypeReferenceNumber = type => createIfAndElseAndReturns(type === numberWithTypePossibleParameters[0], null, createIfAndElseAndReturns(type === numberWithTypePossibleParameters[1], tHex.max + 1, 0));
+tHex.numberWithTypeReferenceNumber = type => type === numberWithTypePossibleParameters[0] ? null : type === numberWithTypePossibleParameters[1] ? tHex.max + 1 : 0;
 tHex.isSearchEqualsMinToMaxWithNumberTypePossibleParametersSomeElement = function (search) {
     return isObjectEqualsSomeElementOfArray(getValidString(search), minToMaxNumberWithNumberTypePossibleParameters);
 };
@@ -90,8 +90,8 @@ tHex.isHexColor = function (value) {
     return value !== null && isHexChars && (length === 3 || length === 6 || length === 8);
 };
 tHex.isHex = value => tHex.isHexColor(tHex.hexColor(value)) && value[0] === "#";
-tHex.getValidRgbHex = value => createIfAndElseAndReturns(tHex.isHex(value), value, "#000000");
-tHex.getValidRgbaHex = value => createIfAndElseAndReturns(tHex.isHex(value), value, "#00000000");
+tHex.getValidRgbHex = value => tHex.isHex(value) ? value : "#000000";
+tHex.getValidRgbaHex = value => tHex.isHex(value) ? value : "#00000000";
 tHex.getValidRgbHexsArray = function (array) {
     array = getValidArray(array);
     let value = [];
@@ -285,7 +285,7 @@ tHex.convertRgbIntegersArrayToHex = function (rgbArray) {
     return tHex.convertRgbIntegersToHex(rgbArray[0], rgbArray[1], rgbArray[2]);
 };
 tHex.getNumberWithTypePossibleParameters = function (type) {
-    return createIfAndElseAndReturns(type === numberWithTypePossibleParameters[0], numberWithNumberTypePossibleParameters, createIfAndElseAndReturns(type === numberWithTypePossibleParameters[1], minToMaxNumberWithNumberTypePossibleParameters, []));
+    return type === numberWithTypePossibleParameters[0] ? numberWithNumberTypePossibleParameters : type === numberWithTypePossibleParameters[1] ? minToMaxNumberWithNumberTypePossibleParameters : [];
 }
 tHex.getNumberWithTypeIndexPossibleParameters = function (typeIndex) {
     return tHex.getNumberWithTypePossibleParameters(numberWithTypePossibleParameters[typeIndex]);
@@ -376,7 +376,7 @@ tHex.getReverseHex = function (hex) {
 };
 tHex.getReverseRgbaTHexWithNumberType = function (hex, type, numberType) {
     const possibleParameters = numberWithTypePossibleParameters;
-    const referenceNumber = createIfAndElseAndReturns(type === possibleParameters[0], null, createIfAndElseAndReturns(type === possibleParameters[1], tHex.max + 1, 0));
+    const referenceNumber = type === possibleParameters[0] ? null : type === possibleParameters[1] ? tHex.max + 1 : 0;
     let value = "";
     if (tHex.isHex(hex) && hex.length === 9 && isObjectEqualsSomeElementOfArray(type, possibleParameters)) {
         const rgbaArray = tHex.convertHexToRgbaArray(hex);
@@ -479,7 +479,7 @@ export function getStringCapitalLetterIndex(string) {
 
 export function getStringCapitalLetter(string) {
     const stringChar = string[getStringCapitalLetterIndex(string)];
-    return createIfAndElseAndReturns(typeof stringChar === "string", stringChar, "");
+    return typeof stringChar === "string" ? stringChar : "";
 }
 
 export function removeCapitalLetterInString(string) {
@@ -524,7 +524,7 @@ export function placeStringCapitalLetterThBeforeToPlace(string, capitalLetterTh,
     capitalLetterTh = getValidSearchTh(capitalLetterTh);
     const capitalLetterThIndex = getStringCapitalLetterThIndex(string, capitalLetterTh);
     const placedBeforeLetterTh = StringManipulation.placeStringFromIndex(string, capitalLetterThIndex, place);
-    return createIfAndElseAndReturns(capitalLetterTh > 0, placedBeforeLetterTh, string);
+    return capitalLetterTh > 0 ? placedBeforeLetterTh : string;
 }
 
 export function placeStringAllCapitalLetterThBeforeToPlace(string, place) {
@@ -552,10 +552,10 @@ export function placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLett
 
 export function getStringCapitalLetterThToNextSearch(string, capitalLetterTh) {
     capitalLetterTh = getValidSearchTh(capitalLetterTh);
-    const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(capitalLetterTh > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, capitalLetterTh));
-    const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((capitalLetterTh + 1) > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, getValidSearchTh(capitalLetterTh) + 1) - 1);
-    const searchedStringStartIndex = createIfAndElseAndReturns(capitalLetterTh > 0, searchedStringStartIndexIfIndexGreaterThan0, -1);
-    const searchedStringEndIndex = createIfAndElseAndReturns(capitalLetterTh > 0, searchedStringEndIndexIfIndexGreaterThan0, getStringCapitalLetter(string) - 1);
+    const searchedStringStartIndexIfIndexGreaterThan0 = capitalLetterTh > containsCapitalLetterCountInString(string) ? string.length : getStringCapitalLetterThIndex(string, capitalLetterTh);
+    const searchedStringEndIndexIfIndexGreaterThan0 = (capitalLetterTh + 1) > containsCapitalLetterCountInString(string) ? string.length : getStringCapitalLetterThIndex(string, getValidSearchTh(capitalLetterTh) + 1) - 1;
+    const searchedStringStartIndex = capitalLetterTh > 0 ? searchedStringStartIndexIfIndexGreaterThan0 : -1;
+    const searchedStringEndIndex = capitalLetterTh > 0 ? searchedStringEndIndexIfIndexGreaterThan0 : getStringCapitalLetter(string) - 1;
     return StringPart.subString(string, searchedStringStartIndex, searchedStringEndIndex);
 }
 
@@ -564,16 +564,16 @@ export function isStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(stri
 }
 
 export function getStringAfterSearchIfStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, searchTh, afterSearch) {
-    return createIfAndElseAndReturns(isStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, searchTh, afterSearch), afterSearch, "");
+    return isStringAfterOfCapitalLetterThToNextSearchEqualsAfterSearch(string, searchTh, afterSearch) ? afterSearch : "";
 }
 
 export function replaceStringCapitalLetterThToNextSearch(string, capitalLetterTh, replace) {
     capitalLetterTh = getValidSearchTh(capitalLetterTh);
     const stringPart = new StringPart(string);
-    const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(capitalLetterTh > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, capitalLetterTh) - 1);
-    const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((capitalLetterTh + 1) > containsCapitalLetterCountInString(string), string.length, getStringCapitalLetterThIndex(string, getValidSearchTh(capitalLetterTh) + 1));
-    const searchedStringStartIndex = createIfAndElseAndReturns(getValidSearchTh(capitalLetterTh) > 0, searchedStringStartIndexIfIndexGreaterThan0, -1);
-    const searchedStringEndIndex = createIfAndElseAndReturns(getValidSearchTh(capitalLetterTh) > 0, searchedStringEndIndexIfIndexGreaterThan0, getStringCapitalLetterIndex(string));
+    const searchedStringStartIndexIfIndexGreaterThan0 = capitalLetterTh > containsCapitalLetterCountInString(string) ? string.length : getStringCapitalLetterThIndex(string, capitalLetterTh) - 1;
+    const searchedStringEndIndexIfIndexGreaterThan0 = (capitalLetterTh + 1) > containsCapitalLetterCountInString(string) ? string.length : getStringCapitalLetterThIndex(string, getValidSearchTh(capitalLetterTh) + 1);
+    const searchedStringStartIndex = getValidSearchTh(capitalLetterTh) > 0 ? searchedStringStartIndexIfIndexGreaterThan0 : -1;
+    const searchedStringEndIndex = getValidSearchTh(capitalLetterTh) > 0 ? searchedStringEndIndexIfIndexGreaterThan0 : getStringCapitalLetterIndex(string);
     const beforeReplacePart = stringPart.subStringWithToIndex(searchedStringStartIndex);
     const afterReplacePart = stringPart.subStringWithToIndex(searchedStringEndIndex);
     return beforeReplacePart + getValidString(replace) + afterReplacePart;
@@ -582,10 +582,10 @@ export function replaceStringCapitalLetterThToNextSearch(string, capitalLetterTh
 export function getStringAfterOfSearchThToNextSearch(string, search, searchTh) {
     searchTh = getValidSearchTh(searchTh);
     const containsSearchsCount = StringManipulation.containsSearchCount(string, search);
-    const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(searchTh > containsSearchsCount, string.length, StringManipulation.getSearchThIndex(string, search, searchTh) + 1);
-    const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((searchTh + 1) > containsSearchsCount, string.length, StringManipulation.getSearchThIndex(string, search, getValidSearchTh(searchTh) + 1) - 1);
-    const searchedStringStartIndex = createIfAndElseAndReturns(searchTh > 0, searchedStringStartIndexIfIndexGreaterThan0, -1);
-    const searchedStringEndIndex = createIfAndElseAndReturns(searchTh > 0, searchedStringEndIndexIfIndexGreaterThan0, getStringIndexOf(string, search) - 1);
+    const searchedStringStartIndexIfIndexGreaterThan0 = searchTh > containsSearchsCount ? string.length : StringManipulation.getSearchThIndex(string, search, searchTh) + 1;
+    const searchedStringEndIndexIfIndexGreaterThan0 = (searchTh + 1) > containsSearchsCount ? string.length : StringManipulation.getSearchThIndex(string, search, getValidSearchTh(searchTh) + 1) - 1;
+    const searchedStringStartIndex = searchTh > 0 ? searchedStringStartIndexIfIndexGreaterThan0 : -1;
+    const searchedStringEndIndex = searchTh > 0 ? searchedStringEndIndexIfIndexGreaterThan0 : getStringIndexOf(string, search) - 1;
     return StringPart.subString(string, searchedStringStartIndex, searchedStringEndIndex);
 }
 
@@ -597,10 +597,10 @@ export function replaceStringAfterOfSearchThToNextSearch(string, search, searchT
     searchTh = getValidSearchTh(searchTh);
     const stringPart = new StringPart(string);
     const containsSearchsCount = StringManipulation.containsSearchCount(string, search);
-    const searchedStringStartIndexIfIndexGreaterThan0 = createIfAndElseAndReturns(searchTh > containsSearchsCount, string.length, StringManipulation.getSearchThIndex(string, search, searchTh));
-    const searchedStringEndIndexIfIndexGreaterThan0 = createIfAndElseAndReturns((searchTh + 1) > containsSearchsCount, string.length, StringManipulation.getSearchThIndex(string, search, getValidSearchTh(searchTh) + 1));
-    const searchedStringStartIndex = createIfAndElseAndReturns(searchTh > 0, searchedStringStartIndexIfIndexGreaterThan0, -1);
-    const searchedStringEndIndex = createIfAndElseAndReturns(searchTh > 0, searchedStringEndIndexIfIndexGreaterThan0, getStringIndexOf(string, search));
+    const searchedStringStartIndexIfIndexGreaterThan0 = searchTh > containsSearchsCount ? string.length : StringManipulation.getSearchThIndex(string, search, searchTh);
+    const searchedStringEndIndexIfIndexGreaterThan0 = (searchTh + 1) > containsSearchsCount ? string.length : StringManipulation.getSearchThIndex(string, search, getValidSearchTh(searchTh) + 1);
+    const searchedStringStartIndex = searchTh > 0 ? searchedStringStartIndexIfIndexGreaterThan0 : -1;
+    const searchedStringEndIndex = searchTh > 0 ? searchedStringEndIndexIfIndexGreaterThan0 : getStringIndexOf(string, search);
     const beforeReplacePart = stringPart.subStringWithToIndex(searchedStringStartIndex);
     const afterReplacePart = stringPart.subStringWithToIndex(searchedStringEndIndex);
     return beforeReplacePart + getValidString(replace) + afterReplacePart;
@@ -674,13 +674,12 @@ function isEqualsObjectArrayElements(array) {
 export function isEqualsArrayElementsToObject(object, array) {
     array = getValidArray(array);
     const isEmpty = isEmptyArray(array);
-    const isFirstTrue = createIfAndElseAndReturns(isEmpty, false, array[0] === object);
+    const isFirstTrue = isEmpty ? false : array[0] === object;
     return isEqualsObjectArrayElements(array) && isFirstTrue;
 }
 
 export function isEqualsElementsToObject(object, ...elements) {
-    const array = createArrayFromObjects(elements);
-    return isEqualsArrayElementsToObject(object, array);
+    return isEqualsArrayElementsToObject(object, elements);
 }
 
 export function isArrayElementsTrue(array) {
@@ -773,11 +772,7 @@ export function getValidOnceOccurringIntegersArray(array) {
 }
 
 function isEqualsObjects(...objects) {
-    return isEqualsObjectArrayElements(createArrayFromObjects(objects));
-}
-
-export function getObjectWithConditionalBoolean(condition, ifTrue, ifFalse) {
-    return condition ? ifTrue : ifFalse;
+    return isEqualsObjectArrayElements(objects);
 }
 
 export function getReturnIfArrayFirstTrue(equalsAndReturnsArray) {
@@ -795,11 +790,7 @@ function isEqObj(object, eqObj) {
         ifTrue,
         ifFalse
     ) =>
-        createIfAndElseAndReturns(
-            condition,
-            ifTrue,
-            ifFalse
-        )
+        condition ? ifTrue : ifFalse
     ;
     const isType = obj => type === obj;
     return crifanders(
@@ -859,11 +850,7 @@ export function getReturnsArrayElementIfObjectEqualsArrayElement(object, equalsA
     let returnValue = null;
     for (let i = 0; i < equalsArray.length; i++) {
         const isEquals = isEqObj(object, equalsArray[i], arguments[2]);
-        returnValue = createIfAndElseAndReturns(
-            returnsArray.length > i,
-            returnsArray[i],
-            null
-        );
+        returnValue = returnsArray.length > i ? returnsArray[i] : null;
         if (isEquals) {
             value = returnValue;
             break;
@@ -925,15 +912,7 @@ export function getObjectIfObjectArrayElementEqualsArrayFirst(objectsArray, equa
 }
 
 export function getObjectIfEqualsObjects(a, b) {
-    return createIfAndElseAndReturns(a === b, b, a);
-}
-
-export function createArrayFromObjects(...elements) {
-    let array = [];
-    for (const element of elements) {
-        array.push(element);
-    }
-    return array;
+    return a === b ? b : a;
 }
 
 export function getArrayElementsWithIndexesArray(array, indexesArray) {
@@ -967,7 +946,7 @@ export function isStringNumber(string) {
     const isValidDotCount = containsDotCount <= 1;
     const dotIndex = getStringIndexOf(string, ".");
     const afterDotPartIfContainsDot = StringPart.subStringWithFromIndex(string, dotIndex + 1);
-    const afterDotPart = createIfAndElseAndReturns(isContainsDot, afterDotPartIfContainsDot, string);
+    const afterDotPart = isContainsDot ? afterDotPartIfContainsDot : string;
     const isAfterDotIndexDigits = StringManipulation.isDigits(afterDotPart);
     const isDigits = stringManipulation.isDigits();
     const isFirstDigit = isDigit(string[0]);
@@ -975,8 +954,8 @@ export function isStringNumber(string) {
     const secondElements = StringPart.subStringWithFromIndex(string, 2);
     const isSecondDigits = StringManipulation.isDigits(secondElements);
     const isFirstHyphen = string[0] === "-";
-    const isBeginDigit = createIfAndElseAndReturns(isFirstHyphen, isSecondDigit, isFirstDigit);
-    const isBeginDigits = createIfAndElseAndReturns(isFirstHyphen, isSecondDigits, isDigits);
+    const isBeginDigit = isFirstHyphen ? isSecondDigit : isFirstDigit;
+    const isBeginDigits = isFirstHyphen ? isSecondDigits : isDigits;
     return isBeginDigit && ((isValidDotCount && isAfterDotIndexDigits) || isBeginDigits);
 }
 
@@ -997,7 +976,7 @@ function max1DigitOfNumberAddOrOutOfOneIfNumberGreaterThan0(digit, digitsType) {
     }
     if (isCharEqualsCharacterOfText(digit, digits)) {
         const index = digits.indexOf(digit);
-        value = index === createIfAndElseAndReturns(digits.length - 1, digits[0], digits[index + 1]);
+        value = index === (digits.length - 1 ? digits[0] : digits[index + 1]);
     } else {
         value = DIGITS[0];
     }
@@ -1032,11 +1011,11 @@ function max2DigitsOfNumberAddOne(digits) {
     const addOne = max1DigitOfNumberAddOneIfNumberGreaterThan0(digits[digits.length - 1]);
     if (isStringAllCharsEqualsDigitsAndLength(digits, 1)) {
         const isFirstToAddOne = StringPart.subStringWithToIndex(DIGITS, 1);
-        value = addOne === createIfAndElseAndReturns(DIGITS[0], isFirstToAddOne, addOne);
+        value = addOne === (DIGITS[0] ? isFirstToAddOne : addOne);
     } else if (isStringAllCharsEqualsDigitsAndLength(digits, 2)) {
         if (addOne === DIGITS[0]) {
             const digit = max1DigitOfNumberAddOneIfNumberGreaterThan0(digits[0]);
-            value = createIfAndElseAndReturns(digit === DIGITS[0], DIGITS[0], digit + DIGITS[0]);
+            value = digit === DIGITS[0] ? DIGITS[0] : digit + DIGITS[0];
         } else {
             value = digits[0] + addOne;
         }
@@ -1094,11 +1073,11 @@ export function isObjectEqualsSomeElementOfString(object, string) {
 function isObjectNotEqualsSomeElementOfArray(object, array) {
     const isEmpty = isEmptyArray(array);
     const valueIfArrayNotEmpty = !isObjectEqualsSomeElementOfArray(object, array);
-    return createIfAndElseAndReturns(isEmpty, false, valueIfArrayNotEmpty);
+    return isEmpty ? false : valueIfArrayNotEmpty;
 }
 
 export function isObjectEqualsSomeElementOfObjects(object, ...objects) {
-    return isObjectEqualsSomeElementOfArray(object, createArrayFromObjects(objects));
+    return isObjectEqualsSomeElementOfArray(object, objects);
 }
 
 function isObjectNotEqualsSomeElementOfObjects(object, ...objects) {
@@ -1122,7 +1101,7 @@ function createNestedEmptyArraysWithArrayThAndLengthInArray(arraysCount, arrayTh
                 value[arrayTh - 1] = replaceableArray;
             }
         } else {
-            value = createIfAndElseAndReturns(isValidLength, emptyArraysInArray, value);
+            value = isValidLength ? emptyArraysInArray : value;
         }
     }
     return value;
@@ -1216,11 +1195,7 @@ export function getRepeatedConnectedArraysLengthFromArraysCount(array, arraysCou
         const lastAddCount = toIndex + 1;
         if (arraysCount > 1) {
             for (let i = 0; i < arraysCount; i++) {
-                const addCountIfIGreaterThan0 = createIfAndElseAndReturns(
-                    i < arraysCount - 1,
-                    array.length,
-                    lastAddCount
-                );
+                const addCountIfIGreaterThan0 = i < arraysCount - 1 ? array.length : lastAddCount;
                 if (i > 0) {
                     value += addCountIfIGreaterThan0;
                 } else {
@@ -1241,7 +1216,7 @@ function getLastArrayLengthFromRepeatedConnectedArraysCountFromLength(array, len
     const wholeArraysLengthIfNotJustWholeArrays = array.length * (repeatedConnectedArraysCount - 1);
     let value = 0;
     if (length > 0) {
-        value = createIfAndElseAndReturns(isValidInteger(length / array.length), array.length, length - wholeArraysLengthIfNotJustWholeArrays);
+        value = isValidInteger(length / array.length) ? array.length : length - wholeArraysLengthIfNotJustWholeArrays;
     }
     return value;
 }
@@ -1267,8 +1242,8 @@ export function createSubRepeatedConnectedArrays(array, arraysCount, fromIndex, 
     if (arraysCount > 0) {
         if (arraysCount > 1) {
             for (let i = 0; i < arraysCount; i++) {
-                const addableArrayIfIGreaterThan0 = createIfAndElseAndReturns(i < arraysCount - 1, array, subArrayWithToIndex(array, toIndex));
-                let addableArray = createIfAndElseAndReturns(i > 0, addableArrayIfIGreaterThan0, subArrayWithFromIndex(array, fromIndex));
+                const addableArrayIfIGreaterThan0 = i < arraysCount - 1 ? array : subArrayWithToIndex(array, toIndex);
+                let addableArray = i > 0 ? addableArrayIfIGreaterThan0 : subArrayWithFromIndex(array, fromIndex);
                 value = addNewArrayToAfterOfTheArray(value, addableArray);
             }
         } else {
@@ -1451,17 +1426,17 @@ function placeIntegerToTheIntegersArray(integersArray, integer, index) {
     index = getValidInteger(index);
     const isValid = isIntegersArray(integersArray) && isStringInteger(integer);
     const ifValid = placeObjectToTheArray(integersArray, integer, index);
-    return createIfAndElseAndReturns(isValid, ifValid, integersArray);
+    return isValid ? ifValid : integersArray;
 }
 
 export function placeIntegerToTheIncreasingIntegersArray(integersArray, integer) {
     const isEmpty = isEmptyArray(integersArray);
     const isValidIntegersArray = isIntegersArray(integersArray);
     const isValidIncreasingIntegersArray = isIncreasingIntegersArray(integersArray);
-    const isValidArray = createIfAndElseAndReturns(integersArray.length === 1, isValidIntegersArray, isValidIncreasingIntegersArray);
+    const isValidArray = integersArray.length === 1 ? isValidIntegersArray : isValidIncreasingIntegersArray;
     const isIntegerNotEqualsIntegerArrayElement = isObjectNotEqualsSomeElementOfArray(integer, integersArray);
     const isValid = isIntegerNotEqualsIntegerArrayElement && isValidArray && isValidInteger(integer);
-    let value = createIfAndElseAndReturns(isEmpty, [integer], integersArray);
+    let value = isEmpty ? [integer] : integersArray;
     if (isValid) {
         const {length} = integersArray;
         for (let i = 0; i < length; i++) {
@@ -1502,7 +1477,7 @@ function isCharEqualsSomeElementOfDigits(char, digits) {
 }
 
 function getPositiveNumber(number) {
-    return createIfAndElseAndReturns(number < 0, -number, number);
+    return number < 0 ? -number : number;
 }
 
 function getPositiveInteger(integer) {
@@ -1513,8 +1488,8 @@ function getHalfInteger(number) {
     number = getValidNumber(number);
     const isDivisibleBy2 = (number + 1) % 2 === 0;
     const ifDivisibleBy2 = ((number + 1) / 2) - 1;
-    const ifNotDivisibleBy2 = createIfAndElseAndReturns(number % 2 === 0, number / 2, number);
-    return createIfAndElseAndReturns(isDivisibleBy2, ifDivisibleBy2, ifNotDivisibleBy2);
+    const ifNotDivisibleBy2 = number % 2 === 0 ? number / 2 : number;
+    return isDivisibleBy2 ? ifDivisibleBy2 : ifNotDivisibleBy2;
 }
 
 function getQuarterInteger(number) {
@@ -1594,13 +1569,13 @@ function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNu
     } else if (numberType === possibleParameters[6]) {
         value = getEighthInteger(positiveNumber) + getSevenSixteenthsInteger(positiveReferenceNumber + 4);
     }
-    return createIfAndElseAndReturns(positiveReferenceNumber >= 0 && positiveNumber >= 0 && positiveNumber <= positiveReferenceNumber, value, 0);
+    return positiveReferenceNumber >= 0 && positiveNumber >= 0 && positiveNumber <= positiveReferenceNumber ? value : 0;
 }
 
 function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetweenReferenceNumberAndOutOfOneOfDoubleReferenceNumber(positiveReferenceNumber, numberType, positiveNumber) {
     positiveReferenceNumber = getValidInteger(positiveReferenceNumber);
     positiveNumber = getValidInteger(positiveNumber);
-    return createIfAndElseAndReturns(positiveReferenceNumber >= 0 && positiveNumber >= positiveReferenceNumber && positiveNumber <= (positiveReferenceNumber * 2) - 1, validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndReferenceNumber(positiveReferenceNumber, numberType, positiveReferenceNumber - (positiveNumber - positiveReferenceNumber)), 0);
+    return positiveReferenceNumber >= 0 && positiveNumber >= positiveReferenceNumber && positiveNumber <= (positiveReferenceNumber * 2) - 1 ? validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndReferenceNumber(positiveReferenceNumber, numberType, positiveReferenceNumber - (positiveNumber - positiveReferenceNumber)) : 0;
 }
 
 function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0AndNumberBetween0AndOutOfOneOfDoubleReferenceNumber(positiveReferenceNumber, numberType, positiveNumber) {
@@ -1643,8 +1618,8 @@ function validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0(posi
 function validateIntegerWithNumberType(referenceNumber, numberType, number) {
     referenceNumber = getValidInteger(referenceNumber);
     number = getValidInteger(number);
-    const positiveReferenceNumber = createIfAndElseAndReturns(referenceNumber < 0, -referenceNumber, referenceNumber);
-    const positiveNumber = createIfAndElseAndReturns(referenceNumber < 0, -number, number);
+    const positiveReferenceNumber = referenceNumber < 0 ? -referenceNumber : referenceNumber;
+    const positiveNumber = referenceNumber < 0 ? -number : number;
     return validateIntegerWithNumberTypeIfReferenceNumberGreaterThanOrEquals0(positiveReferenceNumber, numberType, positiveNumber);
 }
 
@@ -1652,8 +1627,8 @@ function getMinToMaxIntegerWithNumberType(referenceNumber, numberType, number) {
     referenceNumber = getValidInteger(referenceNumber);
     number = getValidInteger(number);
     const valueIfPositiveReferenceNumber = validateIntegerWithNumberType(referenceNumber, numberType, number);
-    const valueIfNegativeOr0ReferenceNumber = createIfAndElseAndReturns(referenceNumber < 0, -validateIntegerWithNumberType(-referenceNumber, numberType, -number), 0);
-    return createIfAndElseAndReturns(referenceNumber > 0, valueIfPositiveReferenceNumber, valueIfNegativeOr0ReferenceNumber);
+    const valueIfNegativeOr0ReferenceNumber = referenceNumber < 0 ? -validateIntegerWithNumberType(-referenceNumber, numberType, -number) : 0;
+    return referenceNumber > 0 ? valueIfPositiveReferenceNumber : valueIfNegativeOr0ReferenceNumber;
 }
 
 function getMinToMaxIntegerWithNumberTypeIndex(referenceNumber, numberTypeIndex, number) {
@@ -1891,7 +1866,7 @@ function getOutsideOfConsecutiveMatchingSearchsPartsIndexesFromString(string, se
     const firstSearch = StringPart.subStringWithToIndex(string, search.length - 1);
     const searchIndex = getStringIndexOf(string, search);
     const isFirstSearch = searchIndex === 0 && firstSearch === search;
-    let value = createIfAndElseAndReturns(isFirstSearch, [], [0]);
+    let value = isFirstSearch ? [] : [0];
     for (let i = 0; i < indexesCount; i++) {
         const index = partsIndexAndEndIndexArraysInArray[i][1];
         if (i + 1 < indexesCount || index + 1 !== length) {
@@ -2010,8 +1985,8 @@ export function getOutsideOfConsecutiveMatchingSearchsPartsFromString(string, se
     const searchIndex = getStringIndexOf(string, search);
     const isFirstSearch = searchIndex === 0 && firstSearch === search;
     const firstOutsidePartIfContainsSearch = stringPart.subStringWithToIndex(searchIndex - 1);
-    const firstOutsidePart = createIfAndElseAndReturns(isContainsSearch, firstOutsidePartIfContainsSearch, string);
-    let value = createIfAndElseAndReturns(isFirstSearch, [], [firstOutsidePart]);
+    const firstOutsidePart = isContainsSearch ? firstOutsidePartIfContainsSearch : string;
+    let value = isFirstSearch ? [] : [firstOutsidePart];
     if (isContainsSearch) {
         for (let i = 0; i < length; i++) {
             const indexAndEndIndexArrays = partsIndexAndEndIndexArraysInArray;
@@ -2043,7 +2018,7 @@ function createOutsideAndConsecutiveMatchingSearchsPartIndexesArrayFromString(st
     const length = partsIndexes.length + outsideParts.length;
     const searchIndex = getStringIndexOf(string, search);
     const isFirstSearch = searchIndex === 0;
-    let value = createIfAndElseAndReturns(isFirstSearch, [], [outsideParts[0]]);
+    let value = isFirstSearch ? [] : [outsideParts[0]];
     let partsIndexesCounter = 0;
     let outsidePartsCounter = 0;
     let counter = 0;
@@ -2051,12 +2026,12 @@ function createOutsideAndConsecutiveMatchingSearchsPartIndexesArrayFromString(st
         const partIndex = partsIndexes[partsIndexesCounter];
         const outsidePart = outsideParts[outsidePartsCounter];
         const isCounterHalfable = counter % 2 === 0;
-        const elementIfCounterHalfable = createIfAndElseAndReturns(isFirstSearch, partIndex, outsidePart);
-        const elementIfCounterNotHalfable = createIfAndElseAndReturns(isFirstSearch, outsidePart, partIndex);
+        const elementIfCounterHalfable = isFirstSearch ? partIndex : outsidePart;
+        const elementIfCounterNotHalfable = isFirstSearch ? outsidePart : partIndex;
         let element = isCounterHalfable ? elementIfCounterHalfable : elementIfCounterNotHalfable;
         if (counter + 1 < length) {
-            const counterHalfableFirst = createIfAndElseAndReturns(isCounterHalfable, 1, 0);
-            const counterHalfableSecond = createIfAndElseAndReturns(isCounterHalfable, 0, 1);
+            const counterHalfableFirst = isCounterHalfable ? 1 : 0;
+            const counterHalfableSecond = isCounterHalfable ? 0 : 1;
             partsIndexesCounter += isFirstSearch ? counterHalfableFirst : counterHalfableSecond;
             outsidePartsCounter += isFirstSearch ? counterHalfableSecond : counterHalfableFirst;
         }
@@ -2296,13 +2271,13 @@ function containsSearchArrayCountInArray(array, searchArray) {
             counter++;
         }
     }
-    return createIfAndElseAndReturns(isEmptyArray(searchArray), Infinity, counter);
+    return isEmptyArray(searchArray) ? Infinity : counter;
 }
 
 function isContainsSearchCharOnIndexInString(string, searchChar, index) {
     string = getValidString(string);
     searchChar = getValidString(searchChar);
-    const search = createIfAndElseAndReturns(searchChar.length === 1, searchChar, " ");
+    const search = searchChar.length === 1 ? searchChar : " ";
     const stringIndex = validateNumber(index, 0, string.length - 1);
     const isContainsSearch = StringManipulation.isContainsSearch(string, search);
     return isContainsSearch && string[stringIndex] === searchChar;
@@ -2313,7 +2288,7 @@ function isContainsOneSearchOnIndexInArray(array, search, index) {
 }
 
 function isContainsOneSearchOnIndexInElements(search, index, ...elements) {
-    return isContainsOneSearchOnIndexInArray(createArrayFromObjects(elements), search, index);
+    return isContainsOneSearchOnIndexInArray(elements, search, index);
 }
 
 export function isContainsSearchArrayElementsInString(string, searchArray) {
@@ -2351,18 +2326,6 @@ export function isEmptyStrings(...string) {
     return value;
 }
 
-/**
- * Returns same as {@link getObjectWithConditionalBoolean this}.
- * @returns {*}
- */
-export function createIfAndElseAndReturns(condition, ifTrue, ifFalse) {
-    if (condition) {
-        return ifTrue;
-    } else {
-        return ifFalse;
-    }
-}
-
 export function validateMinAndMax(min, max) {
     min = getValidNumber(min);
     max = getValidNumber(max);
@@ -2380,7 +2343,7 @@ function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh
     let isContainsSearch = containsSearchsCount > 0;
     search = getValidString(search);
     partTh = getValidSearchTh(partTh);
-    let value = createIfAndElseAndReturns(isValidParameters, -1, 0);
+    let value = isValidParameters ? -1 : 0;
     let counter = 0;
     let i = getStringIndexOf(string, search);
     if (isContainsSearch && partTh > 0) {
@@ -2393,12 +2356,12 @@ function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh
             if (counter < partTh) {
                 let disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
                 let isContainsMoreThan1Search = disassembledStringSearchIndex > 0;
-                disassembledString = createIfAndElseAndReturns(isContainsMoreThan1Search, removedBetweenFirstAndSecondPart, disassembledString);
+                disassembledString = isContainsMoreThan1Search ? removedBetweenFirstAndSecondPart : disassembledString;
                 disassembledStringSearchIndex = getStringIndexOf(disassembledString, search);
                 isContainsMoreThan1Search = disassembledStringSearchIndex > 0;
-                i += createIfAndElseAndReturns(isContainsMoreThan1Search, 0, containsConsecutiveMatchingFirstSearchsCount - 1);
+                i += isContainsMoreThan1Search ? 0 : containsConsecutiveMatchingFirstSearchsCount - 1;
                 const newDisassembledStringIfContains1Search = StringManipulation.removeConsecutiveMatchingFirstSearchs(disassembledString, search);
-                disassembledString = createIfAndElseAndReturns(isContainsMoreThan1Search, disassembledString, newDisassembledStringIfContains1Search);
+                disassembledString = isContainsMoreThan1Search ? disassembledString : newDisassembledStringIfContains1Search;
                 if (isEmptyString(disassembledString)) {
                     i = -1;
                     break;
@@ -2408,7 +2371,7 @@ function getConsecutiveMatchingSearchsPartThIndexInString(string, search, partTh
                     containsConsecutiveMatchingFirstSearchsCount = StringManipulation.containsConsecutiveMatchingFirstSearchsCount(disassembledString, search);
                     containsSearchsCount = StringManipulation.containsSearchCount(disassembledString, search);
                     isContainsSearch = containsSearchsCount > 0;
-                    i += createIfAndElseAndReturns(isContainsSearch, getStringIndexOf(disassembledString, search) + 1, 0);
+                    i += isContainsSearch ? getStringIndexOf(disassembledString, search) + 1 : 0;
                 }
             }
         }
