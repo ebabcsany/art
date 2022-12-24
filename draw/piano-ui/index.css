@@ -1,17 +1,9 @@
-reserved-word {
-    color: #1f3faf;
-}
-
 number {
     color: #3f5fef;
 }
 
 label {
     color: rgba(0, 0, 0, 0.5);
-}
-
-canvas-item {
-    color: black;
 }
 
 text-item {

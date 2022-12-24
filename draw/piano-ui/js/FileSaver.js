@@ -1,4 +1,4 @@
-/*
+﻿/*
 * FileSaver.js
 * A saveAs() FileSaver implementation.
 *
@@ -10,11 +10,20 @@
 
 // The one and only way of getting global scope in all environments
 // https://stackoverflow.com/q/3277182/1008999
-var _global = typeof window === 'object' && window.window === window
-    ? window : typeof self === 'object' && self.self === self
-        ? self : typeof global === 'object' && global.global === global
-            ? global
-            : this
+var _global;
+if (typeof window === 'object' && window.window === window) {
+    _global = window;
+} else {
+    if (typeof self === 'object' && self.self === self) {
+        _global = self;
+    } else {
+        if (typeof global === 'object' && global.global === global) {
+            _global = global;
+        } else {
+            _global = this;
+        }
+    }
+}
 
 function bom (blob, opts) {
     if (typeof opts === 'undefined') opts = { autoBom: false }
@@ -71,7 +80,7 @@ function click (node) {
 // https://www.whatismybrowser.com/guides/the-latest-user-agent/macos
 var isMacOSWebView = _global.navigator && /Macintosh/.test(navigator.userAgent) && /AppleWebKit/.test(navigator.userAgent) && !/Safari/.test(navigator.userAgent)
 
-var saveAs = _global.saveAs || (
+export var saveAs = _global.saveAs || (
     // probably in some web worker
     (typeof window !== 'object' || window !== _global)
         ? function saveAs () { /* noop */ }

@@ -1,14 +1,27 @@
-import {createIfAndElseAndReturns, getValidInteger, getValidString, isEmptyString} from "./script.js";
+import {createIfAndElseAndReturns, getValidInteger, getValidString, isEmptyString, isTypes} from "./script.js";
 
 export class StringPart {
-    static isValidSubStringParameters(string, fromIndex, toIndex) {
-        const isValidIndexes = typeof fromIndex === "number" && typeof toIndex === "number";
-        return !isEmptyString(string) && isValidIndexes;
+    /**
+     * Returns is valid parameters
+     * @param string {string}
+     * @param fromIndex {number} (integer)
+     * @param toIndex {number} (integer)
+     * @returns {false|boolean}
+     */
+    static #isValidSubStringParameters(string, fromIndex, toIndex) {
+        return !isEmptyString(string) && isTypes([fromIndex, toIndex], ["number", "number"]);
     }
 
-    static subString(string, fromIndex, toIndex) {
+    /**
+     * Returns sub string
+     * @param string {string}
+     * @param fromIndex {number} (integer)
+     * @param toIndex {number} (integer)
+     * @returns {string|string}
+     */
+    static subString(string = "", fromIndex = 0, toIndex = 0) {
         string = getValidString(string);
-        const isValid = this.isValidSubStringParameters(string, fromIndex, toIndex);
+        const isValid = this.#isValidSubStringParameters(string, fromIndex, toIndex);
         fromIndex = getValidInteger(fromIndex);
         toIndex = getValidInteger(toIndex);
         const substring = string.substring(fromIndex, toIndex + 1);
@@ -35,7 +48,7 @@ export class StringPart {
         this.string = getValidString(string);
     }
 
-    isValidSubStringParameters = (fromIndex, toIndex) => StringPart.isValidSubStringParameters(this.string, fromIndex, toIndex);
+    isValidParameters = (fromIndex, toIndex) => StringPart.#isValidSubStringParameters(this.string, fromIndex, toIndex);
     subString = (fromIndex, toIndex) => StringPart.subString(this.string, fromIndex, toIndex);
     subStringWithLength = (fromIndex, length) => StringPart.subStringWithLength(this.string, fromIndex, length);
     subStringWithFromIndex = fromIndex => StringPart.subStringWithFromIndex(this.string, fromIndex);
