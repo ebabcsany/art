@@ -20,7 +20,6 @@ import {
     fillColoredRect,
     getArrayElementsWithIndexesArray,
     getCanvasMousePos,
-    getFileData,
     getObjectIfEqualsObjects,
     getReturnIfArrayFirstTrue,
     getReturnIfObjectEqualsArrayFirst,
@@ -32,7 +31,6 @@ import {
     getValidString,
     isArrayElementsTrue,
     isEmptyString,
-    isEqualsArrayElementsToObject,
     isIntegersArray,
     isObjectEqualsSomeElementOfArray,
     isObjectEqualsSomeElementOfObjects,
@@ -49,7 +47,6 @@ import {
     validateNumberWithMin
 } from "../../art-script/script.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
-import {saveAs} from "./js/FileSaver.js"
 
 window.canvas = document.getElementById("piano-song-editor");
 window.canvasContext = canvas.getContext("2d");
@@ -210,45 +207,6 @@ const defaultWholeOctaveWidth = 112;
 const defaultWholeOctavesCount = 7;
 const keySoundPitchesArray = [];
 const keyBetweenSoundsSpacesArray = [];
-var txtFile = "test";
-var str = JSON.stringify(txtFile);
-var blob = new Blob(["666666-666"], {
-    type: "text/plain;charset=utf-8",
-});
-
-if (window.open("http://localhost:63342/art/piano-ui/index.html")) {
-    saveAs(blob, str);
-}
-const fileData1 = getFileData("js/ssss.txt");
-console.log(fileData1); // open file with write access
-// Create element with <a> tag
-//const link = document.createElement("a");
-//
-//// Create a blog object with the file content which you want to add to the file
-//const file = new Blob(["content"], { type: 'text/plain' });
-//let URL_b = (window.URL || window.webkitURL);
-//// Add file content in the object URL
-//link.href = URL_b.createObjectURL(file);
-//
-//// Add file name
-//link.download = "sample.txt";
-//
-//// Add click event to <a> tag to save file.
-//link.click();
-//URL_b.revokeObjectURL(link.href);
-//function saveFile(blob, filename) {
-//    let URL_ = (window.URL || window.webkitURL);
-//    let fileURL = URL_.createObjectURL(blob);
-//    let a = document.createElement('a');
-//    a.setAttribute('href', fileURL);
-//    a.setAttribute('download', filename);
-//    a.click();
-//    a.remove();
-//    setTimeout(function() {
-//        URL_.revokeObjectURL(fileURL);
-//    }, 60000);
-//}
-//saveFile(new Blob(["s"]), "das.txt");
 let drawnKeyIndex = -1;
 let drawnKeysIndexes = [];
 let drawnKeys = [];
@@ -516,19 +474,31 @@ setColorsFromFile.onclick = function () {
             if (isValid) {
                 settedFileContent = content;
                 const savedFileContent = tHex.getValidRgbHexsArray(content);
-                savedCanvasInputsColors = content.length <= defaultCanvasColorValues.length ? addNewArrayToAfterOfTheArray(
-                    savedFileContent,
-                    subArrayWithFromIndex(
-                        defaultCanvasColorValues,
-                        content.length
-                    )
-                ) : subArrayWithToIndex(
-                    savedFileContent,
-                    defaultCanvasColorValues.length - 1
-                );
+                if (content.length <= defaultCanvasColorValues.length) {
+                    savedCanvasInputsColors = addNewArrayToAfterOfTheArray(
+                        savedFileContent,
+                        subArrayWithFromIndex(
+                            defaultCanvasColorValues,
+                            content.length
+                        )
+                    );
+                } else {
+                    savedCanvasInputsColors = subArrayWithToIndex(
+                        savedFileContent,
+                        defaultCanvasColorValues.length - 1
+                    );
+                }
             } else {
                 settedFileContent = [];
-                error = isContainsOpenOrClosingBracket ? Array.isArray(content) ? errorStrings[0] + errorStrings[1] + " (use an array of square brackets)" : errorStrings[0] + errorStrings[1] : errorStrings[0] + errorStrings[3];
+                if (isContainsOpenOrClosingBracket) {
+                    if (Array.isArray(content)) {
+                        error = errorStrings[0] + errorStrings[1] + " (use an array of square brackets)";
+                    } else {
+                        error = errorStrings[0] + errorStrings[1];
+                    }
+                } else {
+                    error = errorStrings[0] + errorStrings[3];
+                }
             }
             if (isValid) {
                 setColorsFromFile.hidden = true;
@@ -783,13 +753,6 @@ function getPartOfNumber(number, numberOfParts, partOfNumber) {
     return number / (numberOfParts / partOfNumber);
 }
 
-function getNumberOfPart(number, numberOfParts, part) {
-    number = getValidNumber(number);
-    numberOfParts = validateIntegerWithMin(numberOfParts, 0);
-    part = getValidNumber(part);
-    return numberOfParts / (number / part);
-}
-
 function getPartOfWidth(width, partOfWidth) {
     return getPartOfNumber(canvas.width, width, partOfWidth);
 }
@@ -872,10 +835,9 @@ function fillOctaveOfPianoVerticalSongEditorStripes(style, width, height, partOf
     }
 }
 
-const wholeKeyShapeXEqualsAndReturnsArray = ["0", 0, ["1", 3, ["2", 4, ["3", 5, 3]]]];
-
 function getWholeKeyShapeX(type) {
     type = getValidString(type);
+    const wholeKeyShapeXEqualsAndReturnsArray = ["0", 0, ["1", 3, ["2", 4, ["3", 5, 3]]]];
     return getReturnIfObjectEqualsArrayFirst(type, wholeKeyShapeXEqualsAndReturnsArray);
 }
 
@@ -1261,16 +1223,6 @@ function getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index) {
     };
 }
 
-function getStartKeyIndexFromOctaveFromIndexOfPiano(index) {
-    const startKeyIndexAndRepairsCount = getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index);
-    return startKeyIndexAndRepairsCount[0];
-}
-
-function getRepairsCountFromOctaveFromIndexOfPiano(index) {
-    const startKeyIndexAndRepairsCount = getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index);
-    return startKeyIndexAndRepairsCount[1];
-}
-
 function getDefaultOctaveKeyPosXOfPiano(octaveStartPosX, keyTh) {
     octaveStartPosX = getValidInteger(octaveStartPosX);
     keyTh = getValidSearchTh(keyTh);
@@ -1580,9 +1532,7 @@ function getPianoNextToEachOtherKeysParameters(width, height, posX, posY, {
     keysCount = validateIntegerWithMin(keysCount, 0);
     const wholeKeyWidth = 15;
     const wholeKeyHeight = 104;
-    const octaveWidth = 112;
     const value = [];
-    const lastKeyIndex = keysCount - 1;
     const keyTypesInOctave = getKeyTypesInOctave();
     const firstKeyType = keyTypesInOctave[startKeyIndexFromOctave];
     const lastKeyIndexFromOctaves = new KeyIndexFromOctaveOfPianoFromIndex(startKeyIndexFromOctave + keysCount - 1);
@@ -1601,8 +1551,6 @@ function getPianoNextToEachOtherKeysParameters(width, height, posX, posY, {
     let normalStartKeyIndexFromOctave = startKeyIndexFromOctave;
     let defaultNormalStartKeyIndexFromOctave = startKeyIndexFromOctave;
     const firstOctaveStartToFirstKeyIndexPosX = getDefaultOctaveKeyPosXInOctaves(0, startKeyIndexFromOctave);
-    const firstOctaveStartPosX = getDefaultOctaveKeyPosXInOctaves(keyPosX, startKeyIndexFromOctave);
-    let firstNormalKeyPosX;
     const newDefaultFirstWholeKeyParameters = {
         canvasPartsCount,
         pos: {
@@ -1618,13 +1566,6 @@ function getPianoNextToEachOtherKeysParameters(width, height, posX, posY, {
             height: firstKeyType.height
         }
     };
-    const equalsFirstKeyTypesArray = [];
-    equalsFirstKeyTypesArray.push(firstKeyType.type === newDefaultFirstWholeKeyParameters.keyType.type);
-    equalsFirstKeyTypesArray.push(firstKeyType.left === newDefaultFirstWholeKeyParameters.keyType.left);
-    equalsFirstKeyTypesArray.push(firstKeyType.right === newDefaultFirstWholeKeyParameters.keyType.right);
-    equalsFirstKeyTypesArray.push(firstKeyType.width === newDefaultFirstWholeKeyParameters.keyType.width);
-    equalsFirstKeyTypesArray.push(firstKeyType.height === newDefaultFirstWholeKeyParameters.keyType.height);
-    const isNotEqualsFirstKeyTypes = isEqualsArrayElementsToObject(false, equalsFirstKeyTypesArray);
     if (isStartKeyWholeFromOctave) {
         value.push(newDefaultFirstWholeKeyParameters);
         i++;
@@ -1663,7 +1604,6 @@ function getPianoNextToEachOtherKeysParameters(width, height, posX, posY, {
     }
     if (remainedKeysCount > 0 && !isLastKeyHalf) {
         const beforeLastKeyType = value[i - 1].keyType;
-        const beforeLastKeyTypeLeft = getValidInteger(beforeLastKeyType.left);
         const lastKeyTypeLeft = getWholeKeyShapeX(lastKeyType.left);
         const beforeLastKeyTypeWidth = getValidInteger(beforeLastKeyType.width);
         const isBeforeLastKeyHalf = getValidString(beforeLastKeyType.type) === "half";
@@ -1854,7 +1794,6 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
     const halfKeyWidth = 7;
     const halfKeyHeight = 68;
     const wholeKeyHeight = 104;
-    const namedModifiedColors = subArray(getCanvasColorValuesWithName(backgroundColorInput.value), 11, 12);
     const modifiedColors = subArray(getCanvasColorValues(backgroundColorInput.value), 11, 12);
     const namedColorsWithNotSaveChangedColorsOnCanvas = {
         pianoActivePartClickingWholeKeyColor: getColorWithNotSaveChangedColorsOnCanvasOfPiano("canvas-piano-active-part-clicking-whole-key-color", modifiedColors[0]),
