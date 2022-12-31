@@ -427,98 +427,104 @@ setCanvasInputsColorsButton.onclick = function () {
         setSelectedFile.hidden = true;
     }
 };
-setColorsFromFile.onclick = function () {
-    isWindowClicked = false;
-    setFileSelector.onchange = function (ev) {
-        const files = ev.target.files;
-        const reader = new FileReader();
-        reader.onload = handleFileLoad;
-        settedFileContent = "";
-        if (files.length > 0) {
-            reader.readAsText(files[0]);
-        }
-    };
+document.addEventListener('DOMContentLoaded', function () {
+    if (null === setColorsFromFile) {
+        console.warn("File selector has not been found!");
+        return;
+    }
+    setColorsFromFile.onclick = function () {
+        isWindowClicked = false;
+        setFileSelector.onchange = function (ev) {
+            const files = ev.target.files;
+            const reader = new FileReader();
+            reader.onload = handleFileLoad;
+            settedFileContent = "";
+            if (files.length > 0) {
+                reader.readAsText(files[0]);
+            }
+        };
 
-    function handleFileLoad(ev) {
-        const errorStrings = [
-            "Unexpected error: ",
-            "Invalid array",
-            "This is not an array",
-            "Array is not found"
-        ];
-        const result = getValidString(ev.target.result);
-        const openingSquareBracketIndex = result.indexOf("[");
-        const openingBraceIndex = result.indexOf("{");
-        const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
-        const isContainsClosingSquareBracket = StringManipulation.isContainsSearch(result, "]");
-        const isContainsOpeningBrace = openingBraceIndex > -1;
-        const isContainsClosingBrace = StringManipulation.isContainsSearch(result, "}");
-        const isContainsOpenOrClosingSquareBracket =
-            isContainsOpeningSquareBracket ||
-            isContainsClosingSquareBracket;
-        const isContainsOpenOrClosingBrace =
-            isContainsOpeningBrace ||
-            isContainsClosingBrace;
-        const isContainsOpenOrClosingBracket =
-            isContainsOpenOrClosingSquareBracket ||
-            isContainsOpenOrClosingBrace;
-        const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
-        let content = [];
-        let error = "";
-        try {
-            content = JSON.parse(result);
-            const isValid =
-                isContainsOpenOrClosingBracket &&
-                Array.isArray(content) &&
-                isFirstJustSquareBrackets;
-            if (isValid) {
-                settedFileContent = content;
-                const savedFileContent = tHex.getValidRgbHexsArray(content);
-                if (content.length <= defaultCanvasColorValues.length) {
-                    savedCanvasInputsColors = addNewArrayToAfterOfTheArray(
-                        savedFileContent,
-                        subArrayWithFromIndex(
-                            defaultCanvasColorValues,
-                            content.length
-                        )
-                    );
-                } else {
-                    savedCanvasInputsColors = subArrayWithToIndex(
-                        savedFileContent,
-                        defaultCanvasColorValues.length - 1
-                    );
-                }
-            } else {
-                settedFileContent = [];
-                if (isContainsOpenOrClosingBracket) {
-                    if (Array.isArray(content)) {
-                        error = errorStrings[0] + errorStrings[1] + " (use an array of square brackets)";
+        function handleFileLoad(ev) {
+            const errorStrings = [
+                "Unexpected error: ",
+                "Invalid array",
+                "This is not an array",
+                "Array is not found"
+            ];
+            const result = getValidString(ev.target.result);
+            const openingSquareBracketIndex = result.indexOf("[");
+            const openingBraceIndex = result.indexOf("{");
+            const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
+            const isContainsClosingSquareBracket = StringManipulation.isContainsSearch(result, "]");
+            const isContainsOpeningBrace = openingBraceIndex > -1;
+            const isContainsClosingBrace = StringManipulation.isContainsSearch(result, "}");
+            const isContainsOpenOrClosingSquareBracket =
+                isContainsOpeningSquareBracket ||
+                isContainsClosingSquareBracket;
+            const isContainsOpenOrClosingBrace =
+                isContainsOpeningBrace ||
+                isContainsClosingBrace;
+            const isContainsOpenOrClosingBracket =
+                isContainsOpenOrClosingSquareBracket ||
+                isContainsOpenOrClosingBrace;
+            const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
+            let content = [];
+            let error = "";
+            try {
+                content = JSON.parse(result);
+                const isValid =
+                    isContainsOpenOrClosingBracket &&
+                    Array.isArray(content) &&
+                    isFirstJustSquareBrackets;
+                if (isValid) {
+                    settedFileContent = content;
+                    const savedFileContent = tHex.getValidRgbHexsArray(content);
+                    if (content.length <= defaultCanvasColorValues.length) {
+                        savedCanvasInputsColors = addNewArrayToAfterOfTheArray(
+                            savedFileContent,
+                            subArrayWithFromIndex(
+                                defaultCanvasColorValues,
+                                content.length
+                            )
+                        );
                     } else {
-                        error = errorStrings[0] + errorStrings[1];
+                        savedCanvasInputsColors = subArrayWithToIndex(
+                            savedFileContent,
+                            defaultCanvasColorValues.length - 1
+                        );
                     }
                 } else {
-                    error = errorStrings[0] + errorStrings[3];
+                    settedFileContent = [];
+                    if (isContainsOpenOrClosingBracket) {
+                        if (Array.isArray(content)) {
+                            error = errorStrings[0] + errorStrings[1] + " (use an array of square brackets)";
+                        } else {
+                            error = errorStrings[0] + errorStrings[1];
+                        }
+                    } else {
+                        error = errorStrings[0] + errorStrings[3];
+                    }
                 }
+                if (isValid) {
+                    setColorsFromFile.hidden = true;
+                } else {
+                    console.error(error);
+                }
+                setSelectedFile.hidden = !isValid;
+            } catch (e) {
+                if (isContainsOpenOrClosingBracket) {
+                    error = errorStrings[2];
+                } else {
+                    error = errorStrings[3];
+                }
+                settedFileContent = [];
+                console.error(e + " (" + error + ")");
             }
-            if (isValid) {
-                setColorsFromFile.hidden = true;
-            } else {
-                console.error(error);
-            }
-            setSelectedFile.hidden = !isValid;
-        } catch (e) {
-            if (isContainsOpenOrClosingBracket) {
-                error = errorStrings[2];
-            } else {
-                error = errorStrings[3];
-            }
-            settedFileContent = [];
-            console.error(e + " (" + error + ")");
         }
-    }
 
-    setFileSelector.click();
-};
+        setFileSelector.click();
+    };
+});
 backgroundColorInput.onclick = function () {
     isWindowClicked = false;
     isBackgroundColorInputClicked = true;

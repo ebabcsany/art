@@ -219,18 +219,17 @@ class FileSelectorElement extends HTMLElement {
         return isEmptyString(type) ? thisId : validId;
     }
 
-    static getElement(type, hidden) {
-        const element = document.createElement("file-selector");
-        const thisHidden = getValidType(arguments[2]);
-        hidden = typeof hidden === "undefined" ? (typeof thisHidden === "boolean" ? thisHidden : false) : hidden;
-        const thisType = getValidType(arguments[3]);
-        const thisId = getValidType(arguments[4]);
+    constructor() {
+        super();
+
+        const type = this.getAttribute("type");
+        const hidden = this.getAttribute("hidden");
+        const name = getValidType(this.getAttribute("name"));
+        const thisType = getValidType(type);
+        const thisId = getValidType(name);
         const thisValidId = FileSelectorElement.validId(type, thisType, "", thisId);
         const labelItem = document.createElement("label");
         const fileInputItem = document.createElement("input");
-        element.setAttribute("hidden", arguments[2]);
-        element.setAttribute("type", arguments[3]);
-        element.setAttribute("name", arguments[4]);
         labelItem.setAttribute("title", thisValidId);
         labelItem.setAttribute("for", thisValidId);
         fileInputItem.setAttribute("id", thisValidId);
@@ -238,53 +237,16 @@ class FileSelectorElement extends HTMLElement {
         fileInputItem.setAttribute("type", "file");
         fileInputItem.hidden = hidden;
 
-        element["type"] = "";
-        element["id"] = "";
-        element.appendChild(labelItem);
-        element.appendChild(fileInputItem);
-        return element;
-    }
-
-    constructor(type, hidden) {
-        super();
-
-        const element = FileSelectorElement.getElement(type, hidden, true, )
-        this.attributes = element.attributes;
-        this.iattributes = element.attributes;
+        this["type"] = "";
+        this["id"] = "";
+        this.appendChild(labelItem);
+        this.appendChild(fileInputItem);
     }
 }
 
-class FileSelectorWithButtonAndTextElement extends HTMLElement {
+class FileSelectorWithButtonAndTextElement extends FileSelectorElement {
     constructor() {
         super();
-
-        const thisType = getValidType(this.getAttribute("type"));
-        const buttonId = getValidType(this.getAttribute("button-name"));
-        const buttonText = getValidType(this.getAttribute("button-text"));
-        const selectedId = getValidType(this.getAttribute("selected-name"));
-        const selectedText = getValidType(this.getAttribute("selected-text"));
-        const selectorId = getValidType(this.getAttribute("selector-name"));
-        const thisValidButtonName = FileSelectorElement.validId("", thisType, "button", buttonId);
-        const thisValidSelectedPartName = FileSelectorElement.validId("", thisType, "selected", selectedId);
-        const thisValidSelectorPartId = FileSelectorElement.validId("", thisType, "selector", selectorId);
-        const buttonItem = document.createElement("button");
-        const textItem = document.createElement("text-item");
-        const fileSelectorItem = FileSelectorElement.getElement();
-        buttonItem.setAttribute("title", thisValidButtonName);
-        buttonItem.setAttribute("id", thisValidButtonName);
-        buttonItem.setAttribute("name", thisValidButtonName);
-        buttonItem.textContent = buttonText;
-        textItem.setAttribute("title", thisValidSelectedPartName);
-        textItem.setAttribute("id", thisValidSelectedPartName);
-        textItem.setAttribute("name", thisValidSelectedPartName);
-        textItem.textContent = selectedText;
-        fileSelectorItem.setAttribute("type", thisType);
-        fileSelectorItem.setAttribute("id", thisValidSelectorPartId);
-        fileSelectorItem.setAttribute("hidden", true);
-
-        this.appendChild(buttonItem);
-        this.appendChild(textItem);
-        this.appendChild(fileSelectorItem);
     }
 }
 
