@@ -1,0 +1,14 @@
+{
+  "border": "#954853",
+  "background": "#6567de",
+  "songEditorStripes": "#defa45",
+  "piano": {
+    "background": "#6666ac",
+    "topMostUpperPart": "#c10ae5",
+    "topUpperPart": "#bd3e09",
+    "topUpperPartCenter": "#f2a4cd",
+    "active": {
+      "clickingWholeKey": "#ff0000"
+    }
+  }
+}

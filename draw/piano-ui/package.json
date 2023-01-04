@@ -2,10 +2,10 @@
   "name": "piano-song-editor",
   "version": "0.0.1",
   "description": "Piano song editor",
-  "main": "draw/piano-ui/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "cypress:open": "cypress open"
+    "cypress:open": "../../node_modules/.bin/cypress open"
   },
   "repository": {
     "type": "git",

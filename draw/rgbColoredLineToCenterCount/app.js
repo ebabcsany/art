@@ -1,14 +1,14 @@
 (function () {
-  var canvas = document.getElementById('myCanvas');
-  var context = canvas.getContext('2d');
-  var canvasWidth = canvas.width;
-  var canvasHeight = canvas.height;
-  var count = prompt("rgbColoredLineToCenterCount");
-  var posXText = "positionX";
-  var posYText = "positionY";
-  var redText = "rgbRedCount";
-  var greenText = "rgbGreenCount";
-  var blueText = "rgbBlueCount";
+  const canvas = document.getElementById('myCanvas');
+  const context = canvas.getContext('2d');
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+  const count = prompt("rgbColoredLineToCenterCount");
+  const posXText = "positionX";
+  const posYText = "positionY";
+  const redText = "rgbRedCount";
+  const greenText = "rgbGreenCount";
+  const blueText = "rgbBlueCount";
 
   rgbColoredLineToCenterCount();
 
@@ -40,18 +40,18 @@
   }
 
   function canvasBorders(i, I, canvas) {
-    let Ł = 0;
-    while ((i < Ł) || (i > I)) {
-      alert(countBordersText(canvas, i, Ł, I));
+    let L = 0;
+    while ((i < L) || (i > I)) {
+      alert(countBordersText(canvas, i, L, I));
       i = prompt(posXText);
     }
     return i;
   }
 
   function canvasBordersI(i, i1, I, I1, canvas, canvas1) {
-    let Ł = 0;
-    while ((i < Ł) || (i > I)) {
-      alert(countBordersText(canvas, i, Ł, I));
+    let L = 0;
+    while ((i < L) || (i > I)) {
+      alert(countBordersText(canvas, i, L, I));
       canvasBorders(i1, I1, canvas1);
       i = prompt(posYText);
     }
@@ -59,10 +59,10 @@
   }
 
   function rgbColorCountBorders(rgbColorCount, count, i) {
-    let Ł = 0;
+    let L = 0;
     let K = 255;
-    while ((count < Ł) || (count > K)) {
-      alert(countBordersText(rgbColorCount, count, Ł, K));
+    while ((count < L) || (count > K)) {
+      alert(countBordersText(rgbColorCount, count, L, K));
       count = prompt(i);
     }
     return count;

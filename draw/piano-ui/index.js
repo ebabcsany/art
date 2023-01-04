@@ -1,22 +1,10 @@
 import {
-    changeCanvasColorInputNameFirstLetterToCapitalFromId,
-    getCanvasColorInputClickedNameFromName,
-    getCanvasColorInputClickedNameFromType,
-    getCanvasColorInputId,
-    getCanvasColorInputIdFromName,
-    getCanvasColorInputNameFromId,
-    getCanvasColorInputNameFromType,
-    getCanvasColorInputTypeFromId,
-    getDefaultCanvasColorInputNameFromId,
-    getDefaultCanvasColorInputNameFromName,
-    setDefaultCanvasColorInputValueFromType
-} from "./defines.js";
-import {
     addNewArrayToAfterOfTheArray,
     canvasHeightInput,
     canvasWidthInput,
     createArrayFromOneElement,
     createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength,
+    createStringArrayFromObjectsArray,
     fillColoredRect,
     getArrayElementsWithIndexesArray,
     getCanvasMousePos,
@@ -46,7 +34,21 @@ import {
     validateIntegerWithMin,
     validateNumberWithMin
 } from "../../art-script/script.js";
+import {
+    changeCanvasColorInputNameFirstLetterToCapitalFromId,
+    getCanvasColorInputClickedNameFromName,
+    getCanvasColorInputClickedNameFromType,
+    getCanvasColorInputId,
+    getCanvasColorInputIdFromName,
+    getCanvasColorInputNameFromId,
+    getCanvasColorInputNameFromType,
+    getCanvasColorInputTypeFromId,
+    getDefaultCanvasColorInputNameFromId,
+    getDefaultCanvasColorInputNameFromName,
+    setDefaultCanvasColorInputValueFromType
+} from "./defines.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
+import {saveAs} from "./js/FileSaver.js";
 
 window.canvas = document.getElementById("piano-song-editor");
 window.canvasContext = canvas.getContext("2d");
@@ -78,24 +80,34 @@ const canvasColorInputTypes = [
     "piano-active-part-moving-bar-belonging-half-key"
 ];
 const getCanvasColorValues = (color) => {
-    color = tHex.getValidRgbHex(color);
-    return [
-        tHex.getReverseRgbQuarterToThreeQuarterHex(color),
-        color,
-        tHex.getReverseRgbQuarterToThreeQuarterHex(color),
-        tHex.getReverseRgbQuarterToThreeQuarterHex(color),
-        tHex.getReverseRgbQuarterToThreeQuarterHex(color),
-        tHex.getRgbEighthToSevenEighthsHex(color),
-        color,
-        tHex.getReverseRgbSixteenToFifteenSixteensHex(color),
-        tHex.getReverseRgbEighthToSevenEighthsHex(color),
-        color,
-        tHex.getReverseHex(color),
-        tHex.getRgbEighthToSevenEighthsHex(color),
-        tHex.getReverseRgbEighthToSevenEighthsHex(color),
-        tHex.getReverseRgbEighthToSevenEighthsHex(color),
-        tHex.getReverseRgbEighthToSevenEighthsHex(color)
-    ];
+    let value = [];
+    if (typeof color === "undefined") {
+        for (const element of canvasColorInputTypes) {
+            const name = getCanvasColorInputNameFromType(element);
+            const inputName = name + "Input";
+            value.push(window[inputName].value);
+        }
+    } else {
+        color = tHex.getValidRgbHex(color);
+        value = [
+            tHex.getReverseRgbQuarterToThreeQuarterHex(color),
+            color,
+            tHex.getReverseRgbQuarterToThreeQuarterHex(color),
+            tHex.getReverseRgbQuarterToThreeQuarterHex(color),
+            tHex.getReverseRgbQuarterToThreeQuarterHex(color),
+            tHex.getRgbEighthToSevenEighthsHex(color),
+            color,
+            tHex.getReverseRgbSixteenToFifteenSixteensHex(color),
+            tHex.getReverseRgbEighthToSevenEighthsHex(color),
+            color,
+            tHex.getReverseHex(color),
+            tHex.getRgbEighthToSevenEighthsHex(color),
+            tHex.getReverseRgbEighthToSevenEighthsHex(color),
+            tHex.getReverseRgbEighthToSevenEighthsHex(color),
+            tHex.getReverseRgbEighthToSevenEighthsHex(color)
+        ];
+    }
+    return value;
 };
 const getCanvasColorInputsIds = () => {
     let value = [];
@@ -182,14 +194,19 @@ const textItemsColorInputResetColorsPart = document.getElementById("text-items-c
 const isCanvasBackgroundColorTransparentInput = document.getElementById("is-canvas-background-color-transparent");
 const saveChangedColorsOnCanvasInput = document.getElementById("save-changed-colors-on-canvas-by-modified-background-color-input-value");
 const saveCanvasInputsColors = document.getElementById("save-canvas-inputs-colors");
-const saveCanvasInputsColorsPart = document.getElementById("save-canvas-inputs-colors-part");
+const saveCanvasInputsColorsToFilePart = document.getElementById("save-canvas-inputs-colors-part");
 const saveCanvasInputsColorsButton = document.getElementById("save-canvas-inputs-colors-button");
 const savedCanvasInputsColorsPart = document.getElementById("saved-canvas-inputs-colors-part");
 const setCanvasInputsColorsPart = document.getElementById("set-canvas-inputs-colors-part");
 const setCanvasInputsColorsButton = document.getElementById("set-canvas-inputs-colors-button");
-const setColorsFromFile = document.getElementById("set-colors-from-file");
+const setCanvasInputsColorsFromFile = document.getElementById("set-colors-from-file");
+const saveColorsToFilePart = document.getElementById("save-colors-from-file-part");
+const saveColorsToFile = document.getElementById("save-colors-to-file");
+const saveEnterTheFileSelectorIdPart = document.getElementById("save-enter-the-file-selector-id-part");
+const saveEnterTheFileSelectorId = document.getElementById("save-enter-the-file-selector-id");
 const setFileSelector = document.getElementById("set-file-selector");
 const setSelectedFile = document.getElementById("set-selected-file");
+let savedFileContent = "";
 let settedFileContent = "";
 const resetColorsOnCanvasPart = document.getElementById("reset-colors-on-canvas-part");
 const resetColorsOnCanvasButton = document.getElementById("reset-colors-on-canvas");
@@ -381,7 +398,10 @@ canvasPianoActivePartInputsResetColorsButton.onclick = function () {
 };
 saveCanvasInputsColors.onclick = function () {
     isWindowClicked = false;
-    saveCanvasInputsColorsPart.hidden = !saveCanvasInputsColors.checked;
+    if (saveEnterTheFileSelectorIdPart.hidden) {
+        saveEnterTheFileSelectorId.value = "";
+        saveEnterTheFileSelectorIdPart.hidden = false;
+    }
     if (!saveCanvasInputsColors.checked) {
         savedCanvasInputsColors = undefined;
         for (const element of canvasColorInputTypes) {
@@ -398,13 +418,36 @@ saveCanvasInputsColors.onclick = function () {
 };
 saveCanvasInputsColorsButton.onclick = function () {
     isWindowClicked = false;
-    const values = getCanvasInputsValues();
-    const defaultValues = getCanvasInputsDefaultValues();
-    savedCanvasInputsColors = saveCanvasInputsColors.checked ? values : defaultValues;
+    if (!Array.isArray(savedFileContent)) {
+        const values = getCanvasInputsValues();
+        const defaultValues = getCanvasInputsDefaultValues();
+        savedCanvasInputsColors = saveCanvasInputsColors.checked ? values : defaultValues;
+    } else {
+        savedCanvasInputsColors = JSON.parse(settedFileContent);
+    }
     saveCanvasInputsColorsButton.hidden = true;
+    if (!saveColorsToFilePart.hidden) {
+        saveColorsToFilePart.hidden = true;
+    }
     savedCanvasInputsColorsPart.hidden = false;
     setCanvasInputsColorsPart.hidden = false;
 };
+saveColorsToFile.onclick = function () {
+    isWindowClicked = false;
+    if (saveEnterTheFileSelectorIdPart.hidden) {
+        saveEnterTheFileSelectorId.value = "";
+        saveEnterTheFileSelectorIdPart.hidden = false;
+    } else {
+        const fileName = saveEnterTheFileSelectorId.value;
+        const canvasColorValues = createStringArrayFromObjectsArray(getCanvasColorValues());
+        const blob = new Blob([canvasColorValues], {
+            type: "text/plain;charset=utf-8",
+        });
+        saveAs(blob, "" + fileName + ".txt");
+        savedFileContent = canvasColorValues;
+        saveEnterTheFileSelectorIdPart.hidden = true;
+    }
+}
 setCanvasInputsColorsButton.onclick = function () {
     isWindowClicked = false;
     if (savedCanvasInputsColors !== undefined) {
@@ -423,11 +466,11 @@ setCanvasInputsColorsButton.onclick = function () {
         }
     }
     if (!setSelectedFile.hidden) {
-        setColorsFromFile.hidden = false;
+        setCanvasInputsColorsFromFile.hidden = false;
         setSelectedFile.hidden = true;
     }
 };
-setColorsFromFile.onclick = function () {
+setCanvasInputsColorsFromFile.onclick = function () {
     isWindowClicked = false;
     setFileSelector.onchange = function (ev) {
         const files = ev.target.files;
@@ -447,6 +490,7 @@ setColorsFromFile.onclick = function () {
             "Array is not found"
         ];
         const result = getValidString(ev.target.result);
+        
         const openingSquareBracketIndex = result.indexOf("[");
         const openingBraceIndex = result.indexOf("{");
         const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
@@ -463,6 +507,7 @@ setColorsFromFile.onclick = function () {
             isContainsOpenOrClosingSquareBracket ||
             isContainsOpenOrClosingBrace;
         const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
+
         let content = [];
         let error = "";
         try {
@@ -501,7 +546,7 @@ setColorsFromFile.onclick = function () {
                 }
             }
             if (isValid) {
-                setColorsFromFile.hidden = true;
+                setCanvasInputsColorsFromFile.hidden = true;
             } else {
                 console.error(error);
             }
@@ -618,7 +663,7 @@ function createTheDefaultColorInputFieldsAndListenersWithElementId(elementId, na
 }
 
 function getCanvasInputsValues() {
-    let value = [];
+    const value = [];
     for (const element of canvasColorInputTypes) {
         const validId = getCanvasColorInputId(element);
         const field = document.getElementById(validId);
@@ -628,7 +673,7 @@ function getCanvasInputsValues() {
 }
 
 function getCanvasInputsDefaultValues() {
-    let value = [];
+    const value = [];
     for (const element of canvasColorInputTypes) {
         const validId = getCanvasColorInputId(element);
         const field = document.getElementById(validId);
@@ -815,6 +860,12 @@ function getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeigh
     return partOfHeightOfCanvas < height ? valuePart : canvas.height;
 }
 
+function fillColoredRectOfPiano(style, width, height, rectX, rectY, rectWidth, rectHeight) {
+    const x = getPartOfWidth(width, rectX);
+    const y = getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, rectY);
+    fillColoredRect(style, x, y, getPartOfWidth(width, rectWidth), getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, rectHeight));
+}
+
 function getTopOfPianoKeys(height) {
     return getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, height - 105);
 }
@@ -824,7 +875,7 @@ function getWholeKeyHeight(height) {
 }
 
 function fillVerticalColoredStripeWithWidthAndPartOfWidth(style, width, height, partOfWidthPosX, stripeWidthPartOfWidth, stripeHeight) {
-    fillColoredRect(style, getPartOfWidth(width, partOfWidthPosX), 0, getPartOfWidth(width, stripeWidthPartOfWidth), getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, stripeHeight));
+    fillColoredRectOfPiano(style, width, height, partOfWidthPosX, 0, stripeWidthPartOfWidth, stripeHeight);
 }
 
 function fillOctaveOfPianoVerticalSongEditorStripes(style, width, height, partOfWidthAndStart, stripeWidth, stripeHeight) {
@@ -1931,7 +1982,7 @@ function drawPianoSongEditor() {
     self.canvasFieldsCount = 0;
 
     if (saveCanvasInputsColors.checked) {
-        saveCanvasInputsColorsPart.hidden = false;
+        saveCanvasInputsColorsToFilePart.hidden = false;
     }
     textItemsColorInputResetColorsPart.hidden = textItemsColorInput.value === defaultTextItemsColorValue;
     backgroundColorInputResetColorsPart.hidden = backgroundColorInput.value === defaultBackgroundColorValue;
@@ -2261,7 +2312,6 @@ function drawClassicPianoAndSongEditorStripes() {
     const defaultOctaveWidth = 112;
     const wholeOctavesCount = 7;
     const partOfWidth = value => getPartOfWidth(width, value);
-    const namedModifiedColors = subArrayWithToIndex(getCanvasColorValuesWithName(backgroundColorInput.value), 10);
     const modifiedColors = subArrayWithToIndex(getCanvasColorValues(backgroundColorInput.value), 10);
     const namedColorsWithNotSaveChangedColorsOnCanvas = {
         borderColor: getColorWithNotSaveChangedColorsOnCanvasOfPiano("canvas-border-color", modifiedColors[0]),

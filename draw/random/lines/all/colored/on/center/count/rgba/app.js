@@ -1,9 +1,9 @@
 (function () {
-  var canvas = document.getElementById('myCanvas');
-  var context = canvas.getContext('2d');
-  var canvasWidth = canvas.width;
-  var canvasHeight = canvas.height;
-  var lineCount = prompt('line count');
+  const canvas = document.getElementById('myCanvas');
+  const context = canvas.getContext('2d');
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+  const lineCount = prompt('line count');
 
   function randomRgbaColoredLineToCenterCount() {
     for (let int = 0; int < lineCount; int++) {

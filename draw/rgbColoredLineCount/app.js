@@ -1,15 +1,15 @@
 (function () {
-  var canvas = document.getElementById('myCanvas');
-  var context = canvas.getContext('2d');
-  var canvasWidth = canvas.width;
-  var canvasHeight = canvas.height;
-  var moveXText = "moveX";
-  var moveYText = "moveY";
-  var lineXText = "lineX";
-  var lineYText = "lineY";
-  var redText = "rgbRedCount";
-  var greenText = "rgbGreenCount";
-  var blueText = "rgbBlueCount";
+  const canvas = document.getElementById('myCanvas');
+  const context = canvas.getContext('2d');
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+  const moveXText = "moveX";
+  const moveYText = "moveY";
+  const lineXText = "lineX";
+  const lineYText = "lineY";
+  const redText = "rgbRedCount";
+  const greenText = "rgbGreenCount";
+  const blueText = "rgbBlueCount";
 
   rgbColoredLineToCenter();
 
@@ -19,7 +19,7 @@
     let lineX = canvasBorders(prompt(lineXText), canvasWidth, lineXText, lineXText);
     let lineY = canvasBordersI(prompt(lineYText), lineX, canvasHeight, canvasWidth, lineYText, lineXText, lineYText);
     context.beginPath();
-    context.moveTo(posX, posY);
+    context.moveTo(moveX, moveY);
     context.lineTo(lineX, lineY);
     let red = rgbColorCountBorders(redText, prompt(redText), redText);
     let green = rgbColorCountBorders(greenText, prompt(greenText), greenText);
@@ -33,18 +33,18 @@
   }
 
   function canvasBorders(i, I, canvas, K) {
-    let Ł = 0;
-    while ((i < Ł) || (i > I)) {
-      alert(countBordersText(canvas, i, Ł, I));
+    let L = 0;
+    while ((i < L) || (i > I)) {
+      alert(countBordersText(canvas, i, L, I));
       i = prompt(K);
     }
     return i;
   }
 
   function canvasBordersI(i, i1, I, I1, canvas, canvas1, K) {
-    let Ł = 0;
-    while ((i < Ł) || (i > I)) {
-      alert(countBordersText(canvas, i, Ł, I));
+    let L = 0;
+    while ((i < L) || (i > I)) {
+      alert(countBordersText(canvas, i, L, I));
       canvasBorders(i1, I1, canvas1);
       i = prompt(K);
     }
@@ -52,10 +52,10 @@
   }
 
   function rgbColorCountBorders(rgbColorCount, count, i) {
-    let Ł = 0;
+    let L = 0;
     let K = 255;
-    while ((count < Ł) || (count > K)) {
-      alert(countBordersText(rgbColorCount, count, Ł, K));
+    while ((count < L) || (count > K)) {
+      alert(countBordersText(rgbColorCount, count, L, K));
       count = prompt(i);
     }
     return count;

@@ -7,6 +7,9 @@ window.getMousePos = (element) => ({
 });
 window.canvas = null;
 window.canvasContext = null;
+window.canvasColorsIds = [];
+window.canvasColorsNames = [];
+window.canvasColorsValues = [];
 
 export function getValidString(value) {
     return typeof value === "string" ? value : "" + value;
@@ -933,11 +936,6 @@ function isStringAllCharsEqualsDigitsAndLength(string, length) {
     const isDigits = stringManipulation.isDigits(string);
     return isDigits && string.length === getValidInteger(length);
 }
-
-export function isStringArray(string) {
-
-}
-
 export function isStringNumber(string) {
     string = getValidString(string);
     const stringManipulation = new StringManipulation(string);
@@ -1150,6 +1148,22 @@ function createArrayFromStringElements(string) {
         array.push(element);
     }
     return array;
+}
+
+export function createStringArrayFromObjectsArray(objectsArray) {
+    const getValidString = (value) => typeof value === "string" ? "\"" + value + "\"" : value;
+    const {length} = objectsArray;
+    let value = "[";
+    if (length > 0) {
+        value += getValidString(objectsArray[0]);
+        if (length > 1) {
+            for (let i = 1; i < length; i++) {
+                value += ", " + getValidString(objectsArray[i]);
+            }
+        }
+        value += "]";
+    }
+    return value;
 }
 
 export function stringifyArrayElements(array) {

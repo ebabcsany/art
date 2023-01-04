@@ -148,8 +148,7 @@ export class StringManipulation {
 
     static isContainsOneSearchs(string, ...searchs) {
         let value = false;
-        const searchsArray = searchs;
-        if (isEmptyArray(searchsArray)) {
+        if (isEmptyArray(searchs)) {
             value = true;
             for (const element of searchs) {
                 value = value && this.isContainsOneSearch(string, element);
@@ -328,8 +327,7 @@ export class StringManipulation {
 
     static removeAllSearchs(string, ...searchs) {
         string = getValidString(string);
-        const searchsArray = searchs;
-        const onceOccurringSearchsArray = getValidOnceOccurringObjectsArray(searchsArray);
+        const onceOccurringSearchsArray = getValidOnceOccurringObjectsArray(searchs);
         let value = string;
         for (const element of onceOccurringSearchsArray) {
             value = this.removeAllSearch(value, element);

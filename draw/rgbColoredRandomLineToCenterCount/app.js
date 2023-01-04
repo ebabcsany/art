@@ -1,12 +1,12 @@
 (function () {
-  var canvas = document.getElementById('myCanvas');
-  var context = canvas.getContext('2d');
-  var canvasWidth = canvas.width;
-  var canvasHeight = canvas.height;
-  var count = prompt('rgbColoredRandomLineToCenterCount');
-  var redText = "rgbRedCount";
-  var greenText = "rgbGreenCount";
-  var blueText = "rgbBlueCount";
+  const canvas = document.getElementById('myCanvas');
+  const context = canvas.getContext('2d');
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+  const count = prompt('rgbColoredRandomLineToCenterCount');
+  const redText = "rgbRedCount";
+  const greenText = "rgbGreenCount";
+  const blueText = "rgbBlueCount";
 
   rgbColoredRandomLineToCenterCount();
 
@@ -17,18 +17,18 @@
   }
 
   function rgbColoredRandomLineToCenter() {
-    let posX = random(canvasWidth, 0);
-    let posY = random(canvasHeight, 0);
+    const posX = random(canvasWidth, 0);
+    const posY = random(canvasHeight, 0);
     context.beginPath();
-    let canvasWidthHalf = canvasWidth / 2;
-    let canvasHeightHalf = canvasHeight / 2;
-    let canvasWidthHalfOutOfPosX = canvasWidthHalf - posX;
-    let canvasHeightHalfOutOfPosY = canvasHeightHalf - posY;
+    const canvasWidthHalf = canvasWidth / 2;
+    const canvasHeightHalf = canvasHeight / 2;
+    const canvasWidthHalfOutOfPosX = canvasWidthHalf - posX;
+    const canvasHeightHalfOutOfPosY = canvasHeightHalf - posY;
     context.moveTo(posX, posY);
     context.lineTo(canvasWidthHalf + canvasWidthHalfOutOfPosX, canvasHeightHalf + canvasHeightHalfOutOfPosY);
-    let red = rgbColorCountBorders(redText, prompt(redText), redText);
-    let green = rgbColorCountBorders(greenText, prompt(greenText), greenText);
-    let blue = rgbColorCountBorders(blueText, prompt(blueText), blueText);
+    const red = rgbColorCountBorders(redText, prompt(redText), redText);
+    const green = rgbColorCountBorders(greenText, prompt(greenText), greenText);
+    const blue = rgbColorCountBorders(blueText, prompt(blueText), blueText);
     rgbStrokeStyle(red, green, blue);
     context.stroke();
   }
@@ -38,10 +38,10 @@
   }
 
   function rgbColorCountBorders(rgbColorCount, count, i) {
-    let Ł = 0;
+    let L = 0;
     let K = 255;
-    while ((count < Ł) || (count > K)) {
-      alert(countBordersText(rgbColorCount, count, Ł, K));
+    while ((count < L) || (count > K)) {
+      alert(countBordersText(rgbColorCount, count, L, K));
       count = prompt(i);
     }
     return count;

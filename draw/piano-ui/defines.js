@@ -164,6 +164,7 @@ class CanvasColorInputElement extends HTMLElement {
         const validType = getValidType(type);
         const text = this.textContent;
         const thisId = typeof this.name === "undefined" ? this.validId(validType, text) : this.name;
+        const color = this.getAttribute("color");
         const thisResetColorName = this.getAttribute("reset-color-name") === null ? thisId + "-reset-color" : this.getAttribute("reset-color-name");
         const thisResetColorPartId = this.getAttribute("reset-color-part-name") === null ? thisResetColorName + "-part" : this.getAttribute("reset-color-part-name");
         const thisResetColorButtonName = this.getAttribute("reset-color-button-name") === null ? thisResetColorName + "-button" : this.getAttribute("reset-color-button-name");
@@ -176,13 +177,16 @@ class CanvasColorInputElement extends HTMLElement {
         const firstSpanTextItem = document.createElement('text-item');
         const firstResetColorButtonItem = document.createElement('button');
         const ifFirstTextItemType = getValidTypeOfElementValue(text, "after");
+        window.canvasColorsIds.push(thisId);
+        window.canvasColorsNames.push(getCanvasColorInputNameFromId(thisId));
+        window.canvasColorsValues.push(color);
         firstTextItem.textContent = ifFirstTextItemType + "color:";
         firstLabelItem.setAttribute("title", thisId);
         firstLabelItem.setAttribute("for", thisId);
         firstInputItem.id = thisId;
         firstInputItem.name = thisId;
         firstInputItem.type = "color";
-        firstInputItem.value = this.getAttribute("color");
+        firstInputItem.value = color;
         firstSpanItem.id = thisResetColorPartId;
         firstSpanItem.hidden = true;
         firstSpanItem.append(" ");
@@ -222,7 +226,13 @@ class FileSelectorElement extends HTMLElement {
     static getElement(type, hidden) {
         const element = document.createElement("file-selector");
         const thisHidden = getValidType(arguments[2]);
-        hidden = typeof hidden === "undefined" ? (typeof thisHidden === "boolean" ? thisHidden : false) : hidden;
+        if (typeof hidden === "undefined") {
+            if (typeof thisHidden === "boolean") {
+                hidden = thisHidden;
+            } else {
+                hidden = false;
+            }
+        }
         const thisType = getValidType(arguments[3]);
         const thisId = getValidType(arguments[4]);
         const thisValidId = FileSelectorElement.validId(type, thisType, "", thisId);
@@ -249,44 +259,44 @@ class FileSelectorElement extends HTMLElement {
         super();
 
         const element = FileSelectorElement.getElement(type, hidden, true, )
-        this.attributes = element.attributes;
-        this.iattributes = element.attributes;
+        const shadow = this.attachShadow({mode: "closed"});
+        shadow.appendChild()
     }
 }
-
-class FileSelectorWithButtonAndTextElement extends HTMLElement {
-    constructor() {
-        super();
-
-        const thisType = getValidType(this.getAttribute("type"));
-        const buttonId = getValidType(this.getAttribute("button-name"));
-        const buttonText = getValidType(this.getAttribute("button-text"));
-        const selectedId = getValidType(this.getAttribute("selected-name"));
-        const selectedText = getValidType(this.getAttribute("selected-text"));
-        const selectorId = getValidType(this.getAttribute("selector-name"));
-        const thisValidButtonName = FileSelectorElement.validId("", thisType, "button", buttonId);
-        const thisValidSelectedPartName = FileSelectorElement.validId("", thisType, "selected", selectedId);
-        const thisValidSelectorPartId = FileSelectorElement.validId("", thisType, "selector", selectorId);
-        const buttonItem = document.createElement("button");
-        const textItem = document.createElement("text-item");
-        const fileSelectorItem = FileSelectorElement.getElement();
-        buttonItem.setAttribute("title", thisValidButtonName);
-        buttonItem.setAttribute("id", thisValidButtonName);
-        buttonItem.setAttribute("name", thisValidButtonName);
-        buttonItem.textContent = buttonText;
-        textItem.setAttribute("title", thisValidSelectedPartName);
-        textItem.setAttribute("id", thisValidSelectedPartName);
-        textItem.setAttribute("name", thisValidSelectedPartName);
-        textItem.textContent = selectedText;
-        fileSelectorItem.setAttribute("type", thisType);
-        fileSelectorItem.setAttribute("id", thisValidSelectorPartId);
-        fileSelectorItem.setAttribute("hidden", true);
-
-        this.appendChild(buttonItem);
-        this.appendChild(textItem);
-        this.appendChild(fileSelectorItem);
-    }
-}
+//
+// class FileSelectorWithButtonAndTextElement extends HTMLElement {
+//     constructor() {
+//         super();
+//
+//         const thisType = getValidType(this.getAttribute("type"));
+//         const buttonId = getValidType(this.getAttribute("button-name"));
+//         const buttonText = getValidType(this.getAttribute("button-text"));
+//         const selectedId = getValidType(this.getAttribute("selected-name"));
+//         const selectedText = getValidType(this.getAttribute("selected-text"));
+//         const selectorId = getValidType(this.getAttribute("selector-name"));
+//         const thisValidButtonName = FileSelectorElement.validId("", thisType, "button", buttonId);
+//         const thisValidSelectedPartName = FileSelectorElement.validId("", thisType, "selected", selectedId);
+//         const thisValidSelectorPartId = FileSelectorElement.validId("", thisType, "selector", selectorId);
+//         const buttonItem = document.createElement("button");
+//         const textItem = document.createElement("text-item");
+//         const fileSelectorItem = FileSelectorElement.getElement();
+//         buttonItem.setAttribute("title", thisValidButtonName);
+//         buttonItem.setAttribute("id", thisValidButtonName);
+//         buttonItem.setAttribute("name", thisValidButtonName);
+//         buttonItem.textContent = buttonText;
+//         textItem.setAttribute("title", thisValidSelectedPartName);
+//         textItem.setAttribute("id", thisValidSelectedPartName);
+//         textItem.setAttribute("name", thisValidSelectedPartName);
+//         textItem.textContent = selectedText;
+//         fileSelectorItem.setAttribute("type", thisType);
+//         fileSelectorItem.setAttribute("id", thisValidSelectorPartId);
+//         fileSelectorItem.setAttribute("hidden", true);
+//
+//         this.appendChild(buttonItem);
+//         this.appendChild(textItem);
+//         this.appendChild(fileSelectorItem);
+//     }
+// }
 
 function setDefaultCanvasColorInputValueFromName(name) {
     const defaultInputValueName = getDefaultCanvasColorInputNameFromName(name);
@@ -304,5 +314,5 @@ export function setDefaultCanvasColorInputValueFromType(type) {
 }
 
 customElements.define("canvas-color-input", CanvasColorInputElement);
-customElements.define("file-selector", FileSelectorElement);
-customElements.define("file-selector-with-button-and-text", FileSelectorWithButtonAndTextElement);
+// customElements.define("file-selector", FileSelectorElement);
+// customElements.define("file-selector-with-button-and-text", FileSelectorWithButtonAndTextElement);
