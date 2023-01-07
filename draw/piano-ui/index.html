@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>sonk</title>
         <link rel="icon" type="icon/png" href="logo.png">
-        <link rel="stylesheet" type="text/css" href="../../index.css">
+        <link rel="stylesheet" type="text/css" href="./index.css">
         <link rel="stylesheet" type="text/css" href="../index.css">
     </head>
     <body>
@@ -39,7 +39,14 @@
             </div>
         </div>
         <p><text-item>is-canvas-background-color-transparent:</text-item> <label for="is-canvas-background-color-transparent"></label><input id="is-canvas-background-color-transparent" name="is-canvas-background-color-transparent" type="checkbox" role="switch" checked/></p>
-        <p><text-item>save-canvas-inputs-colors:</text-item> <label for="save-canvas-inputs-colors"></label><input id="save-canvas-inputs-colors" name="save-canvas-inputs-colors" type="checkbox" value=""><span id="save-canvas-inputs-colors-part" hidden> <text-item>-</text-item> <button id="save-canvas-inputs-colors-button" name="save-canvas-inputs-colors-button">save</button><text-item id="saved-canvas-inputs-colors-part" hidden>saved</text-item> <span id="save-colors-from-file-part"><text-item>-</text-item> <button id="save-colors-to-file">save-file</button> <span id="save-enter-the-file-selector-id-part" hidden><text-item>-</text-item> <label for="save-enter-the-file-selector-id"></label><input placeholder="Enter the file name" id="save-enter-the-file-selector-id"></span></span><span id="set-canvas-inputs-colors-part" hidden><text-item>-</text-item> <button id="set-canvas-inputs-colors-button" name="set-canvas-inputs-colors-button">set</button> <text-item>-</text-item> <button id="set-colors-from-file">select-file</button><text-item id="set-selected-file" hidden>selected</text-item><label title="set-file-selector" for="set-file-selector"></label><input id="set-file-selector" name="set-file-selector" type="file" hidden /></span></span></p>
+        <p><text-item>save-canvas-inputs-colors:</text-item> <label for="save-canvas-inputs-colors"></label><input id="save-canvas-inputs-colors" name="save-canvas-inputs-colors" type="checkbox"> <span style="cursor: pointer" hidden><text-item>&ltrif;</text-item></span> <text-item hidden>{</text-item><text-item hidden>}</text-item></p>
+        <div style="margin-left: 30px" id="save-and-set-colors-inputs" hidden>
+            <p><button title="save" id="save-canvas-inputs-colors-button" name="save-canvas-inputs-colors-button">save</button></p>
+            <p><button title="save-file" id="save-colors-to-file" name="save-colors-to-file">save-to-file</button> <text-item>-</text-item> <label for="save-enter-the-file-selector-id"></label><input placeholder="Enter the file name" id="save-enter-the-file-selector-id" name="save-enter-the-file-selector-id" /></p>
+            <p><button title="set" id="set-canvas-inputs-colors-button" name="set-canvas-inputs-colors-button">set</button></p>
+            <p><button title="set-file" id="set-colors-from-file" name="set-colors-from-file">set-from-file</button><label title="set-file-selector" for="set-file-selector"></label><input id="set-file-selector" name="set-file-selector" type="file" hidden /></p>
+        </div>
+        <p><text-item hidden>}</text-item></p>
         <p><text-item>text-items-color:</text-item> <label for="text-items-color"></label><input id="text-items-color" name="text-items-color" type="color" value="#000000"><span id="text-items-color-reset-color-part" hidden> <text-item>-</text-item> <button id="text-items-color-reset-color-button" name="text-items-color-reset-color-button">reset-color</button></span></p>
         <p><text-item>background-color:</text-item> <label for="background-color"></label><input id="background-color" name="background-color" type="color" value="#ffffff"><span id="background-color-reset-color-part" hidden> <text-item>-</text-item> <button id="background-color-reset-color-button" name="background-color-reset-color-button">reset-color</button></span></p>
         <p><text-item>save-changed-colors-on-canvas-by-modified-background-color:</text-item> <label for="save-changed-colors-on-canvas-by-modified-background-color-input-value"></label><input id="save-changed-colors-on-canvas-by-modified-background-color-input-value" name="save-changed-colors-on-canvas-by-modified-background-color-input-value" type="checkbox"><span id="reset-colors-on-canvas-part" hidden> <text-item>-</text-item> <button id="reset-colors-on-canvas" name="reset-colors-on-canvas">reset-colors</button></span></p>

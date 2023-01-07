@@ -193,19 +193,18 @@ const backgroundColorInputResetColorsPart = document.getElementById("background-
 const textItemsColorInputResetColorsPart = document.getElementById("text-items-color-reset-color-part");
 const isCanvasBackgroundColorTransparentInput = document.getElementById("is-canvas-background-color-transparent");
 const saveChangedColorsOnCanvasInput = document.getElementById("save-changed-colors-on-canvas-by-modified-background-color-input-value");
+const saveAndSetCanvasColorsInputs = document.getElementById("save-and-set-colors-inputs");
 const saveCanvasInputsColors = document.getElementById("save-canvas-inputs-colors");
-const saveCanvasInputsColorsToFilePart = document.getElementById("save-canvas-inputs-colors-part");
+const arrowOfSaveCanvasInputsColors = ((document.body.children)[8].children)[3];
+const firstOpeningBracketOfSaveCanvasInputsColors = ((document.body.children)[8].children)[4];
+const firstClosingBracketOfSaveCanvasInputsColors = ((document.body.children)[8].children)[5];
+const closingBracketOfSaveCanvasInputsColors = ((document.body.children)[10].children)[0];
 const saveCanvasInputsColorsButton = document.getElementById("save-canvas-inputs-colors-button");
-const savedCanvasInputsColorsPart = document.getElementById("saved-canvas-inputs-colors-part");
-const setCanvasInputsColorsPart = document.getElementById("set-canvas-inputs-colors-part");
 const setCanvasInputsColorsButton = document.getElementById("set-canvas-inputs-colors-button");
 const setCanvasInputsColorsFromFile = document.getElementById("set-colors-from-file");
-const saveColorsToFilePart = document.getElementById("save-colors-from-file-part");
 const saveColorsToFile = document.getElementById("save-colors-to-file");
-const saveEnterTheFileSelectorIdPart = document.getElementById("save-enter-the-file-selector-id-part");
 const saveEnterTheFileSelectorId = document.getElementById("save-enter-the-file-selector-id");
 const setFileSelector = document.getElementById("set-file-selector");
-const setSelectedFile = document.getElementById("set-selected-file");
 let savedFileContent = "";
 let settedFileContent = "";
 const resetColorsOnCanvasPart = document.getElementById("reset-colors-on-canvas-part");
@@ -396,12 +395,25 @@ canvasPianoActivePartInputsResetColorsButton.onclick = function () {
     }
     canvasPianoActivePartInputsResetColorsPart.hidden = true;
 };
+arrowOfSaveCanvasInputsColors.onclick = function () {
+    isWindowClicked = false;
+    const children = document.body.children;
+    const marker = children[8];
+    const markerChildren = marker.children;
+    const firstClosingBrace = markerChildren[4];
+    const closingBrace = children[16].children[0];
+    if (this.textContent === "◂") {
+        this.textContent = "▾";
+        firstClosingBrace.hidden = true;
+        closingBrace.hidden = false;
+    } else if (this.textContent === "▾") {
+        this.textContent = "◂";
+        firstClosingBrace.hidden = false;
+        closingBrace.hidden = true;
+    }
+}
 saveCanvasInputsColors.onclick = function () {
     isWindowClicked = false;
-    if (saveEnterTheFileSelectorIdPart.hidden) {
-        saveEnterTheFileSelectorId.value = "";
-        saveEnterTheFileSelectorIdPart.hidden = false;
-    }
     if (!saveCanvasInputsColors.checked) {
         savedCanvasInputsColors = undefined;
         for (const element of canvasColorInputTypes) {
@@ -410,12 +422,8 @@ saveCanvasInputsColors.onclick = function () {
             const defaultName = getDefaultCanvasColorInputNameFromName(name);
             window[inputName].value = window[defaultName];
         }
-    } else {
-        savedCanvasInputsColorsPart.hidden = true;
-        setCanvasInputsColorsPart.hidden = true;
-        saveCanvasInputsColorsButton.hidden = false;
     }
-};
+}
 saveCanvasInputsColorsButton.onclick = function () {
     isWindowClicked = false;
     if (!Array.isArray(savedFileContent)) {
@@ -425,28 +433,16 @@ saveCanvasInputsColorsButton.onclick = function () {
     } else {
         savedCanvasInputsColors = JSON.parse(settedFileContent);
     }
-    saveCanvasInputsColorsButton.hidden = true;
-    if (!saveColorsToFilePart.hidden) {
-        saveColorsToFilePart.hidden = true;
-    }
-    savedCanvasInputsColorsPart.hidden = false;
-    setCanvasInputsColorsPart.hidden = false;
 };
 saveColorsToFile.onclick = function () {
     isWindowClicked = false;
-    if (saveEnterTheFileSelectorIdPart.hidden) {
-        saveEnterTheFileSelectorId.value = "";
-        saveEnterTheFileSelectorIdPart.hidden = false;
-    } else {
-        const fileName = saveEnterTheFileSelectorId.value;
-        const canvasColorValues = createStringArrayFromObjectsArray(getCanvasColorValues());
-        const blob = new Blob([canvasColorValues], {
-            type: "text/plain;charset=utf-8",
-        });
-        saveAs(blob, "" + fileName + ".txt");
-        savedFileContent = canvasColorValues;
-        saveEnterTheFileSelectorIdPart.hidden = true;
-    }
+    const fileName = saveEnterTheFileSelectorId.value;
+    const canvasColorValues = createStringArrayFromObjectsArray(getCanvasColorValues());
+    const blob = new Blob([canvasColorValues], {
+        type: "text/plain;charset=utf-8",
+    });
+    saveAs(blob, "" + fileName + ".txt");
+    savedFileContent = canvasColorValues;
 }
 setCanvasInputsColorsButton.onclick = function () {
     isWindowClicked = false;
@@ -464,10 +460,6 @@ setCanvasInputsColorsButton.onclick = function () {
         if (!isArrayElementsTrue(canvasInputsColorsEqualsSavedColorsArray)) {
             saveChangedColorsOnCanvasInput.checked = false;
         }
-    }
-    if (!setSelectedFile.hidden) {
-        setCanvasInputsColorsFromFile.hidden = false;
-        setSelectedFile.hidden = true;
     }
 };
 setCanvasInputsColorsFromFile.onclick = function () {
@@ -490,7 +482,7 @@ setCanvasInputsColorsFromFile.onclick = function () {
             "Array is not found"
         ];
         const result = getValidString(ev.target.result);
-        
+
         const openingSquareBracketIndex = result.indexOf("[");
         const openingBraceIndex = result.indexOf("{");
         const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
@@ -533,24 +525,22 @@ setCanvasInputsColorsFromFile.onclick = function () {
                         defaultCanvasColorValues.length - 1
                     );
                 }
+                setCanvasInputsColorsButton.click();
             } else {
                 settedFileContent = [];
+                error += errorStrings[0];
                 if (isContainsOpenOrClosingBracket) {
+                    error += errorStrings[1];
                     if (Array.isArray(content)) {
-                        error = errorStrings[0] + errorStrings[1] + " (use an array of square brackets)";
-                    } else {
-                        error = errorStrings[0] + errorStrings[1];
+                        error += " (use an array of square brackets)";
                     }
                 } else {
-                    error = errorStrings[0] + errorStrings[3];
+                    error += errorStrings[3];
                 }
             }
-            if (isValid) {
-                setCanvasInputsColorsFromFile.hidden = true;
-            } else {
+            if (!isValid) {
                 console.error(error);
             }
-            setSelectedFile.hidden = !isValid;
         } catch (e) {
             if (isContainsOpenOrClosingBracket) {
                 error = errorStrings[2];
@@ -629,14 +619,12 @@ function createTheDefaultColorInputFieldsAndListenersWithElementIdWithDefaultVal
     };
     field.onchange = function () {
         saveCanvasInputsColorsButton.hidden = false;
-        savedCanvasInputsColorsPart.hidden = true;
     };
     fieldResetColorPart.onclick = function () {
         isWindowClicked = false;
         saveChangedColorsOnCanvasInput.checked = false;
         if (field.value !== defaultValue) {
             saveCanvasInputsColorsButton.hidden = false;
-            savedCanvasInputsColorsPart.hidden = true;
         }
         field.value = defaultValue;
     }
@@ -864,6 +852,32 @@ function fillColoredRectOfPiano(style, width, height, rectX, rectY, rectWidth, r
     const x = getPartOfWidth(width, rectX);
     const y = getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, rectY);
     fillColoredRect(style, x, y, getPartOfWidth(width, rectWidth), getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, rectHeight));
+}
+
+function drawColoredRectOfHalfKeyOfPiano(style, width, height, rectX, rectY, rectHeight) {
+    fillColoredRectOfPiano(style, width, height, rectX, rectY, 7, rectHeight);
+}
+
+function getValidKeyIndexInOctaveFromIndex(index) {
+    index = getValidInteger(index);
+    let value = index;
+    if (index >= 0) {
+        while (value >= 12) {
+            value -= 12;
+        }
+    } else {
+        while (value < 0) {
+            value += 12;
+        }
+    }
+    return value;
+}
+
+function drawColoredRectOfOctaveOfPiano(style, width, height, rectX, rectY, rectHeight, index) {
+    const listOfNumberOfSpacesBetweenStripesInOctave = [11, 8, 10, 8, 11, 11, 8, 9, 8, 9, 8, 11];
+    const validIndex = getValidKeyIndexInOctaveFromIndex(index);
+    const rectWidth = listOfNumberOfSpacesBetweenStripesInOctave[validIndex];
+    fillColoredRectOfPiano(style, width, height, rectX, rectY, rectWidth, rectHeight);
 }
 
 function getTopOfPianoKeys(height) {
@@ -1516,21 +1530,6 @@ function drawKeyOctaveOfPiano(wholeKeyFillStyle, halfKeyFillStyle, width, height
     }
 }
 
-function getValidKeyIndexInOctaveFromIndex(index) {
-    index = getValidInteger(index);
-    let value = index;
-    if (index >= 0) {
-        while (value >= 12) {
-            value -= 12;
-        }
-    } else {
-        while (value < 0) {
-            value += 12;
-        }
-    }
-    return value;
-}
-
 class KeyIndexFromOctaveOfPianoFromIndex {
     #index;
     #value;
@@ -1981,9 +1980,11 @@ function drawPianoSongEditor() {
     const definedValues = values;
     self.canvasFieldsCount = 0;
 
-    if (saveCanvasInputsColors.checked) {
-        saveCanvasInputsColorsToFilePart.hidden = false;
-    }
+    arrowOfSaveCanvasInputsColors.hidden = !saveCanvasInputsColors.checked;
+    firstOpeningBracketOfSaveCanvasInputsColors.hidden = arrowOfSaveCanvasInputsColors.hidden;
+    firstClosingBracketOfSaveCanvasInputsColors.hidden = saveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.textContent !== "◂";
+    closingBracketOfSaveCanvasInputsColors.hidden = saveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.textContent !== "▾";
+    saveAndSetCanvasColorsInputs.hidden = arrowOfSaveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.textContent !== "▾";
     textItemsColorInputResetColorsPart.hidden = textItemsColorInput.value === defaultTextItemsColorValue;
     backgroundColorInputResetColorsPart.hidden = backgroundColorInput.value === defaultBackgroundColorValue;
 

@@ -2420,24 +2420,6 @@ export function getConsecutiveMatchingSearchsPartsIndexesInString(string, search
     return value;
 }
 
-export function getFileData(fileURL) {
-//     const fs = require('fs');
-//     fs.writeFile("/tmp/test", "Hey there!", function(err) {
-//         if(err) {
-//             return console.log(err);
-//         }
-//         console.log("The file was saved!");
-//     });
-// // Or
-//     fs.writeFileSync('/tmp/test-sync', 'Hey there!');
-    const self = document.createElement("a");
-    self.href = fileURL;
-    fetch(fileURL)
-        .then(response => response.text())
-        .then((data) => data);
-    return self.result;
-}
-
 export function isTypes(objectsArray, typesArray) {
     objectsArray = getValidArray(objectsArray);
     typesArray = getValidArray(typesArray);
