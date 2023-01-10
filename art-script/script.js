@@ -16,7 +16,7 @@ export function getValidString(value) {
 }
 
 export function getValidArray(value) {
-    return Array.isArray(value) ? value : [];
+    return Array.isArray(value) ? value : [value];
 }
 
 function isValidNumber(value) {
@@ -920,7 +920,7 @@ export function getObjectIfEqualsObjects(a, b) {
 
 export function getArrayElementsWithIndexesArray(array, indexesArray) {
     array = getValidArray(array);
-    indexesArray = getValidArray(indexesArray);
+    indexesArray = getValidIntegersArray(indexesArray);
     let value = [];
     for (const index of indexesArray) {
         value.push(array[index]);
@@ -1247,6 +1247,14 @@ function getLastArrayFromRepeatedConnectedArraysFromLength(array, length) {
     return value;
 }
 
+/**
+ * Return(s) <code style="color: #000000">(<code style="color: #7f008f">sub repeated connected arrays</code>) - (elements) - in array</code>
+ * @param array {array}
+ * @param arraysCount {number}
+ * @param fromIndex {number}
+ * @param toIndex {number}
+ * @returns {[]}
+ */
 export function createSubRepeatedConnectedArrays(array, arraysCount, fromIndex, toIndex) {
     array = getValidArray(array);
     arraysCount = validateIntegerWithMin(arraysCount, 0);
@@ -1267,6 +1275,12 @@ export function createSubRepeatedConnectedArrays(array, arraysCount, fromIndex, 
     return value;
 }
 
+/**
+ * @param array {array}
+ * @param arraysCount {number}
+ * @param fromIndex {number}
+ * @returns <code>{@link createSubRepeatedConnectedArrays}</code> from {@link fromIndex index}
+ */
 function createSubRepeatedConnectedArraysWithFromIndex(array, arraysCount, fromIndex) {
     array = getValidArray(array);
     return createSubRepeatedConnectedArrays(array, arraysCount, fromIndex, array.length - 1);
@@ -1476,6 +1490,35 @@ function replaceObjectToTheArray(array, object, index) {
 export function replaceNewArrayToTheArray(array, newArray, fromIndex, toIndex) {
     array = removeSubArrayInArray(array, fromIndex, toIndex);
     return placeNewArrayToTheArray(array, newArray, fromIndex);
+}
+
+export function replaceElementsInArrayWithIndexesArray(array, objects, indexesArray) {
+    array = getValidArray(array);
+    objects = getValidArray(objects);
+    indexesArray = getValidIntegersArray(indexesArray);
+    const length = Math.max(
+        objects.length,
+        indexesArray.length
+    );
+    let value = array;
+    for (let i = 0; i < length; i++) {
+        if (i >= objects.length - 1) {
+            const index = indexesArray[i];
+            value[index] = objects[objects.length - 1];
+        } else if (i >= indexesArray.length - 1) {
+            const index = indexesArray[indexesArray.length - 1];
+            value[index] = objects[i];
+        }
+    }
+    return value;
+}
+
+export function replaceElementsInArray(array, objects, ...indexes) {
+    return replaceElementsInArrayWithIndexesArray(array, objects, indexes);
+}
+
+export function replaceElementInArray(array, object, ...indexes) {
+    return replaceElementsInArrayWithIndexesArray(array, [object], indexes);
 }
 
 function isDigit(char) {

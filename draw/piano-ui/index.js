@@ -25,6 +25,7 @@ import {
     isObjectEqualsSomeElementOfString,
     isValidInteger,
     placeIntegerToTheIncreasingIntegersArray,
+    replaceElementInArray,
     subArray,
     subArrayWithFromIndex,
     subArrayWithToIndex,
@@ -45,6 +46,7 @@ import {
     getCanvasColorInputTypeFromId,
     getDefaultCanvasColorInputNameFromId,
     getDefaultCanvasColorInputNameFromName,
+    getValidType,
     setDefaultCanvasColorInputValueFromType
 } from "./defines.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
@@ -76,8 +78,8 @@ const canvasColorInputTypes = [
     "piano-half-key",
     "piano-active-part-clicking-whole-key",
     "piano-active-part-clicking-half-key",
-    "piano-active-part-moving-bar-belonging-whole-key",
-    "piano-active-part-moving-bar-belonging-half-key"
+    "piano-active-part-moving-strip-for-clicking-whole-key",
+    "piano-active-part-moving-strip-for-clicking-half-key"
 ];
 const getCanvasColorValues = (color) => {
     let value = [];
@@ -228,6 +230,7 @@ let drawnKeysIndexes = [];
 let drawnKeys = [];
 let drawnHalfKeys = [];
 let drawnWholeKeys = [];
+let drawnBelongingParts = [];
 let drawnKeysCount = 0;
 let drawnWholeKeysCount = 0;
 let drawnHalfKeysCount = 0;
@@ -397,20 +400,15 @@ canvasPianoActivePartInputsResetColorsButton.onclick = function () {
 };
 arrowOfSaveCanvasInputsColors.onclick = function () {
     isWindowClicked = false;
-    const children = document.body.children;
-    const marker = children[8];
-    const markerChildren = marker.children;
-    const firstClosingBrace = markerChildren[4];
-    const closingBrace = children[16].children[0];
     if (this.textContent === "◂") {
         this.textContent = "▾";
-        firstClosingBrace.hidden = true;
-        closingBrace.hidden = false;
     } else if (this.textContent === "▾") {
         this.textContent = "◂";
-        firstClosingBrace.hidden = false;
-        closingBrace.hidden = true;
     }
+    firstOpeningBracketOfSaveCanvasInputsColors.hidden = arrowOfSaveCanvasInputsColors.hidden;
+    firstClosingBracketOfSaveCanvasInputsColors.hidden = saveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.textContent !== "◂";
+    closingBracketOfSaveCanvasInputsColors.hidden = saveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.textContent !== "▾";
+    saveAndSetCanvasColorsInputs.hidden = arrowOfSaveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.textContent !== "▾";
 }
 saveCanvasInputsColors.onclick = function () {
     isWindowClicked = false;
@@ -430,8 +428,10 @@ saveCanvasInputsColorsButton.onclick = function () {
         const values = getCanvasInputsValues();
         const defaultValues = getCanvasInputsDefaultValues();
         savedCanvasInputsColors = saveCanvasInputsColors.checked ? values : defaultValues;
-    } else {
+    } else try {
         savedCanvasInputsColors = JSON.parse(settedFileContent);
+    } catch (e) {
+        savedCanvasInputsColors = defaultCanvasColorValues;
     }
 };
 saveColorsToFile.onclick = function () {
@@ -586,7 +586,12 @@ reloadingTimeSubmitButton.onclick = function () {
 let isCanvasInterval = false;
 
 /**
- * @return <code style="color: #000000">creates the fields <em>({@link HTMLInputElement <code style="color: #7f008f">element</code>}, {@link HTMLInputElement.name <code style="color: #7f008f">name</code>}, {@link HTMLInputElement.defaultValue <code style="color: #7f008f">defaultValue</code>})</em> associated with the color input element;</code>
+ * @param element {HTMLElement}
+ * @param name {string}
+ * @param defaultValue {color}
+ * @returns <code style="color: #000000">creates the fields <em>({@link element <code style="color: #7f008f">element</code>},
+ * {@link name <code style="color: #7f008f">name</code>},
+ * {@link defaultValue <code style="color: #7f008f">defaultValue</code>})</em> associated with the color input element;</code>
  */
 function createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElementWithDefaultValue(element, name, defaultValue) {
     const fieldName = name + "Input";
@@ -631,7 +636,13 @@ function createTheDefaultColorInputFieldsAndListenersWithElementIdWithDefaultVal
 }
 
 /**
- * @return <code style="color: #000000">creates the fields <em>({@link HTMLInputElement <code style="color: #7f008f">element</code>}, {@link HTMLInputElement.name <code style="color: #7f008f">name</code>})</em> associated with the color input element;</code>
+ * @param element {HTMLElement}
+ * @param name {string}
+ * @returns <code style="color: #000000">
+ *     creates the fields <em>({@link element <code style="color: #7f008f">element</code>},
+ *     {@link name <code style="color: #7f008f">name</code>})</em>
+ *     associated with the color input element;
+ * </code>
  */
 function createsTheDefaultColorInputFieldsAssociatedWithTheColorInputElement(element, name) {
     const id = getCanvasColorInputIdFromName(name);
@@ -676,26 +687,34 @@ function createTheDefaultCanvasColorInputFieldsAndListeners(type) {
     createTheDefaultColorInputFieldsAndListenersWithElementId(elementId, elementName);
 }
 
+function setCanvasInput(inputType, type) {
+    inputType = getValidType(inputType);
+    type = getValidString(type);
+    setDefaultCanvasColorInputValueFromType(inputType + type);
+}
+
 function setJustCanvasInputs() {
-    setDefaultCanvasColorInputValueFromType("border");
-    setDefaultCanvasColorInputValueFromType("background");
-    setDefaultCanvasColorInputValueFromType("song-editor-stripes");
+    setCanvasInput("", "border");
+    setCanvasInput("", "background");
+    setCanvasInput("", "song-editor-stripes");
 }
 
 function setJustCanvasPianoInputs() {
-    setDefaultCanvasColorInputValueFromType("piano-background");
-    setDefaultCanvasColorInputValueFromType("piano-top-most-upper-part");
-    setDefaultCanvasColorInputValueFromType("piano-top-upper-part");
-    setDefaultCanvasColorInputValueFromType("piano-top-upper-part-center");
-    setDefaultCanvasColorInputValueFromType("piano-top-lower-part");
-    setDefaultCanvasColorInputValueFromType("piano-top-most-lower-part");
-    setDefaultCanvasColorInputValueFromType("piano-whole-key");
-    setDefaultCanvasColorInputValueFromType("piano-half-key");
+    setCanvasInput("piano", "background");
+    setCanvasInput("piano", "top-most-upper-part");
+    setCanvasInput("piano", "top-upper-part");
+    setCanvasInput("piano", "top-upper-part-center");
+    setCanvasInput("piano", "top-lower-part");
+    setCanvasInput("piano", "top-most-lower-part");
+    setCanvasInput("piano", "whole-key");
+    setCanvasInput("piano", "half-key");
 }
 
 function setCanvasPianoActivePartInputs() {
-    setDefaultCanvasColorInputValueFromType("piano-active-part-clicking-whole-key");
-    setDefaultCanvasColorInputValueFromType("piano-active-part-clicking-half-key");
+    setCanvasInput("piano-active-part", "clicking-whole-key");
+    setCanvasInput("piano-active-part", "clicking-half-key");
+    setCanvasInput("piano-active-part", "moving-strip-for-clicking-half-key");
+    setCanvasInput("piano-active-part", "moving-strip-for-clicking-half-key");
 }
 
 function setJustCanvasAndPianoInputs() {
@@ -764,18 +783,47 @@ function addDrawnKeyIndex(index) {
     }
 }
 
-function addDrawnKey(value) {
-    drawnKeys.push(value);
+function getDrawnKeyParameters(type, fillStyle, width, height, posX, posY) {
+    const keyType = {
+        type,
+        width: arguments[6],
+        height: arguments[7],
+        left: arguments[8],
+        right: arguments[9]
+    };
+    const newParameters = new KeyParametersOfPiano(keyType, fillStyle, width, height, posX, posY);
+    let value = {
+        type: newParameters.type,
+        canvasParts: newParameters.getCanvasPartsCount(),
+        fillStyle: newParameters.fillStyle,
+        pos: newParameters.getPos(),
+        keyType: newParameters.getType()
+    };
+    if (type === "whole") {
+        const parameters = newParameters.getParameters("whole");
+        value.upperPart = parameters.upperPart;
+        value.lowerPart = parameters.lowerPart;
+    }
+    return value;
+}
+
+function addDrawnKey(type, fillStyle, width, height, posX, posY) {
+    const keyParameters = getDrawnKeyParameters(type, fillStyle, width, height, posX, posY);
+    drawnKeys.push(keyParameters);
     drawnKeysCount++;
 }
 
-function addDrawnWholeKey(value) {
-    drawnWholeKeys.push(value);
+function addDrawnWholeKey(fillStyle, width, height, posX, posY) {
+    const keyParameters = getDrawnKeyParameters("whole", fillStyle, width, height, posX, posY);
+    addDrawnKey("whole", fillStyle, width, height, posX, posY);
+    drawnWholeKeys.push(keyParameters);
     drawnWholeKeysCount++;
 }
 
-function addDrawnHalfKey(value) {
-    drawnHalfKeys.push(value);
+function addDrawnHalfKey(fillStyle, width, height, posX, posY) {
+    const keyParameters = getDrawnKeyParameters("half", fillStyle, width, height, posX, posY);
+    addDrawnKey("half", fillStyle, width, height, posX, posY);
+    drawnHalfKeys.push(keyParameters);
     drawnHalfKeysCount++;
 }
 
@@ -784,6 +832,13 @@ function getPartOfNumber(number, numberOfParts, partOfNumber) {
     numberOfParts = validateIntegerWithMin(numberOfParts, 0);
     partOfNumber = getValidNumber(partOfNumber);
     return number / (numberOfParts / partOfNumber);
+}
+
+function getNumberOfPart(number, numberOfParts, partOfNumber) {
+    number = getValidNumber(number);
+    numberOfParts = validateIntegerWithMin(numberOfParts, 0);
+    partOfNumber = getValidNumber(partOfNumber);
+    return numberOfParts / (number / partOfNumber);
 }
 
 function getPartOfWidth(width, partOfWidth) {
@@ -850,33 +905,28 @@ function getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeigh
 
 function fillColoredRectOfPiano(style, width, height, rectX, rectY, rectWidth, rectHeight) {
     const x = getPartOfWidth(width, rectX);
-    const y = getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, rectY);
-    fillColoredRect(style, x, y, getPartOfWidth(width, rectWidth), getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, rectHeight));
+    const y = getPartOfHeight(height, rectY);
+    const partOfWidth = getPartOfWidth(width, rectWidth);
+    const partOfHeight = getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, rectHeight);
+    fillColoredRect(style, x, y, partOfWidth, partOfHeight);
 }
 
 function drawColoredRectOfHalfKeyOfPiano(style, width, height, rectX, rectY, rectHeight) {
     fillColoredRectOfPiano(style, width, height, rectX, rectY, 7, rectHeight);
 }
 
-function getValidKeyIndexInOctaveFromIndex(index) {
-    index = getValidInteger(index);
-    let value = index;
-    if (index >= 0) {
-        while (value >= 12) {
-            value -= 12;
-        }
-    } else {
-        while (value < 0) {
-            value += 12;
-        }
+function getValidKeyIndexInOctaveFromIndex(
+    index = getValidInteger(index)) {
+    while (index < 0 || index >= 12) {
+        index += index >= 0 ? -12 : 12;
     }
-    return value;
+    return index;
 }
 
 function drawColoredRectOfOctaveOfPiano(style, width, height, rectX, rectY, rectHeight, index) {
-    const listOfNumberOfSpacesBetweenStripesInOctave = [11, 8, 10, 8, 11, 11, 8, 9, 8, 9, 8, 11];
+    const listOfNumberOfSpacesBetweenStripes = [11, 8, 10, 8, 11, 11, 8, 9, 8, 9, 8, 11];
     const validIndex = getValidKeyIndexInOctaveFromIndex(index);
-    const rectWidth = listOfNumberOfSpacesBetweenStripesInOctave[validIndex];
+    const rectWidth = listOfNumberOfSpacesBetweenStripes[validIndex];
     fillColoredRectOfPiano(style, width, height, rectX, rectY, rectWidth, rectHeight);
 }
 
@@ -1128,9 +1178,6 @@ class KeyOfPiano extends KeyParametersOfPiano {
             const keyWidth = keyType.defaultWidth;
             const keyHeight = keyType.defaultHeight;
             fillColoredRect(fillStyle, posX, posY, keyWidth, keyHeight);
-            if (!isStopDrawingKeys) {
-                addDrawnKey(key.keyParameters);
-            }
         }
 
         if (type === "whole") {
@@ -1160,13 +1207,22 @@ class KeyOfPiano extends KeyParametersOfPiano {
                 addDrawnWholeKey(wholeKeyParameters);
             }
         } else {
+            const fillStyle = key.getFillStyle();
+            const keyType = key.getKeyType();
+            const pos = key.getPos();
+            const keyWidth = keyType.defaultWidth;
+            const keyHeight = keyType.defaultHeight;
+            const posX = pos.defaultX;
+            const posY = pos.defaultY;
+            draw();
             if (type === "half") {
-                draw();
                 if (!isStopDrawingKeys) {
-                    addDrawnHalfKey(key.getParameters("half"));
+                    addDrawnHalfKey(fillStyle, keyWidth, keyHeight, posX, posY);
                 }
             } else {
-                draw();
+                if (!isStopDrawingKeys) {
+                    addDrawnKey(type, fillStyle, keyWidth, keyHeight, posX, posY);
+                }
             }
         }
     }
@@ -1205,7 +1261,13 @@ function getDefaultWholeKeyThPosXInOctave(partOfWidthAndStart, keyTh) {
     const isValidKeyTh = keyTh > 0 && keyTh <= 7;
     let value = 0;
     if (isValidKeyTh) {
-        for (let i = partOfWidthAndStart, counter = 0; counter <= keyTh; i += defaultWholeKeyWidthOfPiano + 1, counter++) {
+        for (
+            let i = partOfWidthAndStart,
+                counter = 0;
+            counter <= keyTh;
+            i += defaultWholeKeyWidthOfPiano + 1,
+                counter++
+        ) {
             if (counter === keyTh - 1) {
                 value = i;
             }
@@ -1255,9 +1317,8 @@ function drawHalfKeyOctaveOfPiano(fillStyle, width, height, partOfWidthAndStart)
 }
 
 function getKeyOctaveFirstTypes() {
-    const whole = "whole";
-    const half = "half";
-    return [whole, half, whole, half, whole, whole, half, whole, half, whole, half, whole];
+    const array = createArrayFromOneElement("whole", 12);
+    return replaceElementInArray(array, "half", 1, 3, 6, 8, 10);
 }
 
 function getKeyOctaveFirstType(index) {
@@ -1275,11 +1336,7 @@ function getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index) {
     let repairsCount = 0;
     let i = index;
     while (i < 0 || i > 11) {
-        if (index < 0) {
-            i += 12;
-        } else {
-            i -= 12;
-        }
+        i += index < 0 ? 12 : -12;
         repairsCount++;
     }
     return {
@@ -1349,11 +1406,8 @@ function getDefaultOctaveKeyPosXInOctaves(octavePartOfWidthAndStart, keyIndex) {
     const repairsCount = startKeyIndexAndRepairsCount.repairsCount;
     let i = 0;
     while (i < repairsCount) {
-        if (!isPositive) {
-            octavePartOfWidthAndStart -= defaultWholeOctaveWidth;
-            i++;
-        } else if (!isValid) {
-            octavePartOfWidthAndStart += defaultWholeOctaveWidth;
+        if (!isPositive || !isValid) {
+            octavePartOfWidthAndStart += !isPositive ? -defaultWholeOctaveWidth : !isValid ? defaultWholeOctaveWidth : 0;
             i++;
         }
     }
@@ -1530,62 +1584,38 @@ function drawKeyOctaveOfPiano(wholeKeyFillStyle, halfKeyFillStyle, width, height
     }
 }
 
-class KeyIndexFromOctaveOfPianoFromIndex {
-    #index;
-    #value;
-
-    constructor(index) {
-        this.#index = index;
-        this.#value = getValidKeyIndexInOctaveFromIndex(index);
-    }
-
-    get value() {
-        return this.#value;
-    }
-
-    set value(value) {
-        this.#value = value;
-    }
-
-    toString() {
-        return `${this.#value}`;
-    }
-
-    previous(count) {
-        return new KeyIndexFromOctaveOfPianoFromIndex(this.#index - getValidInteger(count));
-    }
-
-    next(count) {
-        return new KeyIndexFromOctaveOfPianoFromIndex(this.#index + getValidInteger(count));
-    }
-
-    following(count) {
-        return this.next(count);
-    }
-}
-
-console.log(new KeyIndexFromOctaveOfPianoFromIndex(9).previous(4).value);
-
-function getPianoNextToEachOtherKeysParameters(width, height, posX, posY, {
-    wholeKeyFillStyle,
-    halfKeyFillStyle
-}, startKeyIndexFromOctave, keysCount) {
-    width = validateIntegerWithMin(width, 0);
-    height = validateIntegerWithMin(height, 0);
-    posX = getValidInteger(posX);
-    posY = getValidInteger(posY);
-    wholeKeyFillStyle = tHex.getValidRgbHex(wholeKeyFillStyle);
-    halfKeyFillStyle = tHex.getValidRgbHex(halfKeyFillStyle);
+/**
+ * Returns (keys parameters) array
+ * @param width {number} integer
+ * @param height {number} integer
+ * @param posX {number} integer
+ * @param posY {number} integer
+ * @param wholeKeyFillStyle {string} rgb hex
+ * @param halfKeyFillStyle {string} rgb hex
+ * @param startKeyIndexFromOctave {number} integer
+ * @param keysCount {number} integer
+ * @return {[]}
+ */
+function getPianoNextToEachOtherKeysParameters(
+    width = validateIntegerWithMin(width, 0),
+    height = validateIntegerWithMin(height, 0),
+    posX = getValidInteger(posX),
+    posY = getValidInteger(posY),
+    {
+        wholeKeyFillStyle = tHex.getValidRgbHex(wholeKeyFillStyle),
+        halfKeyFillStyle = tHex.getValidRgbHex(halfKeyFillStyle)
+    },
+    startKeyIndexFromOctave = validateInteger(startKeyIndexFromOctave, 0, 11),
+    keysCount = validateIntegerWithMin(keysCount, 0)
+) {
     const wholeKeyIndexesInOctave = [0, 2, 4, 5, 7, 9, 11];
-    startKeyIndexFromOctave = validateInteger(startKeyIndexFromOctave, 0, 11);
     const isStartKeyWholeFromOctave = isObjectEqualsSomeElementOfArray(startKeyIndexFromOctave, wholeKeyIndexesInOctave);
-    keysCount = validateIntegerWithMin(keysCount, 0);
     const wholeKeyWidth = 15;
     const wholeKeyHeight = 104;
     const value = [];
     const keyTypesInOctave = getKeyTypesInOctave();
     const firstKeyType = keyTypesInOctave[startKeyIndexFromOctave];
-    const lastKeyIndexFromOctaves = new KeyIndexFromOctaveOfPianoFromIndex(startKeyIndexFromOctave + keysCount - 1);
+    const lastKeyIndexFromOctaves = getValidKeyIndexInOctaveFromIndex(startKeyIndexFromOctave + keysCount - 1);
     const lastKeyFirstType = getKeyOctaveFirstType(lastKeyIndexFromOctaves);
     const lastKeyType = keyTypesInOctave[lastKeyIndexFromOctaves];
     const isLastKeyHalf = lastKeyFirstType === "half";
@@ -1626,12 +1656,12 @@ function getPianoNextToEachOtherKeysParameters(width, height, posX, posY, {
         } else {
             normalStartKeyIndexFromOctave = 0;
         }
-        connectedNormalKeysCount = isLastKeyHalf ? remainedKeysCount : remainedKeysCount - 1;
-    } else {
-        connectedNormalKeysCount = isLastKeyHalf ? keysCount : keysCount - 1;
     }
-    const connectedNormalKeysTypesArray = createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength(keyTypesInOctave, normalStartKeyIndexFromOctave, connectedNormalKeysCount);
-    const keysPosXsArray = getDefaultNextToEachOtherKeysPosXsInOctaves(keyPosX - firstOctaveStartToFirstKeyIndexPosX, defaultNormalStartKeyIndexFromOctave, keysCount - i);
+    connectedNormalKeysCount = isStartKeyWholeFromOctave ? isLastKeyHalf ? remainedKeysCount : remainedKeysCount - 1 : isLastKeyHalf ? keysCount : keysCount - 1;
+    const connectedNormalKeysTypesArray = createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength(
+        keyTypesInOctave, normalStartKeyIndexFromOctave, connectedNormalKeysCount);
+    const keysPosXsArray = getDefaultNextToEachOtherKeysPosXsInOctaves(
+        keyPosX - firstOctaveStartToFirstKeyIndexPosX, defaultNormalStartKeyIndexFromOctave, keysCount - i);
     const lastNormalKeyTh = isLastKeyHalf ? keysCount : keysCount - 1;
     while (i < lastNormalKeyTh) {
         const outOfKeyIndex = isStartKeyWholeFromOctave ? 1 : 0;
@@ -1711,10 +1741,10 @@ function getKeysParametersOfPianoWithPianoType(pianoType, {
 }
 
 function getKeysParametersOfPianoWithPianoTypeAndKeysIndexesArray(pianoType, {
-    wholeKeyFillStyle,
-    halfKeyFillStyle
-}, keysIndexesArray) {
-    keysIndexesArray = getValidOnceOccurringIntegersArray(keysIndexesArray);
+                                                                      wholeKeyFillStyle,
+                                                                      halfKeyFillStyle
+                                                                  }, keysIndexesArray = getValidOnceOccurringIntegersArray(keysIndexesArray)
+) {
     const keysParameters = getKeysParametersOfPianoWithPianoType(pianoType, {
         wholeKeyFillStyle,
         halfKeyFillStyle
@@ -1793,9 +1823,9 @@ function getClickingWholeKeyParametersOfPiano(keyType, width, height, partOfWidt
     const upperPartDownPosY = topOfKeys + halfKeyHeight;
     return {
         keyWidth,
-        leftTypePosX: leftTypePosX,
-        rightTypePosX: rightTypePosX,
-        upperPartDownPosY: upperPartDownPosY,
+        leftTypePosX,
+        rightTypePosX,
+        upperPartDownPosY,
         lowerPartDownPosY: topOfKeys + getPartOfHeightWithResizedCanvas(width, height, keyHeight)
     }
 }
@@ -1839,29 +1869,42 @@ function getColorWithNotSaveChangedColorsOnCanvasOfPiano(fieldNameWithWordsSepar
 function drawClassicPianoClickingKeysAndCreateKeysSounds() {
     const width = 833;
     const height = 912;
+    const overThePiano = height - 115;
     const topOfKeys = height - 105;
     const defaultOctaveWidth = 112;
     const halfKeyWidth = 7;
     const halfKeyHeight = 68;
     const wholeKeyHeight = 104;
-    const modifiedColors = subArray(getCanvasColorValues(backgroundColorInput.value), 11, 12);
+    const modifiedColors = subArray(getCanvasColorValues(backgroundColorInput.value), 11, 14);
     const namedColorsWithNotSaveChangedColorsOnCanvas = {
-        pianoActivePartClickingWholeKeyColor: getColorWithNotSaveChangedColorsOnCanvasOfPiano("canvas-piano-active-part-clicking-whole-key-color", modifiedColors[0]),
-        pianoActivePartClickingHalfKeyColor: getColorWithNotSaveChangedColorsOnCanvasOfPiano("canvas-piano-active-part-clicking-half-key-color", modifiedColors[1]),
+        pianoActivePartClickingWholeKeyColor: getColorWithNotSaveChangedColorsOnCanvasOfPiano(canvasColorsIds[11], modifiedColors[0]),
+        pianoActivePartClickingHalfKeyColor: getColorWithNotSaveChangedColorsOnCanvasOfPiano(canvasColorsIds[12], modifiedColors[1]),
+        pianoActivePartMovingBarBelongingWholeKeyColor: getColorWithNotSaveChangedColorsOnCanvasOfPiano(canvasColorsIds[13], modifiedColors[3]),
+        pianoActivePartMovingBarBelongingHalfKeyColor: getColorWithNotSaveChangedColorsOnCanvasOfPiano(canvasColorsIds[14], modifiedColors[4]),
     };
     const colorsWithNotSaveChangedColorsOnCanvas = [
         namedColorsWithNotSaveChangedColorsOnCanvas.pianoActivePartClickingWholeKeyColor,
-        namedColorsWithNotSaveChangedColorsOnCanvas.pianoActivePartClickingHalfKeyColor
+        namedColorsWithNotSaveChangedColorsOnCanvas.pianoActivePartClickingHalfKeyColor,
+        namedColorsWithNotSaveChangedColorsOnCanvas.pianoActivePartMovingBarBelongingWholeKeyColor,
+        namedColorsWithNotSaveChangedColorsOnCanvas.pianoActivePartMovingBarBelongingHalfKeyColor
     ];
     const pianoActivePartClickingWholeKeyColor = colorsWithNotSaveChangedColorsOnCanvas[0];
     const pianoActivePartClickingHalfKeyColor = colorsWithNotSaveChangedColorsOnCanvas[1];
+    const pianoActivePartMovingBarBelongingWholeKeyColor = colorsWithNotSaveChangedColorsOnCanvas[2];
+    const pianoActivePartMovingBarBelongingHalfKeyColor = colorsWithNotSaveChangedColorsOnCanvas[3];
 
     function partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(partOfHeightOfCanvas) {
         return getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, partOfHeightOfCanvas);
     }
 
     function drawKey(type, keyType, fillStyle, partOfWidthPosX) {
-        keyType.type = type;
+        try {
+            keyType.type = type;
+        } catch (e) {
+            keyType = {
+                type
+            };
+        }
         const key = new KeyOfPiano(keyType, fillStyle, width, height, partOfWidthPosX, topOfKeys);
         key.draw(type);
     }
@@ -1897,17 +1940,30 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
                     isClickedKey = true;
                     isValidKeyClickingPosition = true;
                     setKeySound(keyCounter);
+                    fillColoredRectOfPiano(pianoActivePartMovingBarBelongingHalfKeyColor, width, height, posX, overThePiano, 7, 1);
                 }
             }
 
-            function loadingWholeKeyOfClickingPosition(keyType, fillStyle, posX) {
+            function loadingWholeKeyOfClickingPosition(keyType, fillStyle, posX, partWidth) {
                 const isValidPos = isValidWholeKeyClickingMousePosition(keyType, width, height, posX);
+                const parts = {
+                    left: typeof keyType.left === "undefined" ? 0 : getWholeKeyShapeX(keyType.left),
+                    right: typeof keyType.right === "undefined" ? 0 : getWholeKeyShapeX(keyType.right)
+                };
+                const partPosXAndWidth = {
+                    posX: posX + parts.left,
+                    width: 15 - parts.left - parts.right
+                };
+                const partPosX = partPosXAndWidth.posX;
+                partWidth = typeof partWidth === "undefined" ? partPosXAndWidth.width : validateIntegerWithMin(partWidth, 0);
+                partWidth = partWidth === partPosXAndWidth.width ? partPosXAndWidth.width : partWidth;
                 keyCounter++;
                 if (isValidPos && !isClickedKey) {
                     drawWholeKey(keyType, fillStyle, posX);
                     isClickedKey = true;
                     isValidKeyClickingPosition = true;
                     setKeySound(keyCounter);
+                    fillColoredRectOfPiano(pianoActivePartMovingBarBelongingWholeKeyColor, width, height, partPosX, overThePiano, partWidth, 1);
                 }
             }
 
@@ -1945,6 +2001,11 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
             if (isValidKeyClickingPosition) {
                 isStopCanvasReloading = false;
                 canvasReloadingCounter++;
+            } else {
+                if (!isNotOscillator) {
+                    stopSound();
+                }
+                canvasReloadingCounter = 0;
             }
         } else {
             if (!isNotOscillator) {
@@ -2168,6 +2229,10 @@ function createSoundWithExponentialRampToValueAtTime(volume, frequency, rampValu
     o.start(0);
 }
 
+function createKeysSoundSimultaneouslyOneAfterTheOther(volumes, frequencies, rampValues, times) {
+
+}
+
 function createKeySound(volume, frequency, time) {
     createSoundWithExponentialRampToValueAtTime(volume, frequency, 0.00001, time);
 }
@@ -2304,6 +2369,10 @@ function getOctaveKeysFillStyles(wholeKeyFillStyle, halfKeyFillStyle) {
     return value;
 }
 
+function addKeyToCanvas({type, canvasWidth, canvasHeight, posX, posY, fillStyle, keyWidth, keyHeight, }) {
+
+}
+
 function drawClassicPianoAndSongEditorStripes() {
     isCanvasListener = true;
     loadCanvasSize();
@@ -2390,10 +2459,24 @@ function drawClassicPianoAndSongEditorStripes() {
 
     function drawClassicPiano() {
         function fillColoredRectWithPartOfHeight(style, posY, rectHeight) {
-            fillColoredRect(style, partOfWidth(1), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - (114 - posY)), partOfWidth(width - 2), partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(rectHeight));
+            fillColoredRect(
+                style,
+                partOfWidth(1),
+                partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(
+                    height - (114 - posY)
+                ),
+                partOfWidth(width - 2),
+                partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(rectHeight)
+            );
         }
 
-        fillColoredRect(pianoBackgroundColor, 0, partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 114), canvas.width, partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(114));
+        fillColoredRect(
+            pianoBackgroundColor,
+            0,
+            partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 114),
+            canvas.width,
+            partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(114)
+        );
         fillColoredRectWithPartOfHeight(pianoTopMostUpperPartColor, 0, 1);
         fillColoredRectWithPartOfHeight(pianoTopUpperPartColor, 1, 3);
         fillColoredRectWithPartOfHeight(pianoTopUpperPartCenterColor, 2, 1);

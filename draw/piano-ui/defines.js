@@ -1,6 +1,6 @@
 import {
     getValidString,
-    isEmptyString,
+    isEmptyString, isEqualsElementsToObject, isObjectEqualsSomeElementOfObjects,
     placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ
 } from "../../art-script/script.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
@@ -103,7 +103,7 @@ export function getCanvasColorInputClickedNameFromType(type) {
     return getCanvasColorInputClickedNameFromId(elementId);
 }
 
-function getValidType(type) {
+export function getValidType(type) {
     const isTypeString = typeof type === "string";
     const isInvalid = !isTypeString || isEmptyString(type);
     return isInvalid ? "" : getValidString(type);
@@ -165,10 +165,30 @@ class CanvasColorInputElement extends HTMLElement {
         const text = this.textContent;
         const thisId = typeof this.name === "undefined" ? this.validId(validType, text) : this.name;
         const color = this.getAttribute("color");
-        const thisResetColorName = this.getAttribute("reset-color-name") === null ? thisId + "-reset-color" : this.getAttribute("reset-color-name");
-        const thisResetColorPartId = this.getAttribute("reset-color-part-name") === null ? thisResetColorName + "-part" : this.getAttribute("reset-color-part-name");
-        const thisResetColorButtonName = this.getAttribute("reset-color-button-name") === null ? thisResetColorName + "-button" : this.getAttribute("reset-color-button-name");
-        const thisResetColorButtonText = this.getAttribute("reset-color-button-text") === null ? "reset-color" : this.getAttribute("reset-color-button-text");
+        const thisResetColor = this.getAttribute("reset-color");
+        let thisResetColorItems;
+        try {
+            const text = "{" + thisResetColor + "}";
+            const validText = text.replaceAll("'", "\"");
+            thisResetColorItems = JSON.parse(validText);
+        } catch (e) {
+            thisResetColorItems = {};
+        }
+        let thisResetColorName = thisResetColorItems.name;
+        let thisResetColorPartName = thisResetColorItems.partName;
+        let thisResetColorButtonName = thisResetColorItems.buttonName;
+        let thisResetColorButtonText = thisResetColorItems.buttonText;
+        if (thisResetColor === null) {
+            thisResetColorName = null;
+            thisResetColorPartName = null;
+            thisResetColorButtonName = null;
+            thisResetColorButtonText = null;
+        }
+        const isUOrNull = (obj) => isObjectEqualsSomeElementOfObjects(obj, undefined, null);
+        const resetColorName = isUOrNull(thisResetColorName) ? thisId + "-reset-color" : thisResetColorName;
+        const resetColorPartId = isUOrNull(thisResetColorPartName) ? resetColorName + "-part" : thisResetColorPartName;
+        const resetColorButtonName = isUOrNull(thisResetColorButtonName) ? resetColorName + "-button" : thisResetColorButtonName;
+        const resetColorButtonText = isUOrNull(thisResetColorButtonText) ? "reset-color" : thisResetColorButtonText;
         const firstParagraphItem = document.createElement('p');
         const firstTextItem = document.createElement('text-item');
         const firstLabelItem = document.createElement('label');
@@ -184,19 +204,18 @@ class CanvasColorInputElement extends HTMLElement {
         firstLabelItem.setAttribute("title", thisId);
         firstLabelItem.setAttribute("for", thisId);
         firstInputItem.id = thisId;
-        firstInputItem.name = thisId;
         firstInputItem.type = "color";
         firstInputItem.value = color;
-        firstSpanItem.id = thisResetColorPartId;
+        firstSpanItem.id = resetColorPartId;
         firstSpanItem.hidden = true;
         firstSpanItem.append(" ");
         firstSpanTextItem.textContent = "-";
         firstSpanItem.appendChild(firstSpanTextItem);
         firstSpanItem.append(" ");
         firstResetColorButtonItem.setAttribute("title", "reset-color");
-        firstResetColorButtonItem.id = thisResetColorButtonName;
-        firstResetColorButtonItem.name = thisResetColorButtonName;
-        firstResetColorButtonItem.textContent = thisResetColorButtonText;
+        firstResetColorButtonItem.id = resetColorButtonName;
+        firstResetColorButtonItem.name = resetColorButtonName;
+        firstResetColorButtonItem.textContent = resetColorButtonText;
         firstSpanItem.appendChild(firstResetColorButtonItem);
         firstParagraphItem.appendChild(firstTextItem);
         firstParagraphItem.append(" ");
@@ -258,11 +277,12 @@ class FileSelectorElement extends HTMLElement {
     constructor(type, hidden) {
         super();
 
-        const element = FileSelectorElement.getElement(type, hidden, true, )
+        const element = FileSelectorElement.getElement(type, hidden, true,)
         const shadow = this.attachShadow({mode: "closed"});
         shadow.appendChild()
     }
 }
+
 //
 // class FileSelectorWithButtonAndTextElement extends HTMLElement {
 //     constructor() {
