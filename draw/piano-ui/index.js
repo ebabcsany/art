@@ -18,6 +18,7 @@ import {
     getValidSearchTh,
     getValidString,
     isArrayElementsTrue,
+    isEmptyArray,
     isEmptyString,
     isIntegersArray,
     isObjectEqualsSomeElementOfArray,
@@ -230,7 +231,7 @@ let drawnKeysIndexes = [];
 let drawnKeys = [];
 let drawnHalfKeys = [];
 let drawnWholeKeys = [];
-let drawnBelongingParts = [];
+window.strips = [];
 let drawnKeysCount = 0;
 let drawnWholeKeysCount = 0;
 let drawnHalfKeysCount = 0;
@@ -777,6 +778,78 @@ function loadCanvasSize() {
     }
 }
 
+function addStrips(fillStyle, width, height, stripWidth, posX, posY) {
+    const strip = {
+        fillStyle,
+        width,
+        height,
+        posX,
+        posY,
+        stripWidth,
+        stripHeight: 1
+    };
+    if (arguments.length > 0) {
+        if (isEmptyArray(strips)) {
+            strips.push(strip);
+        } else {
+            const lastStrip = strips[strips.length - 1];
+            const stripParamsEqLast =
+                strip.fillStyle === lastStrip.fillStyle &&
+                strip.width === lastStrip.width &&
+                strip.height === lastStrip.height &&
+                strip.posX === lastStrip.posX &&
+                strip.posY === lastStrip.posY &&
+                strip.stripWidth === lastStrip.stripWidth &&
+                strip.stripHeight === lastStrip.stripHeight;
+            if (stripParamsEqLast) {
+                lastStrip.posY--;
+                lastStrip.stripHeight++;
+            } else {
+                strips.forEach(strip => {
+                    strip.posY--;
+                });
+                strips.push(strip);
+            }
+        }
+    } else {
+        strips.forEach(strip => {
+            strip.posY--;
+        });
+    }
+    if (!isEmptyArray(strips)) {
+        console.log(strips[0].posY);
+    }
+}
+
+function getStripsHeights() {
+    let value = 0;
+    strips.forEach(strip => {
+        value += strip.stripHeight;
+    });
+    return value;
+}
+
+function drawStrips() {
+    if (!isEmptyArray(strips)) {
+        strips.forEach(element => {
+            const fillStyle = element.fillStyle;
+            const width = element.width;
+            const height = element.height;
+            const posX = element.posX;
+            const posY = element.posY;
+            const stripWidth = element.stripWidth;
+            const stripHeight = element.stripHeight;
+            fillColoredRect(
+                fillStyle,
+                getPartOfWidth(width, posX),
+                getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, posY),
+                getPartOfWidth(width, stripWidth),
+                getPartOfHeightWithResizedCanvas(width, height, stripHeight)
+            );
+        });
+    }
+}
+
 function addDrawnKeyIndex(index) {
     if (isValidInteger(index) && index > -1 && index < drawnKeysCount) {
         drawnKeysIndexes = placeIntegerToTheIncreasingIntegersArray(drawnKeysIndexes, index);
@@ -905,7 +978,7 @@ function getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeigh
 
 function fillColoredRectOfPiano(style, width, height, rectX, rectY, rectWidth, rectHeight) {
     const x = getPartOfWidth(width, rectX);
-    const y = getPartOfHeight(height, rectY);
+    const y = getPartOfHeightWithResizedCanvas(width, height, rectY);
     const partOfWidth = getPartOfWidth(width, rectWidth);
     const partOfHeight = getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, rectHeight);
     fillColoredRect(style, x, y, partOfWidth, partOfHeight);
@@ -1890,8 +1963,8 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
     ];
     const pianoActivePartClickingWholeKeyColor = colorsWithNotSaveChangedColorsOnCanvas[0];
     const pianoActivePartClickingHalfKeyColor = colorsWithNotSaveChangedColorsOnCanvas[1];
-    const pianoActivePartMovingBarBelongingWholeKeyColor = colorsWithNotSaveChangedColorsOnCanvas[2];
-    const pianoActivePartMovingBarBelongingHalfKeyColor = colorsWithNotSaveChangedColorsOnCanvas[3];
+    const pianoActivePartMovingStripForClickingWholeKeyColor = colorsWithNotSaveChangedColorsOnCanvas[2];
+    const pianoActivePartMovingStripClickingHalfKeyColor = colorsWithNotSaveChangedColorsOnCanvas[3];
 
     function partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(partOfHeightOfCanvas) {
         return getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, partOfHeightOfCanvas);
@@ -1918,6 +1991,12 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
     }
 
     const isNotOscillator = window.audioContextOscillator === undefined;
+    const stopActivePart = () => {
+        if (!isNotOscillator) {
+            stopSound();
+        }
+        canvasReloadingCounter = 0;
+    };
     if (isCanvasMouseDown) {
         const isValidPianoMousePosY = savedCanvasMouseValidPos.y >= partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(topOfKeys) && savedCanvasMouseValidPos.y <= canvas.height;
         const isMousePosYLessThanOrEqualsWholeKeyDown = savedCanvasMouseValidPos.y <= partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(topOfKeys + wholeKeyHeight);
@@ -1940,7 +2019,8 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
                     isClickedKey = true;
                     isValidKeyClickingPosition = true;
                     setKeySound(keyCounter);
-                    fillColoredRectOfPiano(pianoActivePartMovingBarBelongingHalfKeyColor, width, height, posX, overThePiano, 7, 1);
+                    addStrips(pianoActivePartMovingStripClickingHalfKeyColor, width, height, 7, posX, overThePiano);
+                    drawStrips();
                 }
             }
 
@@ -1963,7 +2043,8 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
                     isClickedKey = true;
                     isValidKeyClickingPosition = true;
                     setKeySound(keyCounter);
-                    fillColoredRectOfPiano(pianoActivePartMovingBarBelongingWholeKeyColor, width, height, partPosX, overThePiano, partWidth, 1);
+                    addStrips(pianoActivePartMovingStripForClickingWholeKeyColor, width, height, partWidth, partPosX, overThePiano);
+                    drawStrips();
                 }
             }
 
@@ -2002,22 +2083,17 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
                 isStopCanvasReloading = false;
                 canvasReloadingCounter++;
             } else {
-                if (!isNotOscillator) {
-                    stopSound();
-                }
-                canvasReloadingCounter = 0;
+                stopActivePart();
             }
         } else {
-            if (!isNotOscillator) {
-                stopSound();
-            }
-            canvasReloadingCounter = 0;
+            stopActivePart();
         }
     } else {
-        if (!isNotOscillator) {
-            stopSound();
-        }
-        canvasReloadingCounter = 0;
+        stopActivePart();
+    }
+    if (isNotOscillator) {
+        addStrips();
+        drawStrips();
     }
 }
 
