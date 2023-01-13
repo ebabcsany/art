@@ -223,6 +223,7 @@ const defaultWholeKeyHeightOfPiano = 104;
 const defaultHalfKeyWidth = 7;
 const defaultHalfKeyHeight = 68;
 const defaultWholeOctaveWidth = 112;
+const defaultPianoHeight = 114;
 const defaultWholeOctavesCount = 7;
 const keySoundPitchesArray = [];
 const keyBetweenSoundsSpacesArray = [];
@@ -432,6 +433,7 @@ saveCanvasInputsColorsButton.onclick = function () {
     } else try {
         savedCanvasInputsColors = JSON.parse(settedFileContent);
     } catch (e) {
+        console.error(e);
         savedCanvasInputsColors = defaultCanvasColorValues;
     }
 };
@@ -543,13 +545,9 @@ setCanvasInputsColorsFromFile.onclick = function () {
                 console.error(error);
             }
         } catch (e) {
-            if (isContainsOpenOrClosingBracket) {
-                error = errorStrings[2];
-            } else {
-                error = errorStrings[3];
-            }
-            settedFileContent = [];
+            error = isContainsOpenOrClosingBracket ? errorStrings[2] : errorStrings[3];
             console.error(e + " (" + error + ")");
+            settedFileContent = [];
         }
     }
 
@@ -770,7 +768,6 @@ function loadCanvasSize() {
     const canvasHeight = canvasHeightInput.value;
     if (!isCanvasWidthInputFocus && !isCanvasHeightInputFocus) {
         setCanvasSize(Math.min(innerWidth, innerHeight) * threeQuarter);
-        //setCanvasWidth(300);
     } else {
         const newCanvasWidth = isCanvasWidthInputFocus ? canvasWidth : innerWidth * threeQuarter;
         const newCanvasHeight = isCanvasHeightInputFocus ? canvasHeight : innerHeight * threeQuarter;
@@ -803,6 +800,10 @@ class MovingStripsOfPianoKey {
 
     get value() {
         return this.#value;
+    }
+
+    set value(value) {
+        this.#value = value;
     }
 
     add(fillStyle) {
@@ -869,31 +870,24 @@ class MovingStripsOfPianoKey {
     }
 
     draw() {
-        if (!isEmptyArray(strips.value)) {
-            const width = strips.value[0].width;
-            const height = strips.value[0].height;
-            const pianoTop = getPartOfHeightWithResizedCanvas(width, height, height - 114);
-            strips.value.forEach(strip => {
+        const {length} = this.#value;
+        if (!isEmptyArray(this.#value)) {
+            const width = this.#value[length - 1].width;
+            const height = this.#value[length - 1].height;
+            const pianoHeight = getPartOfHeightWithResizedCanvas(width, height, defaultPianoHeight);
+            const pianoTop = canvas.height - pianoHeight;
+            this.#value.forEach(strip => {
                 const fillStyle = strip.fillStyle;
                 const width = strip.width;
                 const height = strip.height;
                 const posX = strip.posX;
-                const posY = pianoTop - strip.outOfPianoTop;
+                const posY = pianoTop - getPartOfHeightWithResizedCanvas(width, height, strip.outOfPianoTop);
                 const stripWidth = strip.stripWidth;
                 const stripHeight = strip.stripHeight;
-                /*fillColoredRectOfPiano(
-                    fillStyle,
-                    width,
-                    height,
-                    posX,
-                    posY,
-                    stripWidth,
-                    stripHeight
-                );*/
                 fillColoredRect(
                     fillStyle,
                     getPartOfWidth(width, posX),
-                    getPartOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height, posY),
+                    posY,
                     getPartOfWidth(width, stripWidth),
                     getPartOfHeightWithResizedCanvas(width, height, stripHeight)
                 );
@@ -972,6 +966,14 @@ function getPartOfWidth(width, partOfWidth) {
 
 function getPartOfHeight(height, partOfHeight) {
     return getPartOfNumber(canvas.height, height, partOfHeight);
+}
+
+function getWidthOfPart(width, partOfWidth) {
+    return getNumberOfPart(canvas.width, width, partOfWidth);
+}
+
+function getHeightOfPart(height, partOfHeight) {
+    return getNumberOfPart(canvas.height, height, partOfHeight);
 }
 
 function getWholeKeyWidth(width) {
@@ -1996,7 +1998,7 @@ function isStripsArray() {
     try {
         value = (Array.isArray(strips.value) && !isEmptyArray(strips.value)) || !Array.isArray(strips);
     } catch (e) {
-        console.log(e);
+        console.error(e);
     }
     return value;
 }
@@ -2015,10 +2017,28 @@ function addAndDrawOrResetStrips(fillStyle, width, height, stripWidth, posX) {
             if (strips.value.length > 0 && strips.value[strips.value.length - 1].posX !== posX) {
                 window.strips = [];
             } else {
+                // const lastStrip = strips.value[strips.value.length - 1];
+                // if (lastStrip.fillStyle !== fillStyle) {
+                //     const pianoHeight = getPartOfHeightWithResizedCanvas(width, height, defaultPianoHeight);
+                //     const pianoTop = canvas.height - pianoHeight;
+                //     const laterPianoTop = getHeightOfPart(canvas.height, pianoTop);
+                //     try {
+                //         if (strips.value[0].outOfPianoTop > laterPianoTop) {
+                //             if (strips.value[0].stripHeight > 1) {
+                //                 window.strips.value[0].stripHeight--;
+                //             } else {
+                //                 window.strips.value.shift();
+                //             }
+                //         }
+                //     } catch (e) {
+                //         console.error(e);
+                //     }
+                // }
                 window.strips.add(fillStyle);
                 window.strips.draw();
             }
         } catch (e) {
+            console.error(e);
             window.strips = new MovingStripsOfPianoKey(fillStyle, width, height, stripWidth, posX);
             window.strips.add(fillStyle);
             window.strips.draw();
@@ -2061,6 +2081,7 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         try {
             keyType.type = type;
         } catch (e) {
+            console.error(e);
             keyType = {
                 type
             };
@@ -2553,7 +2574,7 @@ function drawClassicPianoAndSongEditorStripes() {
     loadCanvasSize();
     const width = 833;
     const height = 912;
-    const pianoTop = height - 114;
+    const pianoTop = height - defaultPianoHeight;
     const defaultOctaveWidth = 112;
     const wholeOctavesCount = 7;
     const partOfWidth = value => getPartOfWidth(width, value);
@@ -2638,7 +2659,7 @@ function drawClassicPianoAndSongEditorStripes() {
                 style,
                 partOfWidth(1),
                 partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(
-                    height - (114 - posY)
+                    height - (defaultPianoHeight - posY)
                 ),
                 partOfWidth(width - 2),
                 partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(rectHeight)
@@ -2648,9 +2669,9 @@ function drawClassicPianoAndSongEditorStripes() {
         fillColoredRect(
             pianoBackgroundColor,
             0,
-            partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - 114),
+            partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(height - defaultPianoHeight),
             canvas.width,
-            partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(114)
+            partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(defaultPianoHeight)
         );
         fillColoredRectWithPartOfHeight(pianoTopMostUpperPartColor, 0, 1);
         fillColoredRectWithPartOfHeight(pianoTopUpperPartColor, 1, 3);
