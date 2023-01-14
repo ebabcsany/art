@@ -435,7 +435,7 @@ saveCanvasInputsColorsButton.onclick = function () {
     } else try {
         savedCanvasInputsColors = JSON.parse(settedFileContent);
     } catch (e) {
-        console.error(e);
+        console.info(e);
         savedCanvasInputsColors = defaultCanvasColorValues;
     }
 };
@@ -780,12 +780,16 @@ function loadCanvasSize() {
 
 function addStrips(fillStyle, width, height, stripWidth, posX) {
     fillStyle = tHex.getValidRgbHex(fillStyle);
-    const isFillStyle = fillStyle === strips.fillStyle;
-    if (!isFillStyle) {
-        window.strips.fillStyle = fillStyle;
-        window.strips.value.forEach(strip => {
-            strip.fillStyle = fillStyle;
-        });
+    try {
+        const isFillStyle = fillStyle === strips.fillStyle;
+        if (!isFillStyle) {
+            window.strips.fillStyle = fillStyle;
+            window.strips.value.forEach(strip => {
+                strip.fillStyle = fillStyle;
+            });
+        }
+    } catch (e) {
+        console.info(e);
     }
     fillStyle = tHex.getValidRgbHex(fillStyle);
     width = validateIntegerWithMin(width, 0);
@@ -1974,7 +1978,7 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         try {
             keyType.type = type;
         } catch (e) {
-            console.error(e);
+            console.info(e);
             keyType = {
                 type
             };
@@ -2091,6 +2095,16 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         }
     } else {
         stopActivePart();
+    }
+    const pianoHeight = getPartOfHeightWithResizedCanvas(width, height, defaultPianoHeight);
+    const pianoTop = canvas.height - pianoHeight;
+    try {
+        const posY = pianoTop - getPartOfHeightWithResizedCanvas(width, height, strips[0].outOfPianoTop);
+        if (!isEmptyArray(strips) && posY < 0) {
+            window.strips.shift();
+        }
+    } catch (e) {
+        console.info(e);
     }
     if (isNotOscillator) {
         addStrips();
