@@ -227,12 +227,14 @@ const defaultPianoHeight = 114;
 const defaultWholeOctavesCount = 7;
 const keySoundPitchesArray = [];
 const keyBetweenSoundsSpacesArray = [];
+const pianoKeyOctaveFirstTypes = replaceElementInArray(createArrayFromOneElement("whole", 12), "half", 1, 3, 6, 8, 10);
+const pianoKeysFirstTypes = createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength(pianoKeyOctaveFirstTypes, 9, 88);
 let drawnKeyIndex = -1;
 let drawnKeysIndexes = [];
 let drawnKeys = [];
 let drawnHalfKeys = [];
 let drawnWholeKeys = [];
-window.strips = [];
+window.strips = createArrayFromOneElement([], 88);
 let drawnKeysCount = 0;
 let drawnWholeKeysCount = 0;
 let drawnHalfKeysCount = 0;
@@ -1443,15 +1445,9 @@ function drawHalfKeyOctaveOfPiano(fillStyle, width, height, partOfWidthAndStart)
     }
 }
 
-function getKeyOctaveFirstTypes() {
-    const array = createArrayFromOneElement("whole", 12);
-    return replaceElementInArray(array, "half", 1, 3, 6, 8, 10);
-}
-
 function getKeyOctaveFirstType(index) {
     index = getValidSearchTh(index);
-    const keyFirstTypes = getKeyOctaveFirstTypes();
-    return keyFirstTypes[index];
+    return pianoKeyOctaveFirstTypes[index];
 }
 
 function isKeyOctaveFirstType(index, firstType) {
@@ -1470,6 +1466,10 @@ function getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index) {
         startKeyIndex: i,
         repairsCount: repairsCount
     };
+}
+
+function getStartKeyIndex(index) {
+    return getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index).startKeyIndex;
 }
 
 function getDefaultOctaveKeyPosXOfPiano(octaveStartPosX, keyTh) {
@@ -1993,29 +1993,32 @@ function getColorWithNotSaveChangedColorsOnCanvasOfPiano(fieldNameWithWordsSepar
     return colorValue;
 }
 
-function isStripsArray() {
+function isStripsArray(index) {
+    index = getValidInteger(index);
     let value = false;
     try {
-        value = (Array.isArray(strips.value) && !isEmptyArray(strips.value)) || !Array.isArray(strips);
+        value = (Array.isArray(strips[index].value) && !isEmptyArray(strips[index].value)) || !Array.isArray(strips[index]);
     } catch (e) {
         console.error(e);
     }
     return value;
 }
 
-function isEmptyStripsArray() {
-    return !isStripsArray() && Array.isArray(strips) && isEmptyArray(strips);
+function isEmptyStripsArray(index) {
+    index = getValidInteger(index);
+    return !isStripsArray(index) && Array.isArray(strips[index]) && isEmptyArray(strips[index]);
 }
 
-function addAndDrawOrResetStrips(fillStyle, width, height, stripWidth, posX) {
-    if (isEmptyStripsArray()) {
-        window.strips = new MovingStripsOfPianoKey(fillStyle, width, height, stripWidth, posX);
-        window.strips.add(fillStyle);
-        window.strips.draw();
+function addAndDrawOrResetStrips(fillStyle, width, height, stripWidth, posX, index) {
+    index = validateInteger(index, 0, 87);
+    if (isEmptyStripsArray(index)) {
+        window.strips[index] = new MovingStripsOfPianoKey(fillStyle, width, height, stripWidth, posX);
+        window.strips[index].add(fillStyle);
+        window.strips[index].draw();
     } else {
         try {
-            if (strips.value.length > 0 && strips.value[strips.value.length - 1].posX !== posX) {
-                window.strips = [];
+            if (strips[index].value.length > 0 && strips[index].value[strips[index].value.length - 1].posX !== posX) {
+                window.strips[index] = [];
             } else {
                 // const lastStrip = strips.value[strips.value.length - 1];
                 // if (lastStrip.fillStyle !== fillStyle) {
@@ -2034,14 +2037,14 @@ function addAndDrawOrResetStrips(fillStyle, width, height, stripWidth, posX) {
                 //         console.error(e);
                 //     }
                 // }
-                window.strips.add(fillStyle);
-                window.strips.draw();
+                window.strips[index].add(fillStyle);
+                window.strips[index].draw();
             }
         } catch (e) {
             console.error(e);
-            window.strips = new MovingStripsOfPianoKey(fillStyle, width, height, stripWidth, posX);
-            window.strips.add(fillStyle);
-            window.strips.draw();
+            window.strips[index] = new MovingStripsOfPianoKey(fillStyle, width, height, stripWidth, posX);
+            window.strips[index].add(fillStyle);
+            window.strips[index].draw();
         }
     }
 }
@@ -2105,6 +2108,7 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         }
         canvasReloadingCounter = 0;
     };
+    let keyIndex = 0;
     if (isCanvasMouseDown) {
         const isValidPianoMousePosY = savedCanvasMouseValidPos.y >= partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(topOfKeys) && savedCanvasMouseValidPos.y <= canvas.height;
         const isMousePosYLessThanOrEqualsWholeKeyDown = savedCanvasMouseValidPos.y <= partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(topOfKeys + wholeKeyHeight);
@@ -2115,7 +2119,7 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
             let isValidKeyClickingPosition = false;
             let keyCounter = 0;
 
-            function loadingHalfKeyOfClickingPosition(fillStyle, posX) {
+            function loadingHalfKeyOfClickingPosition(fillStyle, posX, index) {
                 const isValidPos = isValidHalfKeyClickingMousePosition(width, height, posX);
                 keyCounter++;
                 if (isValidPos && !isClickedKey) {
@@ -2132,24 +2136,32 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
                         width,
                         height,
                         7,
-                        posX
+                        posX,
+                        index
                     );
+                    keyIndex = validateInteger(index, 0, 87);
                 }
             }
 
-            function loadingWholeKeyOfClickingPosition(keyType, fillStyle, posX, partWidth) {
+            function loadingWholeKeyOfClickingPosition(keyType, fillStyle, posX, index) {
+                let partWidth = 15;
+                let leftPart = typeof keyType.left === "undefined" ? 0 : getWholeKeyShapeX(keyType.left);
+                let rightPart = typeof keyType.right === "undefined" ? 0 : getWholeKeyShapeX(keyType.right);
+                    try {
+                        index = pianoKeysFirstTypes[index] === "whole" ? index : 0;
+                        const indexFromOctave = getStartKeyIndex(index - 3);
+                        if (index !== 0 && index !== 87) {
+                            const keyTypeInOctave = getKeyTypeInOctave(indexFromOctave);
+                            leftPart = getWholeKeyShapeX(keyTypeInOctave.left);
+                            rightPart = getWholeKeyShapeX(keyTypeInOctave.right);
+                        }
+                        partWidth = partWidth - leftPart - rightPart;
+                    } catch (e) {
+                        console.error(e);
+                        index = 0;
+                    }
                 const isValidPos = isValidWholeKeyClickingMousePosition(keyType, width, height, posX);
-                const parts = {
-                    left: typeof keyType.left === "undefined" ? 0 : getWholeKeyShapeX(keyType.left),
-                    right: typeof keyType.right === "undefined" ? 0 : getWholeKeyShapeX(keyType.right)
-                };
-                const partPosXAndWidth = {
-                    posX: posX + parts.left,
-                    width: 15 - parts.left - parts.right
-                };
-                const partPosX = partPosXAndWidth.posX;
-                partWidth = typeof partWidth === "undefined" ? partPosXAndWidth.width : validateIntegerWithMin(partWidth, 0);
-                partWidth = partWidth === partPosXAndWidth.width ? partPosXAndWidth.width : partWidth;
+                const partPosX = posX + leftPart;
                 keyCounter++;
                 if (isValidPos && !isClickedKey) {
                     drawWholeKey(keyType, fillStyle, posX);
@@ -2161,42 +2173,47 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
                         width,
                         height,
                         partWidth,
-                        partPosX
+                        partPosX,
+                        index
                     );
+                    keyIndex = validateInteger(index, 0, 87);
                 }
             }
 
-            function loadingKeyOctaveOfClickingPosition(wholeKeyFillStyle, halfKeyFillStyle, partOfWidthAndStart) {
+            function loadingKeyOctaveOfClickingPosition(wholeKeyFillStyle, halfKeyFillStyle, partOfWidthAndStart, fromIndex) {
                 wholeKeyFillStyle = tHex.getValidRgbHex(wholeKeyFillStyle);
                 halfKeyFillStyle = tHex.getValidRgbHex(halfKeyFillStyle);
                 partOfWidthAndStart = getValidInteger(partOfWidthAndStart);
+                fromIndex = getValidSearchTh(fromIndex);
                 const startsOfKeys = getKeyOctavePosXsOfPiano(partOfWidthAndStart);
                 let wholeKeyCounter = 0;
                 for (let i = 0; i < 12; i++) {
                     const keyPosX = startsOfKeys[i];
                     const isWholeFirstType = isKeyOctaveFirstType(i, "whole");
+                    const index = fromIndex + i;
                     if (isWholeFirstType) {
                         const wholeKeyType = getWholeKeyTypeInOctave(wholeKeyCounter);
-                        loadingWholeKeyOfClickingPosition(wholeKeyType, wholeKeyFillStyle, keyPosX);
+                        loadingWholeKeyOfClickingPosition(wholeKeyType, wholeKeyFillStyle, keyPosX, index);
                         wholeKeyCounter++;
                     } else {
-                        loadingHalfKeyOfClickingPosition(halfKeyFillStyle, keyPosX);
+                        loadingHalfKeyOfClickingPosition(halfKeyFillStyle, keyPosX, index);
                     }
                 }
             }
 
             loadingWholeKeyOfClickingPosition({
                 right: "1",
-            }, pianoActivePartClickingWholeKeyColor, 1);
-            loadingHalfKeyOfClickingPosition(pianoActivePartClickingHalfKeyColor, 14);
+            }, pianoActivePartClickingWholeKeyColor, 1, 0);
+            loadingHalfKeyOfClickingPosition(pianoActivePartClickingHalfKeyColor, 14, 1);
             loadingWholeKeyOfClickingPosition({
                 left: "3",
-            }, pianoActivePartClickingWholeKeyColor, 17);
+            }, pianoActivePartClickingWholeKeyColor, 17, 2);
+            let i = 3;
             let j = 33;
-            for (let counter = 0; counter < 7; j += defaultOctaveWidth, counter++) {
-                loadingKeyOctaveOfClickingPosition(pianoActivePartClickingWholeKeyColor, pianoActivePartClickingHalfKeyColor, j);
+            for (let counter = 0; counter < 7; j += defaultOctaveWidth, counter++, i += 12) {
+                loadingKeyOctaveOfClickingPosition(pianoActivePartClickingWholeKeyColor, pianoActivePartClickingHalfKeyColor, j, i);
             }
-            loadingWholeKeyOfClickingPosition({}, pianoActivePartClickingWholeKeyColor, j);
+            loadingWholeKeyOfClickingPosition({}, pianoActivePartClickingWholeKeyColor, j, i);
             if (isValidKeyClickingPosition) {
                 isStopCanvasReloading = false;
                 canvasReloadingCounter++;
@@ -2210,9 +2227,9 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         stopActivePart();
     }
     if (isNotOscillator) {
-        if (isStripsArray()) {
-            strips.add();
-            strips.draw();
+        if (isStripsArray(keyIndex)) {
+            strips[keyIndex].add();
+            strips[keyIndex].draw();
         }
     }
 }
