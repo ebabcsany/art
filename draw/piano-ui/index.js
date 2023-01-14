@@ -194,14 +194,15 @@ const canvasPianoActivePartInputs = document.getElementById("canvas-piano-active
 const backgroundColorInput = document.getElementById("background-color");
 const backgroundColorInputResetColorsPart = document.getElementById("background-color-reset-color-part");
 const textItemsColorInputResetColorsPart = document.getElementById("text-items-color-reset-color-part");
+const isSaveTheParametersOfTheStripsToAFile = document.getElementById("is-save-the-parameters-of-the-strips-to-a-file");
 const isCanvasBackgroundColorTransparentInput = document.getElementById("is-canvas-background-color-transparent");
 const saveChangedColorsOnCanvasInput = document.getElementById("save-changed-colors-on-canvas-by-modified-background-color-input-value");
 const saveAndSetCanvasColorsInputs = document.getElementById("save-and-set-colors-inputs");
 const saveCanvasInputsColors = document.getElementById("save-canvas-inputs-colors");
-const arrowOfSaveCanvasInputsColors = ((document.body.children)[8].children)[3];
-const firstOpeningBracketOfSaveCanvasInputsColors = ((document.body.children)[8].children)[4];
-const firstClosingBracketOfSaveCanvasInputsColors = ((document.body.children)[8].children)[5];
-const closingBracketOfSaveCanvasInputsColors = ((document.body.children)[10].children)[0];
+const arrowOfSaveCanvasInputsColors = ((document.body.children)[9].children)[3];
+const firstOpeningBracketOfSaveCanvasInputsColors = ((document.body.children)[9].children)[4];
+const firstClosingBracketOfSaveCanvasInputsColors = ((document.body.children)[9].children)[5];
+const closingBracketOfSaveCanvasInputsColors = ((document.body.children)[11].children)[0];
 const saveCanvasInputsColorsButton = document.getElementById("save-canvas-inputs-colors-button");
 const setCanvasInputsColorsButton = document.getElementById("set-canvas-inputs-colors-button");
 const setCanvasInputsColorsFromFile = document.getElementById("set-colors-from-file");
@@ -443,10 +444,9 @@ saveColorsToFile.onclick = function () {
     isWindowClicked = false;
     const fileName = saveEnterTheFileSelectorId.value;
     const canvasColorValues = createStringArrayFromObjectsArray(getCanvasColorValues());
-    const blob = new Blob([canvasColorValues], {
+    saveFile("" + fileName + ".txt", canvasColorValues, {
         type: "text/plain;charset=utf-8",
     });
-    saveAs(blob, "" + fileName + ".txt");
     savedFileContent = canvasColorValues;
 }
 setCanvasInputsColorsButton.onclick = function () {
@@ -782,15 +782,13 @@ function addStrips(fillStyle, width, height, stripWidth, posX) {
     fillStyle = tHex.getValidRgbHex(fillStyle);
     try {
         const isFillStyle = fillStyle === strips.fillStyle;
-        if (!isFillStyle) {
+        if (!isEmptyArray(strips) && !isFillStyle) {
             window.strips.fillStyle = fillStyle;
             window.strips.value.forEach(strip => {
                 strip.fillStyle = fillStyle;
             });
         }
-    } catch (e) {
-        console.info(e);
-    }
+    } catch (e) {}
     fillStyle = tHex.getValidRgbHex(fillStyle);
     width = validateIntegerWithMin(width, 0);
     height = validateIntegerWithMin(height, 0);
@@ -2103,9 +2101,7 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         if (!isEmptyArray(strips) && posY < 0) {
             window.strips.shift();
         }
-    } catch (e) {
-        console.info(e);
-    }
+    } catch (e) {}
     if (isNotOscillator) {
         addStrips();
         drawStrips();
@@ -2592,6 +2588,9 @@ function drawClassicPianoAndSongEditorStripes() {
     document.getElementById("canvas-height").style.backgroundColor = canvasHeightInputBackgroundColorInput.value;
     document.getElementById("canvas-width").style.color = canvasWidthInputColorInput.value;
     document.getElementById("canvas-height").style.color = canvasHeightInputColorInput.value;
+    if (isSaveTheParametersOfTheStripsToAFile.checked) {
+        saveAs("" + strips, )
+    }
     if (!isCanvasBackgroundColorTransparentInput.checked) {
         fillColoredRect(backgroundColor, 0, 0, canvas.width, canvas.height);
     }

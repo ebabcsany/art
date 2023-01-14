@@ -1,5 +1,6 @@
 import {StringManipulation} from "./stringManipulation.js";
 import {StringPart} from "./stringPart.js";
+import {saveAs} from "../draw/piano-ui/js/FileSaver.js";
 // noinspection JSDeprecatedSymbols
 window.getMousePos = (element) => ({
     x: event.clientX - element.getBoundingClientRect().left,
@@ -2475,4 +2476,11 @@ export function isTypes(objectsArray, typesArray) {
         }
     }
     return value;
+}
+
+window.saveFile = function (name, content, opts) {
+    const blobContent = new Blob([content], {
+        type: "text/plain;charset=utf-8",
+    });
+    saveAs(blobContent, name, opts);
 }
