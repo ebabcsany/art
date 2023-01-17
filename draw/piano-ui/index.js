@@ -51,7 +51,6 @@ import {
     setDefaultCanvasColorInputValueFromType
 } from "./defines.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
-import {saveAs} from "./js/FileSaver.js";
 
 window.canvas = document.getElementById("piano-song-editor");
 window.canvasContext = canvas.getContext("2d");
@@ -195,6 +194,7 @@ const backgroundColorInput = document.getElementById("background-color");
 const backgroundColorInputResetColorsPart = document.getElementById("background-color-reset-color-part");
 const textItemsColorInputResetColorsPart = document.getElementById("text-items-color-reset-color-part");
 const isSaveTheParametersOfTheStripsToAFile = document.getElementById("is-save-the-parameters-of-the-strips-to-a-file");
+const saveTheParametersOfTheStripsToAFileEnterTheFileName = document.getElementById("save-the-parameters-of-the-strips-to-a-file-enter-the-name");
 const isCanvasBackgroundColorTransparentInput = document.getElementById("is-canvas-background-color-transparent");
 const saveChangedColorsOnCanvasInput = document.getElementById("save-changed-colors-on-canvas-by-modified-background-color-input-value");
 const saveAndSetCanvasColorsInputs = document.getElementById("save-and-set-colors-inputs");
@@ -235,6 +235,7 @@ let drawnKeysIndexes = [];
 let drawnKeys = [];
 let drawnHalfKeys = [];
 let drawnWholeKeys = [];
+let actualStrip = [];
 window.strips = [];
 let drawnKeysCount = 0;
 let drawnWholeKeysCount = 0;
@@ -553,7 +554,11 @@ setCanvasInputsColorsFromFile.onclick = function () {
         }
     }
 
-    setFileSelector.click();
+    if (setFileSelector.files.length > 0) {
+
+    } else {
+        setFileSelector.click();
+    }
 };
 backgroundColorInput.onclick = function () {
     isWindowClicked = false;
@@ -783,7 +788,6 @@ function addStrips(fillStyle, width, height, stripWidth, posX) {
     try {
         const isFillStyle = fillStyle === strips.fillStyle;
         if (!isEmptyArray(strips) && !isFillStyle) {
-            window.strips.fillStyle = fillStyle;
             window.strips.value.forEach(strip => {
                 strip.fillStyle = fillStyle;
             });
@@ -2588,9 +2592,9 @@ function drawClassicPianoAndSongEditorStripes() {
     document.getElementById("canvas-height").style.backgroundColor = canvasHeightInputBackgroundColorInput.value;
     document.getElementById("canvas-width").style.color = canvasWidthInputColorInput.value;
     document.getElementById("canvas-height").style.color = canvasHeightInputColorInput.value;
-    if (isSaveTheParametersOfTheStripsToAFile.checked) {
-        saveAs("" + strips, )
-    }
+    // if (isSaveTheParametersOfTheStripsToAFile.checked && false) {
+    //     //saveFile("" + saveTheParametersOfTheStripsToAFileEnterTheFileName.value, "" + strips);
+    // }
     if (!isCanvasBackgroundColorTransparentInput.checked) {
         fillColoredRect(backgroundColor, 0, 0, canvas.width, canvas.height);
     }

@@ -188,7 +188,7 @@ class CanvasColorInputElement extends HTMLElement {
         const resetColorName = isUOrNull(thisResetColorName) ? thisId + "-reset-color" : thisResetColorName;
         const resetColorPartId = isUOrNull(thisResetColorPartName) ? resetColorName + "-part" : thisResetColorPartName;
         const resetColorButtonName = isUOrNull(thisResetColorButtonName) ? resetColorName + "-button" : thisResetColorButtonName;
-        const resetColorButtonText = isUOrNull(thisResetColorButtonText) ? "reset-color" : thisResetColorButtonText;
+        const resetColorButtonText = isUOrNull(thisResetColorButtonText) ? "Reset color" : thisResetColorButtonText;
         const firstParagraphItem = document.createElement('p');
         const firstTextItem = document.createElement('text-item');
         const firstLabelItem = document.createElement('label');
@@ -197,12 +197,15 @@ class CanvasColorInputElement extends HTMLElement {
         const firstSpanTextItem = document.createElement('text-item');
         const firstResetColorButtonItem = document.createElement('button');
         const ifFirstTextItemType = getValidTypeOfElementValue(text, "after");
+        const firstTextWithHyphens = ifFirstTextItemType + "color";
+        const firstTextWithSpaces = firstTextWithHyphens.replaceAll("-", " ");
+        const firstText = StringManipulation.change.letter.lowercase.firstToUppercaseWithAToZ(firstTextWithSpaces);
         window.canvasColorsIds.push(thisId);
         window.canvasColorsNames.push(getCanvasColorInputNameFromId(thisId));
         window.canvasColorsValues.push(color);
-        firstTextItem.textContent = ifFirstTextItemType + "color:";
-        firstLabelItem.setAttribute("title", thisId);
+        firstTextItem.textContent = firstText + ":";
         firstLabelItem.setAttribute("for", thisId);
+        firstInputItem.setAttribute("title", firstText);
         firstInputItem.id = thisId;
         firstInputItem.type = "color";
         firstInputItem.value = color;
@@ -212,7 +215,7 @@ class CanvasColorInputElement extends HTMLElement {
         firstSpanTextItem.textContent = "-";
         firstSpanItem.appendChild(firstSpanTextItem);
         firstSpanItem.append(" ");
-        firstResetColorButtonItem.setAttribute("title", "reset-color");
+        firstResetColorButtonItem.setAttribute("title", "Reset color");
         firstResetColorButtonItem.id = resetColorButtonName;
         firstResetColorButtonItem.name = resetColorButtonName;
         firstResetColorButtonItem.textContent = resetColorButtonText;
@@ -227,96 +230,6 @@ class CanvasColorInputElement extends HTMLElement {
         this.appendChild(firstParagraphItem);
     }
 }
-
-class FileSelectorElement extends HTMLElement {
-    static validId(type) {
-        const isTypeString = typeof type === "string";
-        const isInvalidType = !isTypeString || isEmptyString(type);
-        const thisType = getValidType(arguments[1]);
-        const thisInputType = getValidType(arguments[2]);
-        const thisId = getValidType(arguments[3]);
-        type = getValidType(isInvalidType ? thisType : type);
-        const ifThisValidType = getValidTypeOfElementValue(type, "after");
-        const ifValidType = getValidTypeOfElementValue(thisInputType, "before");
-        const validId = ifThisValidType + "file-selector" + ifValidType;
-        return isEmptyString(type) ? thisId : validId;
-    }
-
-    static getElement(type, hidden) {
-        const element = document.createElement("file-selector");
-        const thisHidden = getValidType(arguments[2]);
-        if (typeof hidden === "undefined") {
-            if (typeof thisHidden === "boolean") {
-                hidden = thisHidden;
-            } else {
-                hidden = false;
-            }
-        }
-        const thisType = getValidType(arguments[3]);
-        const thisId = getValidType(arguments[4]);
-        const thisValidId = FileSelectorElement.validId(type, thisType, "", thisId);
-        const labelItem = document.createElement("label");
-        const fileInputItem = document.createElement("input");
-        element.setAttribute("hidden", arguments[2]);
-        element.setAttribute("type", arguments[3]);
-        element.setAttribute("name", arguments[4]);
-        labelItem.setAttribute("title", thisValidId);
-        labelItem.setAttribute("for", thisValidId);
-        fileInputItem.setAttribute("id", thisValidId);
-        fileInputItem.setAttribute("name", thisValidId);
-        fileInputItem.setAttribute("type", "file");
-        fileInputItem.hidden = hidden;
-
-        element["type"] = "";
-        element["id"] = "";
-        element.appendChild(labelItem);
-        element.appendChild(fileInputItem);
-        return element;
-    }
-
-    constructor(type, hidden) {
-        super();
-
-        const element = FileSelectorElement.getElement(type, hidden, true,)
-        const shadow = this.attachShadow({mode: "closed"});
-        shadow.appendChild()
-    }
-}
-
-//
-// class FileSelectorWithButtonAndTextElement extends HTMLElement {
-//     constructor() {
-//         super();
-//
-//         const thisType = getValidType(this.getAttribute("type"));
-//         const buttonId = getValidType(this.getAttribute("button-name"));
-//         const buttonText = getValidType(this.getAttribute("button-text"));
-//         const selectedId = getValidType(this.getAttribute("selected-name"));
-//         const selectedText = getValidType(this.getAttribute("selected-text"));
-//         const selectorId = getValidType(this.getAttribute("selector-name"));
-//         const thisValidButtonName = FileSelectorElement.validId("", thisType, "button", buttonId);
-//         const thisValidSelectedPartName = FileSelectorElement.validId("", thisType, "selected", selectedId);
-//         const thisValidSelectorPartId = FileSelectorElement.validId("", thisType, "selector", selectorId);
-//         const buttonItem = document.createElement("button");
-//         const textItem = document.createElement("text-item");
-//         const fileSelectorItem = FileSelectorElement.getElement();
-//         buttonItem.setAttribute("title", thisValidButtonName);
-//         buttonItem.setAttribute("id", thisValidButtonName);
-//         buttonItem.setAttribute("name", thisValidButtonName);
-//         buttonItem.textContent = buttonText;
-//         textItem.setAttribute("title", thisValidSelectedPartName);
-//         textItem.setAttribute("id", thisValidSelectedPartName);
-//         textItem.setAttribute("name", thisValidSelectedPartName);
-//         textItem.textContent = selectedText;
-//         fileSelectorItem.setAttribute("type", thisType);
-//         fileSelectorItem.setAttribute("id", thisValidSelectorPartId);
-//         fileSelectorItem.setAttribute("hidden", true);
-//
-//         this.appendChild(buttonItem);
-//         this.appendChild(textItem);
-//         this.appendChild(fileSelectorItem);
-//     }
-// }
 
 function setDefaultCanvasColorInputValueFromName(name) {
     const defaultInputValueName = getDefaultCanvasColorInputNameFromName(name);
@@ -334,5 +247,3 @@ export function setDefaultCanvasColorInputValueFromType(type) {
 }
 
 customElements.define("canvas-color-input", CanvasColorInputElement);
-// customElements.define("file-selector", FileSelectorElement);
-// customElements.define("file-selector-with-button-and-text", FileSelectorWithButtonAndTextElement);

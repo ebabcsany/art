@@ -21,6 +21,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "cypress": "^11.0.1",
+    "native-file-system-adapter": "^3.0.0",
     "tone": "^14.7.77"
   }
 }
