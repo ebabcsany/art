@@ -47,10 +47,11 @@ import {
     getCanvasColorInputTypeFromId,
     getDefaultCanvasColorInputNameFromId,
     getDefaultCanvasColorInputNameFromName,
-    getValidType,
+    getValidType, getValidTypeOfElementValue,
     setDefaultCanvasColorInputValueFromType
 } from "./defines.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
+import {saveAs} from "./js/FileSaver.js";
 
 window.canvas = document.getElementById("piano-song-editor");
 window.canvasContext = canvas.getContext("2d");
@@ -450,8 +451,8 @@ saveColorsToFile.onclick = function () {
     });
     savedFileContent = canvasColorValues;
 }
-setCanvasInputsColorsButton.onclick = function () {
-    isWindowClicked = false;
+
+function setCanvasInputsColors() {
     if (savedCanvasInputsColors !== undefined) {
         const canvasInputsColorsEqualsSavedColorsArray = [];
         for (let i = 0; i < canvasColorInputTypes.length; i++) {
@@ -467,9 +468,15 @@ setCanvasInputsColorsButton.onclick = function () {
             saveChangedColorsOnCanvasInput.checked = false;
         }
     }
+}
+
+setCanvasInputsColorsButton.onclick = function () {
+    isWindowClicked = false;
+    setCanvasInputsColors();
 };
 setCanvasInputsColorsFromFile.onclick = function () {
     isWindowClicked = false;
+    let isChangedFile = false;
     setFileSelector.onchange = function (ev) {
         const files = ev.target.files;
         const reader = new FileReader();
@@ -478,6 +485,7 @@ setCanvasInputsColorsFromFile.onclick = function () {
         if (files.length > 0) {
             reader.readAsText(files[0]);
         }
+        isChangedFile = true;
     };
 
     function handleFileLoad(ev) {
@@ -485,7 +493,8 @@ setCanvasInputsColorsFromFile.onclick = function () {
             "Unexpected error: ",
             "Invalid array",
             "This is not an array",
-            "Array is not found"
+            "Array is not found",
+            " (use an array of square brackets)"
         ];
         const result = getValidString(ev.target.result);
 
@@ -501,7 +510,7 @@ setCanvasInputsColorsFromFile.onclick = function () {
         const isContainsOpenOrClosingBrace =
             isContainsOpeningBrace ||
             isContainsClosingBrace;
-        const isContainsOpenOrClosingBracket =
+        const isContainsBracket =
             isContainsOpenOrClosingSquareBracket ||
             isContainsOpenOrClosingBrace;
         const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
@@ -511,52 +520,41 @@ setCanvasInputsColorsFromFile.onclick = function () {
         try {
             content = JSON.parse(result);
             const isValid =
-                isContainsOpenOrClosingBracket &&
+                isContainsBracket &&
                 Array.isArray(content) &&
                 isFirstJustSquareBrackets;
             if (isValid) {
                 settedFileContent = content;
                 const savedFileContent = tHex.getValidRgbHexsArray(content);
                 if (content.length <= defaultCanvasColorValues.length) {
-                    savedCanvasInputsColors = addNewArrayToAfterOfTheArray(
-                        savedFileContent,
-                        subArrayWithFromIndex(
-                            defaultCanvasColorValues,
-                            content.length
-                        )
-                    );
+                    const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
+                    savedCanvasInputsColors = addNewArrayToAfterOfTheArray(savedFileContent, specifiedColors);
                 } else {
-                    savedCanvasInputsColors = subArrayWithToIndex(
-                        savedFileContent,
-                        defaultCanvasColorValues.length - 1
-                    );
+                    const toIndex = defaultCanvasColorValues.length - 1;
+                    savedCanvasInputsColors = subArrayWithToIndex(savedFileContent, toIndex);
                 }
                 setCanvasInputsColorsButton.click();
             } else {
                 settedFileContent = [];
                 error += errorStrings[0];
-                if (isContainsOpenOrClosingBracket) {
-                    error += errorStrings[1];
-                    if (Array.isArray(content)) {
-                        error += " (use an array of square brackets)";
-                    }
-                } else {
-                    error += errorStrings[3];
-                }
+                error += errorStrings[isContainsBracket ? 1 : 3];
+                error += isContainsBracket && Array.isArray(content) ? errorStrings[4] : "";
             }
             if (!isValid) {
                 console.error(error);
             }
         } catch (e) {
-            error = isContainsOpenOrClosingBracket ? errorStrings[2] : errorStrings[3];
+            error = isContainsBracket ? errorStrings[2] : errorStrings[3];
             console.error(e + " (" + error + ")");
             settedFileContent = [];
         }
     }
 
-    if (setFileSelector.files.length > 0) {
-
-    } else {
+    try {
+        setFileSelector.click();
+    } catch (e) {
+        console.error(e);
+        saveColorsToFile.click();
         setFileSelector.click();
     }
 };
@@ -696,7 +694,8 @@ function createTheDefaultCanvasColorInputFieldsAndListeners(type) {
 function setCanvasInput(inputType, type) {
     inputType = getValidType(inputType);
     type = getValidString(type);
-    setDefaultCanvasColorInputValueFromType(inputType + type);
+    const validType = inputType + getValidTypeOfElementValue(type, "before");
+    setDefaultCanvasColorInputValueFromType(validType);
 }
 
 function setJustCanvasInputs() {
@@ -2593,7 +2592,9 @@ function drawClassicPianoAndSongEditorStripes() {
     document.getElementById("canvas-width").style.color = canvasWidthInputColorInput.value;
     document.getElementById("canvas-height").style.color = canvasHeightInputColorInput.value;
     // if (isSaveTheParametersOfTheStripsToAFile.checked && false) {
-    //     //saveFile("" + saveTheParametersOfTheStripsToAFileEnterTheFileName.value, "" + strips);
+    //     const fileName = "" + saveTheParametersOfTheStripsToAFileEnterTheFileName.value;
+    //     const fileContent = "" + strips;
+    //     saveFile(fileName, fileContent);
     // }
     if (!isCanvasBackgroundColorTransparentInput.checked) {
         fillColoredRect(backgroundColor, 0, 0, canvas.width, canvas.height);

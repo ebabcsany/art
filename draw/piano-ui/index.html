@@ -40,6 +40,7 @@
             </div>
         </div>
         <p><text-item>Canvas background color is transparent:</text-item> <label for="is-canvas-background-color-transparent"></label><input id="is-canvas-background-color-transparent" name="is-canvas-background-color-transparent" type="checkbox" role="switch" checked/></p>
+        <p><text-item>Upload a file containing an array of {keyTh, time} elements:</text-item> <label for="upload-file"></label><input id="upload-file" name="upload-file" type="file" /></p>
         <p><text-item>Save canvas inputs colors:</text-item> <label for="save-canvas-inputs-colors"></label><input id="save-canvas-inputs-colors" name="save-canvas-inputs-colors" type="checkbox"> <span style="cursor: pointer" hidden><text-item>&ltrif;</text-item></span> <text-item hidden>{</text-item><text-item hidden>}</text-item></p>
         <div style="margin-left: 30px" id="save-and-set-colors-inputs" hidden>
             <p><button title="save" id="save-canvas-inputs-colors-button" name="save-canvas-inputs-colors-button">save</button></p>
@@ -48,6 +49,7 @@
             <p><button title="set-file" id="set-colors-from-file" name="set-colors-from-file">set-from-file</button><label title="set-file-selector" for="set-file-selector"></label><input id="set-file-selector" name="set-file-selector" type="file" hidden /></p>
         </div>
         <p><text-item hidden>}</text-item></p>
+        <img src="js/4.png" style="width: 80px; height: 80px;" alt="4" />
         <p><text-item>Text items color:</text-item> <label for="text-items-color"></label><input id="text-items-color" name="text-items-color" type="color" value="#000000"><span id="text-items-color-reset-color-part" hidden> <text-item>-</text-item> <button id="text-items-color-reset-color-button" name="text-items-color-reset-color-button">reset-color</button></span></p>
         <p><text-item>Background color:</text-item> <label for="background-color"></label><input id="background-color" name="background-color" type="color" value="#ffffff"><span id="background-color-reset-color-part" hidden> <text-item>-</text-item> <button id="background-color-reset-color-button" name="background-color-reset-color-button">reset-color</button></span></p>
         <p><text-item>Save changed colors on canvas by modified background color:</text-item> <label for="save-changed-colors-on-canvas-by-modified-background-color-input-value"></label><input id="save-changed-colors-on-canvas-by-modified-background-color-input-value" name="save-changed-colors-on-canvas-by-modified-background-color-input-value" type="checkbox"><span id="reset-colors-on-canvas-part" hidden> <text-item>-</text-item> <button id="reset-colors-on-canvas" name="reset-colors-on-canvas">reset-colors</button></span></p>

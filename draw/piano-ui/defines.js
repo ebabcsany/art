@@ -109,7 +109,7 @@ export function getValidType(type) {
     return isInvalid ? "" : getValidString(type);
 }
 
-function getValidTypeOfElementValue(value, type) {
+export function getValidTypeOfElementValue(value, type) {
     value = getValidString(value);
     type = getValidString(type);
     const containsSpaceCount = StringManipulation.containsSearchCount(type, " ");
