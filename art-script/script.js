@@ -20,7 +20,7 @@ export function getValidArray(value) {
     return Array.isArray(value) ? value : [value];
 }
 
-function isValidNumber(value) {
+export function isValidNumber(value) {
     return !isNaN(value) && value !== Infinity && value !== -Infinity;
 }
 
@@ -711,6 +711,37 @@ export function getValidIntegersArray(array) {
         value.push(validIntegerElement);
     }
     return value;
+}
+
+/**
+ * Return valid arrays
+ * @param arrays {*[]}
+ * @return {*[]}
+ */
+function getValidArrays(...arrays) {
+    const value = arrays;
+    for (let i = 0; i < arrays.length; i++) {
+        value[i] = getValidArray(arrays[i]);
+    }
+    return value;
+}
+
+/**
+ * Return array lengths
+ * @param arrays {*[]}
+ * @return {[]}
+ */
+window.getArraysLengths = (...arrays) => {
+    arrays = getValidArrays(arrays);
+    let value = [];
+    arrays[0].forEach(array => {
+        value.push(array.length);
+    });
+    return value;
+};
+
+function getSmallestArraysLength(...arrays) {
+    //const lengthsArray
 }
 
 function isIncreasingIntegersArray(array) {

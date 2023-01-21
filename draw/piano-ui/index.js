@@ -13,6 +13,7 @@ import {
     getReturnIfObjectEqualsArrayFirst,
     getValidArray,
     getValidInteger,
+    getValidIntegersArray,
     getValidNumber,
     getValidOnceOccurringIntegersArray,
     getValidSearchTh,
@@ -47,11 +48,11 @@ import {
     getCanvasColorInputTypeFromId,
     getDefaultCanvasColorInputNameFromId,
     getDefaultCanvasColorInputNameFromName,
-    getValidType, getValidTypeOfElementValue,
+    getValidType,
+    getValidTypeOfElementValue,
     setDefaultCanvasColorInputValueFromType
 } from "./defines.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
-import {saveAs} from "./js/FileSaver.js";
 
 window.canvas = document.getElementById("piano-song-editor");
 window.canvasContext = canvas.getContext("2d");
@@ -200,10 +201,12 @@ const isCanvasBackgroundColorTransparentInput = document.getElementById("is-canv
 const saveChangedColorsOnCanvasInput = document.getElementById("save-changed-colors-on-canvas-by-modified-background-color-input-value");
 const saveAndSetCanvasColorsInputs = document.getElementById("save-and-set-colors-inputs");
 const saveCanvasInputsColors = document.getElementById("save-canvas-inputs-colors");
-const arrowOfSaveCanvasInputsColors = ((document.body.children)[9].children)[3];
-const firstOpeningBracketOfSaveCanvasInputsColors = ((document.body.children)[9].children)[4];
-const firstClosingBracketOfSaveCanvasInputsColors = ((document.body.children)[9].children)[5];
-const closingBracketOfSaveCanvasInputsColors = ((document.body.children)[11].children)[0];
+const arrowOfSaveCanvasInputsColors = ((document.body.children)[10].children)[3];
+const firstOpeningBracketOfSaveCanvasInputsColors = ((document.body.children)[10].children)[4];
+const firstClosingBracketOfSaveCanvasInputsColors = ((document.body.children)[10].children)[5];
+const closingBracketOfSaveCanvasInputsColors = ((document.body.children)[12].children)[0];
+const startOfUploadedSound = ((document.body.children)[9].children)[3];
+const uploadFile = document.getElementById("upload-file");
 const saveCanvasInputsColorsButton = document.getElementById("save-canvas-inputs-colors-button");
 const setCanvasInputsColorsButton = document.getElementById("set-canvas-inputs-colors-button");
 const setCanvasInputsColorsFromFile = document.getElementById("set-colors-from-file");
@@ -407,11 +410,7 @@ canvasPianoActivePartInputsResetColorsButton.onclick = function () {
 };
 arrowOfSaveCanvasInputsColors.onclick = function () {
     isWindowClicked = false;
-    if (this.textContent === "◂") {
-        this.textContent = "▾";
-    } else if (this.textContent === "▾") {
-        this.textContent = "◂";
-    }
+    this.textContent = this.textContent === "◂" ? "▾" : "◂";
     firstOpeningBracketOfSaveCanvasInputsColors.hidden = arrowOfSaveCanvasInputsColors.hidden;
     firstClosingBracketOfSaveCanvasInputsColors.hidden = saveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.textContent !== "◂";
     closingBracketOfSaveCanvasInputsColors.hidden = saveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.hidden || arrowOfSaveCanvasInputsColors.textContent !== "▾";
@@ -470,25 +469,34 @@ function setCanvasInputsColors() {
     }
 }
 
-setCanvasInputsColorsButton.onclick = function () {
-    isWindowClicked = false;
-    setCanvasInputsColors();
+window.uploadFileContent = () => {
+    const [file] = uploadFile.files;
+    const reader = new FileReader();
+
+    reader.addEventListener("load", () => {
+        // this will then display a text file
+        let content = reader.result;
+        console.log(content);
+    }, false);
+
+    if (file) {
+        reader.readAsText(file);
+    }
 };
-setCanvasInputsColorsFromFile.onclick = function () {
+
+
+startOfUploadedSound.onclick = function () {
     isWindowClicked = false;
-    let isChangedFile = false;
-    setFileSelector.onchange = function (ev) {
-        const files = ev.target.files;
-        const reader = new FileReader();
-        reader.onload = handleFileLoad;
-        settedFileContent = "";
-        if (files.length > 0) {
-            reader.readAsText(files[0]);
-        }
-        isChangedFile = true;
-    };
+    const files = setFileSelector.files;
+    const reader = new FileReader();
+    reader.onload = handleFileLoad;
+    settedFileContent = "";
+    if (files.length > 0) {
+        reader.readAsText(files[0]);
+    }
 
     function handleFileLoad(ev) {
+        uploadFileContent();
         const errorStrings = [
             "Unexpected error: ",
             "Invalid array",
@@ -524,23 +532,92 @@ setCanvasInputsColorsFromFile.onclick = function () {
                 Array.isArray(content) &&
                 isFirstJustSquareBrackets;
             if (isValid) {
-                settedFileContent = content;
                 const savedFileContent = tHex.getValidRgbHexsArray(content);
+                const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
+                const toIndex = defaultCanvasColorValues.length - 1;
                 if (content.length <= defaultCanvasColorValues.length) {
-                    const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
                     savedCanvasInputsColors = addNewArrayToAfterOfTheArray(savedFileContent, specifiedColors);
                 } else {
-                    const toIndex = defaultCanvasColorValues.length - 1;
                     savedCanvasInputsColors = subArrayWithToIndex(savedFileContent, toIndex);
                 }
                 setCanvasInputsColorsButton.click();
             } else {
-                settedFileContent = [];
                 error += errorStrings[0];
                 error += errorStrings[isContainsBracket ? 1 : 3];
                 error += isContainsBracket && Array.isArray(content) ? errorStrings[4] : "";
             }
-            if (!isValid) {
+            if (!isValid) if (isContainsBracket && Array.isArray(content)) {
+                console.warn(error);
+            } else {
+                console.error(error);
+            }
+        } catch (e) {
+            error = isContainsBracket ? errorStrings[2] : errorStrings[3];
+            console.log(e + error);
+        }
+    }
+};
+setCanvasInputsColorsButton.onclick = function () {
+    isWindowClicked = false;
+    setCanvasInputsColors();
+};
+setCanvasInputsColorsFromFile.onclick = function () {
+    isWindowClicked = false;
+
+    function handleFileLoad(ev) {
+        const errorStrings = [
+            "Unexpected error: ",
+            "Invalid array",
+            "This is not valid array",
+            "Array is not found",
+            " (use an array of square brackets)"
+        ];
+        const result = getValidString(ev.target.result);
+
+        const openingSquareBracketIndex = result.indexOf("[");
+        const openingBraceIndex = result.indexOf("{");
+        const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
+        const isContainsClosingSquareBracket = StringManipulation.isContainsSearch(result, "]");
+        const isContainsOpeningBrace = openingBraceIndex > -1;
+        const isContainsClosingBrace = StringManipulation.isContainsSearch(result, "}");
+        const isContainsOpenOrClosingSquareBracket =
+            isContainsOpeningSquareBracket ||
+            isContainsClosingSquareBracket;
+        const isContainsOpenOrClosingBrace =
+            isContainsOpeningBrace ||
+            isContainsClosingBrace;
+        const isContainsBracket =
+            isContainsOpenOrClosingSquareBracket ||
+            isContainsOpenOrClosingBrace;
+        const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
+
+        let content = [];
+        let error = "";
+        try {
+            content = JSON.parse(result);
+            const isValid =
+                isContainsBracket &&
+                Array.isArray(content) &&
+                isFirstJustSquareBrackets;
+            settedFileContent = isValid ? content : [];
+            if (isValid) {
+                const savedFileContent = tHex.getValidRgbHexsArray(content);
+                const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
+                const toIndex = defaultCanvasColorValues.length - 1;
+                if (content.length <= defaultCanvasColorValues.length) {
+                    savedCanvasInputsColors = addNewArrayToAfterOfTheArray(savedFileContent, specifiedColors);
+                } else {
+                    savedCanvasInputsColors = subArrayWithToIndex(savedFileContent, toIndex);
+                }
+                setCanvasInputsColorsButton.click();
+            } else {
+                error += errorStrings[0];
+                error += errorStrings[isContainsBracket ? 1 : 3];
+                error += isContainsBracket && Array.isArray(content) ? errorStrings[4] : "";
+            }
+            if (!isValid) if (isContainsBracket && Array.isArray(content)) {
+                console.warn(error);
+            } else {
                 console.error(error);
             }
         } catch (e) {
@@ -550,12 +627,14 @@ setCanvasInputsColorsFromFile.onclick = function () {
         }
     }
 
-    try {
-        setFileSelector.click();
-    } catch (e) {
-        console.error(e);
-        saveColorsToFile.click();
-        setFileSelector.click();
+    if (setFileSelector.files.length > 0) {
+        const files = setFileSelector.files;
+        const reader = new FileReader();
+        reader.onload = handleFileLoad;
+        settedFileContent = "";
+        if (files.length > 0) {
+            reader.readAsText(files[0]);
+        }
     }
 };
 backgroundColorInput.onclick = function () {
@@ -791,7 +870,8 @@ function addStrips(fillStyle, width, height, stripWidth, posX) {
                 strip.fillStyle = fillStyle;
             });
         }
-    } catch (e) {}
+    } catch (e) {
+    }
     fillStyle = tHex.getValidRgbHex(fillStyle);
     width = validateIntegerWithMin(width, 0);
     height = validateIntegerWithMin(height, 0);
@@ -2104,7 +2184,8 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         if (!isEmptyArray(strips) && posY < 0) {
             window.strips.shift();
         }
-    } catch (e) {}
+    } catch (e) {
+    }
     if (isNotOscillator) {
         addStrips();
         drawStrips();
@@ -2282,20 +2363,30 @@ function drawPianoSongEditor() {
     drawClassicPianoClickingKeysAndCreateKeysSounds();
 }
 
-function stopSound() {
+function stopSound(time) {
     if (window.audioContextOscillator !== undefined) {
-        window.audioContextOscillator.stop();
+        window.audioContextOscillator.stop(time);
         window.audioContextOscillator = undefined;
     }
 }
 
 function setKeySound(keyTh) {
     if (window.audioContextOscillator === undefined) {
-        const volume = getKeySoundVolumeWithKeyTh(1, keyTh);
-        createKeySoundWithKeyTh(volume, keyTh, 30);
+        createNormalKeySoundWithKeyTh(keyTh);
         window.drawnKeyIndex = keyTh;
     } else if (window.drawnKeyIndex !== keyTh) {
         stopSound();
+    }
+}
+
+window.keySound1 = function () {
+    const keysThs = [15, 44, 33, 35, 37, 39, 36, 32, 34, 35, 12, 48, 46, 44, 45, 51, 10, 43, 46, 38];
+    const keysTimes = [900, 100, 124, 230, 460, 335, 661, 572, 396, 134, 752, 489, 189, 355, 664, 831, 945, 254, 132, 1033];
+
+    for (let i = 0; i < 20; i++) {
+        setKeySound(keysThs[i]);
+        stopSound(keysTimes[i]);
+        setTimeout(null, keysTimes[i]);
     }
 }
 
@@ -2304,7 +2395,15 @@ function createKeySoundWithKeyTh(volume, keyTh, time) {
     createKeySoundPitchWithSteps(volume, keyTh + 9, time);
 }
 
-function createSoundWithExponentialRampToValueAtTime(volume, frequency, rampValue, time) {
+function createNormalKeySoundWithKeyTh(keyTh) {
+    keyTh = getValidSearchTh(keyTh);
+    const volume = getKeySoundVolumeWithKeyTh(1, keyTh);
+    createNormalKeySoundPitchWithSteps(volume, keyTh + 9);
+}
+
+window.createKeySoundWithRampAndFadingSound = createSoundWithExponentialRampToValueAtTimeAndEndTimeForFadingSound;
+
+function createSoundWithExponentialRampToValueAtTime(gainValue, frequency, rampValue, rampTime, startTime) {
     window.audioContext = new AudioContext();
     window.audioContextOscillator = window.audioContext.createOscillator();
     window.audioContextOscillatorGain = window.audioContext.createGain();
@@ -2313,23 +2412,61 @@ function createSoundWithExponentialRampToValueAtTime(volume, frequency, rampValu
     const g = window.audioContextOscillatorGain;
     o.connect(g);
     g.connect(context.destination);
-    g.gain.value = getValidNumber(volume);
-    g.gain.exponentialRampToValueAtTime(rampValue, audioContext.currentTime + time);
+    g.gain.value = getValidNumber(gainValue);
+    g.gain.exponentialRampToValueAtTime(rampValue, audioContext.currentTime + getValidNumber(rampTime));
     o.frequency.value = getValidNumber(frequency);
-    o.start(0);
+    o.start(startTime);
 }
 
-function createKeysSoundSimultaneouslyOneAfterTheOther(volumes, frequencies, rampValues, times) {
+function createSoundWithExponentialRampToValueAtTimeAndEndTimeForFadingSound(gainValue, frequenciesArray, rampValue, rampTime, startTimesArray, endTimesArray) {
+    frequenciesArray = getValidIntegersArray(frequenciesArray);
+    startTimesArray = getValidIntegersArray(startTimesArray);
+    endTimesArray = getValidIntegersArray(endTimesArray);
+    const length = Math.max(
+        frequenciesArray.length,
+        startTimesArray.length,
+        endTimesArray.length
+    );
+    const isValid =
+        !isEmptyArray(frequenciesArray) &&
+        !isEmptyArray(startTimesArray) &&
+        !isEmptyArray(endTimesArray);
+    if (isValid) {
+        for (let i = 0; i <= length; i++) {
+            const frequency = frequenciesArray.length - 1 < i ? frequenciesArray[frequenciesArray.length - 1] : frequenciesArray[i];
+            const startTime = startTimesArray.length - 1 < i ? startTimesArray[startTimesArray.length - 1] : startTimesArray[i];
+            const endTime = endTimesArray.length - 1 < i ? endTimesArray[endTimesArray.length - 1] : endTimesArray[i];
+            createSoundWithExponentialRampToValueAtTime(gainValue, frequency, rampValue, rampTime, startTime);
+            window.audioContextOscillator.stop(getValidNumber(endTime));
+        }
+    }
+}
+
+function createKeySoundWithStartAndEndTimes() {
+
+}
+
+function createKeysSoundSimultaneouslyOneAfterTheOther(volumes, frequencies, rampValue, time) {
+    frequencies = getValidIntegersArray(frequencies);
 
 }
 
 function createKeySound(volume, frequency, time) {
-    createSoundWithExponentialRampToValueAtTime(volume, frequency, 0.00001, time);
+    createSoundWithExponentialRampToValueAtTime(volume, frequency, 0.00001, time, 0);
+}
+
+function createNormalKeySound(volume, frequency) {
+    createKeySound(volume, frequency, 30);
 }
 
 function createKeySoundPitchWithSteps(volume, steps, time) {
     const frequency = getKeySoundPitchWithSteps(steps);
     return createKeySound(volume, frequency, time);
+}
+
+function createNormalKeySoundPitchWithSteps(volume, steps) {
+    const frequency = getKeySoundPitchWithSteps(steps);
+    return createNormalKeySound(volume, frequency);
 }
 
 function createKeySoundWithPitch(volume, octave, note, time) {
@@ -2459,7 +2596,7 @@ function getOctaveKeysFillStyles(wholeKeyFillStyle, halfKeyFillStyle) {
     return value;
 }
 
-function addKeyToCanvas({type, canvasWidth, canvasHeight, posX, posY, fillStyle, keyWidth, keyHeight, }) {
+function addKeyToCanvas({type, canvasWidth, canvasHeight, posX, posY, fillStyle, keyWidth, keyHeight,}) {
 
 }
 
