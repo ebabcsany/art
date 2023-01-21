@@ -53,6 +53,7 @@ import {
     setDefaultCanvasColorInputValueFromType
 } from "./defines.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
+import * as Tone from 'tone';
 
 window.canvas = document.getElementById("piano-song-editor");
 window.canvasContext = canvas.getContext("2d");
@@ -234,6 +235,7 @@ const keySoundPitchesArray = [];
 const keyBetweenSoundsSpacesArray = [];
 const pianoKeyOctaveFirstTypes = replaceElementInArray(createArrayFromOneElement("whole", 12), "half", 1, 3, 6, 8, 10);
 const pianoKeysFirstTypes = createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength(pianoKeyOctaveFirstTypes, 9, 88);
+const synth = new Tone.Synth().toDestination();
 let drawnKeyIndex = -1;
 let drawnKeysIndexes = [];
 let drawnKeys = [];
@@ -477,6 +479,7 @@ window.uploadFileContent = () => {
         // this will then display a text file
         let content = reader.result;
         console.log(content);
+        synth.triggerAttackRelease("C4", "8n");
     }, false);
 
     if (file) {
