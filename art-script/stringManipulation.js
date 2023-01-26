@@ -444,10 +444,6 @@ export class StringManipulation {
     static change = class change {
         static letter = class letter {
             static lowercase = class lowercase {
-                static toUppercaseWithAToZ(lowercaseLetter) {
-                    return getValidString(lowercaseLetter).toUpperCase();
-                }
-
                 static firstToUppercaseWithAToZ(string) {
                     const firstLetter = getValidString(string)[0];
                     const firstPart = StringPart.subStringWithFromIndex(string, 1);
@@ -481,10 +477,6 @@ export class StringManipulation {
             };
 
             static uppercase = class uppercase {
-                static toLowercaseWithAToZ(uppercaseLetter) {
-                    return getValidString(uppercaseLetter).toLowerCase();
-                }
-
                 static firstToLowercaseWithAToZ(string) {
                     const stringPart = new StringPart(string);
                     const firstLetter = getValidString(string)[0];
@@ -523,10 +515,6 @@ export class StringManipulation {
 
             static s = class s {
                 static lowercase = class lowercase {
-                    static toUppercaseWithAToZ(lowercaseLetters) {
-                        return getValidString(lowercaseLetters).toUpperCase();
-                    }
-
                     static allSearchAfterToUppercaseWithAToZAndRemoveAllSearchs(string, search) {
                         const searchsCount = StringManipulation.containsSearchCount(string, search);
                         let value = string;
@@ -560,10 +548,6 @@ export class StringManipulation {
                 };
 
                 static uppercase = class uppercase {
-                    static toLowercaseWithAToZ(uppercaseLetters) {
-                        return getValidString(uppercaseLetters).toLowerCase();
-                    }
-
                     static allSearchAfterToLowercaseWithAToZAndRemoveAllSearchs(string, search) {
                         const containsSearchsCount = StringManipulation.containsSearchCount(string, search);
                         let value = string;

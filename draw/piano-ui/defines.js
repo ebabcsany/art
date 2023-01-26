@@ -1,4 +1,5 @@
 import {
+    canvasColorsIds, canvasColorsNames, canvasColorsValues,
     getValidString,
     isEmptyString, isEqualsElementsToObject, isObjectEqualsSomeElementOfObjects,
     placeStringAllCapitalLetterThBeforeToPlaceAndChangeUppercaseLetterThToLowercaseWithAToZ
@@ -200,9 +201,9 @@ class CanvasColorInputElement extends HTMLElement {
         const firstTextWithHyphens = ifFirstTextItemType + "color";
         const firstTextWithSpaces = firstTextWithHyphens.replaceAll("-", " ");
         const firstText = StringManipulation.change.letter.lowercase.firstToUppercaseWithAToZ(firstTextWithSpaces);
-        window.canvasColorsIds.push(thisId);
-        window.canvasColorsNames.push(getCanvasColorInputNameFromId(thisId));
-        window.canvasColorsValues.push(color);
+        canvasColorsIds.push(thisId);
+        canvasColorsNames.push(getCanvasColorInputNameFromId(thisId));
+        canvasColorsValues.push(color);
         firstTextItem.textContent = firstText + ":";
         firstLabelItem.setAttribute("for", thisId);
         firstInputItem.setAttribute("title", firstText);

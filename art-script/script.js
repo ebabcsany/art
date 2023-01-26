@@ -1,16 +1,20 @@
 import {StringManipulation} from "./stringManipulation.js";
 import {StringPart} from "./stringPart.js";
 import {saveAs} from "../draw/piano-ui/js/FileSaver.js";
+
 // noinspection JSDeprecatedSymbols
-window.getMousePos = (element) => ({
+export const getMousePos = (element) => ({
     x: event.clientX - element.getBoundingClientRect().left,
     y: event.clientY - element.getBoundingClientRect().top
 });
 window.canvas = null;
 window.canvasContext = null;
-window.canvasColorsIds = [];
-window.canvasColorsNames = [];
-window.canvasColorsValues = [];
+export const canvasColorsIds = [];
+export const canvasColorsNames = [];
+export const canvasColorsValues = [];
+//export const audioContext = new AudioContext();
+//export let audioContextOscillator = undefined;
+//export let audioContextOscillatorGain = undefined;
 
 export function getValidString(value) {
     return typeof value === "string" ? value : "" + value;
@@ -731,14 +735,14 @@ function getValidArrays(...arrays) {
  * @param arrays {*[]}
  * @return {[]}
  */
-window.getArraysLengths = (...arrays) => {
+export function getArraysLengths(...arrays) {
     arrays = getValidArrays(arrays);
     let value = [];
     arrays[0].forEach(array => {
         value.push(array.length);
     });
     return value;
-};
+}
 
 function getSmallestArraysLength(...arrays) {
     //const lengthsArray
@@ -2307,7 +2311,7 @@ function fillColoredRectWithCoordinates(style, fromX, fromY, toX, toY) {
 }
 
 export function getCanvasMousePos() {
-    return window.getMousePos(canvas);
+    return getMousePos(canvas);
 }
 
 export function isEmptyArray(array) {
@@ -2509,7 +2513,7 @@ export function isTypes(objectsArray, typesArray) {
     return value;
 }
 
-window.saveFile = function (name, content, opts) {
+export function saveFile(name, content, opts) {
     const blobContent = new Blob([content], {
         type: "text/plain;charset=utf-8",
     });

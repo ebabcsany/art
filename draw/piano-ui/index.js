@@ -1,5 +1,6 @@
 import {
     addNewArrayToAfterOfTheArray,
+    canvasColorsIds,
     canvasHeightInput,
     canvasWidthInput,
     createArrayFromOneElement,
@@ -28,6 +29,7 @@ import {
     isValidInteger,
     placeIntegerToTheIncreasingIntegersArray,
     replaceElementInArray,
+    saveFile,
     subArray,
     subArrayWithFromIndex,
     subArrayWithToIndex,
@@ -53,7 +55,7 @@ import {
     setDefaultCanvasColorInputValueFromType
 } from "./defines.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
-import * as Tone from 'tone';
+// import * as Tone from 'tone';
 
 window.canvas = document.getElementById("piano-song-editor");
 window.canvasContext = canvas.getContext("2d");
@@ -235,14 +237,15 @@ const keySoundPitchesArray = [];
 const keyBetweenSoundsSpacesArray = [];
 const pianoKeyOctaveFirstTypes = replaceElementInArray(createArrayFromOneElement("whole", 12), "half", 1, 3, 6, 8, 10);
 const pianoKeysFirstTypes = createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength(pianoKeyOctaveFirstTypes, 9, 88);
-const synth = new Tone.Synth().toDestination();
+//const synth = new Tone.Synth().toDestination();
 let drawnKeyIndex = -1;
 let drawnKeysIndexes = [];
 let drawnKeys = [];
 let drawnHalfKeys = [];
 let drawnWholeKeys = [];
 let actualStrip = [];
-window.strips = [];
+export const strips = [];
+let isValidMousePosY = false;
 let drawnKeysCount = 0;
 let drawnWholeKeysCount = 0;
 let drawnHalfKeysCount = 0;
@@ -272,6 +275,8 @@ let isWindowMouseMove = false;
 let isCanvasMouseMove = false;
 let isWindowMouseDown = false;
 let isCanvasMouseDown = false;
+let isWindowMouseUp = false;
+let isCanvasMouseUp = false;
 let isCanvasInputsResetColorsButtonMouseDown = false;
 let isCanvasPianoInputsResetColorsButtonMouseDown = false;
 let isReloadingTimeSubmitButtonMouseDown = false;
@@ -288,6 +293,8 @@ window.addEventListener("mousemove", function () {
 window.addEventListener("mouseup", function () {
     isWindowMouseDown = false;
     isCanvasMouseDown = false;
+    isWindowMouseUp = true;
+    isCanvasMouseUp = true;
 }, true);
 window.addEventListener("mousedown", function () {
     isCanvasClicked = false;
@@ -297,11 +304,17 @@ window.addEventListener("mousedown", function () {
     resetCanvasInputsClickedFieldsWithTypesArray(canvasColorInputTypes);
     isCanvasInputsResetColorsButtonMouseDown = false;
     isCanvasPianoInputsResetColorsButtonMouseDown = false;
+    isWindowMouseUp = false;
+    isCanvasMouseUp = false;
     isCanvasMouseDown = false;
     isWindowMouseDown = true;
 }, true);
 window.addEventListener("click", function () {
     isWindowClicked = true;
+    isWindowMouseMove = false;
+    isCanvasMouseMove = false;
+    isWindowMouseDown = false;
+    isCanvasMouseDown = false;
 }, true);
 canvasWidthInput.onclick = function () {
     isWindowClicked = false;
@@ -334,7 +347,7 @@ canvas.onmousedown = function () {
     isCanvasMouseDown = true;
 };
 canvas.onmouseup = function () {
-    isCanvasMouseDown = false;
+    isCanvasMouseUp = true;
 };
 canvas.onclick = function (ev) {
     ev.preventDefault();
@@ -471,7 +484,8 @@ function setCanvasInputsColors() {
     }
 }
 
-window.uploadFileContent = () => {
+export function uploadFileContent() {
+    let fileContent;
     const [file] = uploadFile.files;
     const reader = new FileReader();
 
@@ -479,14 +493,15 @@ window.uploadFileContent = () => {
         // this will then display a text file
         let content = reader.result;
         console.log(content);
-        synth.triggerAttackRelease("C4", "8n");
+        fileContent = content;
+        // synth.triggerAttackRelease("C4", "8n");
     }, false);
 
     if (file) {
         reader.readAsText(file);
     }
-};
-
+    return fileContent;
+}
 
 startOfUploadedSound.onclick = function () {
     isWindowClicked = false;
@@ -499,7 +514,7 @@ startOfUploadedSound.onclick = function () {
     }
 
     function handleFileLoad(ev) {
-        uploadFileContent();
+        const c = uploadFileContent();
         const errorStrings = [
             "Unexpected error: ",
             "Invalid array",
@@ -559,6 +574,8 @@ startOfUploadedSound.onclick = function () {
             console.log(e + error);
         }
     }
+
+    keySound1();
 };
 setCanvasInputsColorsButton.onclick = function () {
     isWindowClicked = false;
@@ -869,7 +886,7 @@ function addStrips(fillStyle, width, height, stripWidth, posX) {
     try {
         const isFillStyle = fillStyle === strips.fillStyle;
         if (!isEmptyArray(strips) && !isFillStyle) {
-            window.strips.value.forEach(strip => {
+            strips.value.forEach(strip => {
                 strip.fillStyle = fillStyle;
             });
         }
@@ -893,7 +910,7 @@ function addStrips(fillStyle, width, height, stripWidth, posX) {
     };
     if (arguments.length > 0) {
         if (isEmptyArray(strips)) {
-            window.strips.push(strip);
+            strips.push(strip);
         } else {
             const lastStrip = strips[strips.length - 1];
             const stripParamsEqLast =
@@ -908,14 +925,14 @@ function addStrips(fillStyle, width, height, stripWidth, posX) {
                 lastStrip.outOfPianoTop++;
                 lastStrip.stripHeight++;
             } else {
-                window.strips.forEach(strip => {
+                strips.forEach(strip => {
                     strip.outOfPianoTop++;
                 });
-                window.strips.push(strip);
+                strips.push(strip);
             }
         }
     } else {
-        window.strips.forEach(strip => {
+        strips.forEach(strip => {
             strip.outOfPianoTop++;
         });
     }
@@ -928,7 +945,7 @@ function drawStrips() {
         const height = strips[length - 1].height;
         const pianoHeight = getPartOfHeightWithResizedCanvas(width, height, defaultPianoHeight);
         const pianoTop = canvas.height - pianoHeight;
-        window.strips.forEach(strip => {
+        strips.forEach(strip => {
             const fillStyle = strip.fillStyle;
             const width = strip.width;
             const height = strip.height;
@@ -2090,10 +2107,10 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
     if (isCanvasMouseDown) {
         const isValidPianoMousePosY = savedCanvasMouseValidPos.y >= partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(topOfKeys) && savedCanvasMouseValidPos.y <= canvas.height;
         const isMousePosYLessThanOrEqualsWholeKeyDown = savedCanvasMouseValidPos.y <= partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(topOfKeys + wholeKeyHeight);
-        const isValidMousePosY = isValidPianoMousePosY && isMousePosYLessThanOrEqualsWholeKeyDown;
+        const isValidMPosY = isValidPianoMousePosY && isMousePosYLessThanOrEqualsWholeKeyDown;
         let isClickedKey = false;
-        window.isValidMousePosY = isValidMousePosY;
-        if (isValidMousePosY) {
+        isValidMousePosY = isValidMPosY;
+        if (isValidMPosY) {
             let isValidKeyClickingPosition = false;
             let keyCounter = 0;
 
@@ -2177,7 +2194,7 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         } else {
             stopActivePart();
         }
-    } else {
+    } else if (isWindowMouseDown || isWindowClicked) {
         stopActivePart();
     }
     const pianoHeight = getPartOfHeightWithResizedCanvas(width, height, defaultPianoHeight);
@@ -2185,7 +2202,7 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
     try {
         const posY = pianoTop - getPartOfHeightWithResizedCanvas(width, height, strips[0].outOfPianoTop);
         if (!isEmptyArray(strips) && posY < 0) {
-            window.strips.shift();
+            strips.shift();
         }
     } catch (e) {
     }
@@ -2376,21 +2393,33 @@ function stopSound(time) {
 function setKeySound(keyTh) {
     if (window.audioContextOscillator === undefined) {
         createNormalKeySoundWithKeyTh(keyTh);
-        window.drawnKeyIndex = keyTh;
-    } else if (window.drawnKeyIndex !== keyTh) {
+        drawnKeyIndex = keyTh;
+    } else if (drawnKeyIndex !== keyTh) {
         stopSound();
     }
 }
 
-window.keySound1 = function () {
+function keySound1() {
     const keysThs = [15, 44, 33, 35, 37, 39, 36, 32, 34, 35, 12, 48, 46, 44, 45, 51, 10, 43, 46, 38];
     const keysTimes = [900, 100, 124, 230, 460, 335, 661, 572, 396, 134, 752, 489, 189, 355, 664, 831, 945, 254, 132, 1033];
 
-    for (let i = 0; i < 20; i++) {
-        setKeySound(keysThs[i]);
-        stopSound(keysTimes[i]);
-        setTimeout(null, keysTimes[i]);
+    function setKeysSound(keyThs, times) {
+        function sound(i = 0) {
+            setTimeout(function () {
+                setKeySound(keyThs[i]);
+            }, times[i]);
+
+            stopSound();
+            if (i < 20) {
+                sound(i + 1);
+            }
+        }
+
+        sound();
+        stopSound();
     }
+
+    setKeysSound(keysThs, keysTimes);
 }
 
 function createKeySoundWithKeyTh(volume, keyTh, time) {
@@ -2403,8 +2432,6 @@ function createNormalKeySoundWithKeyTh(keyTh) {
     const volume = getKeySoundVolumeWithKeyTh(1, keyTh);
     createNormalKeySoundPitchWithSteps(volume, keyTh + 9);
 }
-
-window.createKeySoundWithRampAndFadingSound = createSoundWithExponentialRampToValueAtTimeAndEndTimeForFadingSound;
 
 function createSoundWithExponentialRampToValueAtTime(gainValue, frequency, rampValue, rampTime, startTime) {
     window.audioContext = new AudioContext();
@@ -2419,39 +2446,6 @@ function createSoundWithExponentialRampToValueAtTime(gainValue, frequency, rampV
     g.gain.exponentialRampToValueAtTime(rampValue, audioContext.currentTime + getValidNumber(rampTime));
     o.frequency.value = getValidNumber(frequency);
     o.start(startTime);
-}
-
-function createSoundWithExponentialRampToValueAtTimeAndEndTimeForFadingSound(gainValue, frequenciesArray, rampValue, rampTime, startTimesArray, endTimesArray) {
-    frequenciesArray = getValidIntegersArray(frequenciesArray);
-    startTimesArray = getValidIntegersArray(startTimesArray);
-    endTimesArray = getValidIntegersArray(endTimesArray);
-    const length = Math.max(
-        frequenciesArray.length,
-        startTimesArray.length,
-        endTimesArray.length
-    );
-    const isValid =
-        !isEmptyArray(frequenciesArray) &&
-        !isEmptyArray(startTimesArray) &&
-        !isEmptyArray(endTimesArray);
-    if (isValid) {
-        for (let i = 0; i <= length; i++) {
-            const frequency = frequenciesArray.length - 1 < i ? frequenciesArray[frequenciesArray.length - 1] : frequenciesArray[i];
-            const startTime = startTimesArray.length - 1 < i ? startTimesArray[startTimesArray.length - 1] : startTimesArray[i];
-            const endTime = endTimesArray.length - 1 < i ? endTimesArray[endTimesArray.length - 1] : endTimesArray[i];
-            createSoundWithExponentialRampToValueAtTime(gainValue, frequency, rampValue, rampTime, startTime);
-            window.audioContextOscillator.stop(getValidNumber(endTime));
-        }
-    }
-}
-
-function createKeySoundWithStartAndEndTimes() {
-
-}
-
-function createKeysSoundSimultaneouslyOneAfterTheOther(volumes, frequencies, rampValue, time) {
-    frequencies = getValidIntegersArray(frequencies);
-
 }
 
 function createKeySound(volume, frequency, time) {
@@ -2480,7 +2474,7 @@ function createKeySoundWithPitch(volume, octave, note, time) {
 function getKeyPowerWithSqrXTh(x, xXTh, steps) {
     x = getValidNumber(x);
     xXTh = getValidNumber(xXTh);
-    steps = getValidNumber(steps);
+    steps = getValidInteger(steps);
     return Math.pow(x, steps / xXTh);
 }
 
@@ -2502,9 +2496,8 @@ function getKeySoundPitchWithSteps(steps) {
 }
 
 function getKeySoundVolumeWithSteps(volume, steps) {
-    volume = validateNumberWithMin(volume, 0);
     const power = getKeyPowerWithSteps(steps);
-    return volume / power;
+    return validateNumberWithMin(volume, 0) / power;
 }
 
 function getKeySoundVolumeWithKeyTh(volume, keyTh) {
@@ -2599,7 +2592,7 @@ function getOctaveKeysFillStyles(wholeKeyFillStyle, halfKeyFillStyle) {
     return value;
 }
 
-function addKeyToCanvas({type, canvasWidth, canvasHeight, posX, posY, fillStyle, keyWidth, keyHeight,}) {
+function addKeyToCanvas({type, canvasWidth, canvasHeight, posX, posY, fillStyle, keyWidth, keyHeight, keyFrequency, keyVolume, }) {
 
 }
 
