@@ -12,9 +12,6 @@ window.canvasContext = null;
 export const canvasColorsIds = [];
 export const canvasColorsNames = [];
 export const canvasColorsValues = [];
-//export const audioContext = new AudioContext();
-//export let audioContextOscillator = undefined;
-//export let audioContextOscillatorGain = undefined;
 
 export function getValidString(value) {
     return typeof value === "string" ? value : "" + value;

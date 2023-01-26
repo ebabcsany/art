@@ -14,7 +14,6 @@ import {
     getReturnIfObjectEqualsArrayFirst,
     getValidArray,
     getValidInteger,
-    getValidIntegersArray,
     getValidNumber,
     getValidOnceOccurringIntegersArray,
     getValidSearchTh,
@@ -55,7 +54,7 @@ import {
     setDefaultCanvasColorInputValueFromType
 } from "./defines.js";
 import {StringManipulation} from "../../art-script/stringManipulation.js";
-// import * as Tone from 'tone';
+import * as Tone from 'tone';
 
 window.canvas = document.getElementById("piano-song-editor");
 window.canvasContext = canvas.getContext("2d");
@@ -237,7 +236,7 @@ const keySoundPitchesArray = [];
 const keyBetweenSoundsSpacesArray = [];
 const pianoKeyOctaveFirstTypes = replaceElementInArray(createArrayFromOneElement("whole", 12), "half", 1, 3, 6, 8, 10);
 const pianoKeysFirstTypes = createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength(pianoKeyOctaveFirstTypes, 9, 88);
-//const synth = new Tone.Synth().toDestination();
+const synth = new Tone.Synth().toDestination();
 let drawnKeyIndex = -1;
 let drawnKeysIndexes = [];
 let drawnKeys = [];
@@ -245,6 +244,7 @@ let drawnHalfKeys = [];
 let drawnWholeKeys = [];
 let actualStrip = [];
 export const strips = [];
+export let canvasIntervalCounter = undefined;
 let isValidMousePosY = false;
 let drawnKeysCount = 0;
 let drawnWholeKeysCount = 0;
@@ -494,7 +494,7 @@ export function uploadFileContent() {
         let content = reader.result;
         console.log(content);
         fileContent = content;
-        // synth.triggerAttackRelease("C4", "8n");
+        synth.triggerAttackRelease("C4", "8n");
     }, false);
 
     if (file) {
@@ -503,80 +503,88 @@ export function uploadFileContent() {
     return fileContent;
 }
 
-startOfUploadedSound.onclick = function () {
-    isWindowClicked = false;
-    const files = setFileSelector.files;
-    const reader = new FileReader();
-    reader.onload = handleFileLoad;
-    settedFileContent = "";
-    if (files.length > 0) {
-        reader.readAsText(files[0]);
-    }
-
-    function handleFileLoad(ev) {
-        const c = uploadFileContent();
-        const errorStrings = [
-            "Unexpected error: ",
-            "Invalid array",
-            "This is not an array",
-            "Array is not found",
-            " (use an array of square brackets)"
-        ];
-        const result = getValidString(ev.target.result);
-
-        const openingSquareBracketIndex = result.indexOf("[");
-        const openingBraceIndex = result.indexOf("{");
-        const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
-        const isContainsClosingSquareBracket = StringManipulation.isContainsSearch(result, "]");
-        const isContainsOpeningBrace = openingBraceIndex > -1;
-        const isContainsClosingBrace = StringManipulation.isContainsSearch(result, "}");
-        const isContainsOpenOrClosingSquareBracket =
-            isContainsOpeningSquareBracket ||
-            isContainsClosingSquareBracket;
-        const isContainsOpenOrClosingBrace =
-            isContainsOpeningBrace ||
-            isContainsClosingBrace;
-        const isContainsBracket =
-            isContainsOpenOrClosingSquareBracket ||
-            isContainsOpenOrClosingBrace;
-        const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
-
-        let content = [];
-        let error = "";
-        try {
-            content = JSON.parse(result);
-            const isValid =
-                isContainsBracket &&
-                Array.isArray(content) &&
-                isFirstJustSquareBrackets;
-            if (isValid) {
-                const savedFileContent = tHex.getValidRgbHexsArray(content);
-                const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
-                const toIndex = defaultCanvasColorValues.length - 1;
-                if (content.length <= defaultCanvasColorValues.length) {
-                    savedCanvasInputsColors = addNewArrayToAfterOfTheArray(savedFileContent, specifiedColors);
-                } else {
-                    savedCanvasInputsColors = subArrayWithToIndex(savedFileContent, toIndex);
-                }
-                setCanvasInputsColorsButton.click();
-            } else {
-                error += errorStrings[0];
-                error += errorStrings[isContainsBracket ? 1 : 3];
-                error += isContainsBracket && Array.isArray(content) ? errorStrings[4] : "";
-            }
-            if (!isValid) if (isContainsBracket && Array.isArray(content)) {
-                console.warn(error);
-            } else {
-                console.error(error);
-            }
-        } catch (e) {
-            error = isContainsBracket ? errorStrings[2] : errorStrings[3];
-            console.log(e + error);
+document.addEventListener('DOMContentLoaded', () => {
+    startOfUploadedSound.onclick = function () {
+        isWindowClicked = false;
+        const files = setFileSelector.files;
+        const reader = new FileReader();
+        reader.onload = handleFileLoad;
+        settedFileContent = "";
+        if (files.length > 0) {
+            reader.readAsText(files[0]);
         }
-    }
 
-    keySound1();
-};
+        function handleFileLoad(ev) {
+            const c = uploadFileContent();
+            const errorStrings = [
+                "Unexpected error: ",
+                "Invalid array",
+                "This is not an array",
+                "Array is not found",
+                " (use an array of square brackets)"
+            ];
+            const result = getValidString(ev.target.result);
+
+            const openingSquareBracketIndex = result.indexOf("[");
+            const openingBraceIndex = result.indexOf("{");
+            const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
+            const isContainsClosingSquareBracket = StringManipulation.isContainsSearch(result, "]");
+            const isContainsOpeningBrace = openingBraceIndex > -1;
+            const isContainsClosingBrace = StringManipulation.isContainsSearch(result, "}");
+            const isContainsOpenOrClosingSquareBracket =
+                isContainsOpeningSquareBracket ||
+                isContainsClosingSquareBracket;
+            const isContainsOpenOrClosingBrace =
+                isContainsOpeningBrace ||
+                isContainsClosingBrace;
+            const isContainsBracket =
+                isContainsOpenOrClosingSquareBracket ||
+                isContainsOpenOrClosingBrace;
+            const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
+
+            let content = [];
+            let error = "";
+            try {
+                content = JSON.parse(result);
+                const isValid =
+                    isContainsBracket &&
+                    Array.isArray(content) &&
+                    isFirstJustSquareBrackets;
+                if (isValid) {
+                    const savedFileContent = tHex.getValidRgbHexsArray(content);
+                    const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
+                    const toIndex = defaultCanvasColorValues.length - 1;
+                    if (content.length <= defaultCanvasColorValues.length) {
+                        savedCanvasInputsColors = addNewArrayToAfterOfTheArray(savedFileContent, specifiedColors);
+                    } else {
+                        savedCanvasInputsColors = subArrayWithToIndex(savedFileContent, toIndex);
+                    }
+                    setCanvasInputsColorsButton.click();
+                } else {
+                    error += errorStrings[0];
+                    error += errorStrings[isContainsBracket ? 1 : 3];
+                    error += isContainsBracket && Array.isArray(content) ? errorStrings[4] : "";
+                }
+                if (!isValid) if (isContainsBracket && Array.isArray(content)) {
+                    console.warn(error);
+                } else {
+                    console.error(error);
+                }
+            } catch (e) {
+                error = isContainsBracket ? errorStrings[2] : errorStrings[3];
+                console.log(e + error);
+            }
+        }
+
+        const keysThs = [15, 44, 33, 35, 37, 39, 36, 32, 34, 35, 12, 48, 46, 44, 45, 51, 10, 43, 46, 38];
+        const keysTimes = [900, 100, 124, 230, 460, 335, 661, 572, 396, 134, 752, 489, 189, 355, 664, 831, 945, 254, 132, 1033];
+        for (let i = 0; i < 20; i++) {
+            const frequency = getNormalKeySoundWithKeyTh(keysThs[i]);
+            synth.triggerAttackRelease(frequency, "8n", keysTimes[i]);
+        }
+    };
+});
+
 setCanvasInputsColorsButton.onclick = function () {
     isWindowClicked = false;
     setCanvasInputsColors();
@@ -2047,7 +2055,6 @@ function getColorWithNotSaveChangedColorsOnCanvasOfPiano(fieldNameWithWordsSepar
 function drawClassicPianoClickingKeysAndCreateKeysSounds() {
     const width = 833;
     const height = 912;
-    const overThePiano = height - 115;
     const topOfKeys = height - 105;
     const defaultOctaveWidth = 112;
     const halfKeyWidth = 7;
@@ -2105,6 +2112,8 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         canvasReloadingCounter = 0;
     };
     if (isCanvasMouseDown) {
+        canvasIntervalCounter = getValidInteger(canvasIntervalCounter);
+        canvasIntervalCounter++;
         const isValidPianoMousePosY = savedCanvasMouseValidPos.y >= partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(topOfKeys) && savedCanvasMouseValidPos.y <= canvas.height;
         const isMousePosYLessThanOrEqualsWholeKeyDown = savedCanvasMouseValidPos.y <= partOfHeightWithIfCanvasHeightGreaterThanCanvasWidthAndWidthAndHeight(topOfKeys + wholeKeyHeight);
         const isValidMPosY = isValidPianoMousePosY && isMousePosYLessThanOrEqualsWholeKeyDown;
@@ -2194,7 +2203,8 @@ function drawClassicPianoClickingKeysAndCreateKeysSounds() {
         } else {
             stopActivePart();
         }
-    } else if (isWindowMouseDown || isWindowClicked) {
+    } else {
+        canvasIntervalCounter = undefined;
         stopActivePart();
     }
     const pianoHeight = getPartOfHeightWithResizedCanvas(width, height, defaultPianoHeight);
@@ -2227,6 +2237,9 @@ function main(timeout) {
 }
 
 function drawPianoSongEditor() {
+    if (typeof canvasIntervalCounter === "number") {
+        canvasIntervalCounter++;
+    }
     const self = drawPianoSongEditor;
     const values = getCanvasInputsValues();
     const definedValues = values;
@@ -2399,29 +2412,6 @@ function setKeySound(keyTh) {
     }
 }
 
-function keySound1() {
-    const keysThs = [15, 44, 33, 35, 37, 39, 36, 32, 34, 35, 12, 48, 46, 44, 45, 51, 10, 43, 46, 38];
-    const keysTimes = [900, 100, 124, 230, 460, 335, 661, 572, 396, 134, 752, 489, 189, 355, 664, 831, 945, 254, 132, 1033];
-
-    function setKeysSound(keyThs, times) {
-        function sound(i = 0) {
-            setTimeout(function () {
-                setKeySound(keyThs[i]);
-            }, times[i]);
-
-            stopSound();
-            if (i < 20) {
-                sound(i + 1);
-            }
-        }
-
-        sound();
-        stopSound();
-    }
-
-    setKeysSound(keysThs, keysTimes);
-}
-
 function createKeySoundWithKeyTh(volume, keyTh, time) {
     keyTh = getValidSearchTh(keyTh);
     createKeySoundPitchWithSteps(volume, keyTh + 9, time);
@@ -2429,7 +2419,7 @@ function createKeySoundWithKeyTh(volume, keyTh, time) {
 
 function createNormalKeySoundWithKeyTh(keyTh) {
     keyTh = getValidSearchTh(keyTh);
-    const volume = getKeySoundVolumeWithKeyTh(1, keyTh);
+    const volume = getKeySoundWithKeyTh(1, keyTh);
     createNormalKeySoundPitchWithSteps(volume, keyTh + 9);
 }
 
@@ -2495,13 +2485,18 @@ function getKeySoundPitchWithSteps(steps) {
     return 440 * power;
 }
 
-function getKeySoundVolumeWithSteps(volume, steps) {
+function getKeySoundWithSteps(volume, steps) {
     const power = getKeyPowerWithSteps(steps);
     return validateNumberWithMin(volume, 0) / power;
 }
 
-function getKeySoundVolumeWithKeyTh(volume, keyTh) {
-    return getKeySoundVolumeWithSteps(volume, keyTh + 9);
+function getKeySoundWithKeyTh(volume, keyTh) {
+    return getKeySoundWithSteps(volume, keyTh + 9);
+}
+
+function getNormalKeySoundWithKeyTh(keyTh) {
+    const volume = getKeySoundWithKeyTh(1, keyTh);
+    return getKeySoundWithSteps(volume, keyTh + 9);
 }
 
 function getKeySoundPitch(octave, note) {
@@ -2592,7 +2587,18 @@ function getOctaveKeysFillStyles(wholeKeyFillStyle, halfKeyFillStyle) {
     return value;
 }
 
-function addKeyToCanvas({type, canvasWidth, canvasHeight, posX, posY, fillStyle, keyWidth, keyHeight, keyFrequency, keyVolume, }) {
+function addKeyToCanvas({
+                            type,
+                            canvasWidth,
+                            canvasHeight,
+                            posX,
+                            posY,
+                            fillStyle,
+                            keyWidth,
+                            keyHeight,
+                            keyFrequency,
+                            keyVolume,
+                        }) {
 
 }
 
