@@ -580,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const keysTimes = [900, 100, 124, 230, 460, 335, 661, 572, 396, 134, 752, 489, 189, 355, 664, 831, 945, 254, 132, 1033];
         for (let i = 0; i < 20; i++) {
             const frequency = getNormalKeySoundWithKeyTh(keysThs[i]);
-            synth.triggerAttackRelease(frequency, "8n", keysTimes[i]);
+            synth.triggerAttackRelease(frequency, "8n", Tone.now() + keysTimes[i] / 1000);
         }
     };
 });
