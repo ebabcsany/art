@@ -237,6 +237,7 @@ const keyBetweenSoundsSpacesArray = [];
 const pianoKeyOctaveFirstTypes = replaceElementInArray(createArrayFromOneElement("whole", 12), "half", 1, 3, 6, 8, 10);
 const pianoKeysFirstTypes = createRepeatedConnectedArraysNextToEachOtherElementsWithFromIndexAndLength(pianoKeyOctaveFirstTypes, 9, 88);
 const synth = new Tone.Synth().toDestination();
+const now = Tone.now();
 let drawnKeyIndex = -1;
 let drawnKeysIndexes = [];
 let drawnKeys = [];
@@ -577,10 +578,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const keysThs = [15, 44, 33, 35, 37, 39, 36, 32, 34, 35, 12, 48, 46, 44, 45, 51, 10, 43, 46, 38];
+        const keysThsNotes = getPitchNoteArrayFromKeyThs(keysThs);
         const keysTimes = [900, 100, 124, 230, 460, 335, 661, 572, 396, 134, 752, 489, 189, 355, 664, 831, 945, 254, 132, 1033];
-        for (let i = 0; i < 20; i++) {
-            const frequency = getNormalKeySoundWithKeyTh(keysThs[i]);
-            synth.triggerAttackRelease(frequency, "8n", Tone.now() + keysTimes[i] / 1000);
+        let now = Tone.now();
+        let i = 0;
+        let note = keysThsNotes[0];
+        let duration = keysTimes[0] / 1000;
+        synth.triggerAttackRelease(note, duration, now);
+        i++;
+        for (; i < 20; i++) {
+            note = keysThsNotes[i];
+            duration = keysTimes[i] / 1000;
+            synth.triggerAttackRelease(note, duration, now + duration);
+            if (i < 19) {
+                now += duration;
+            }
         }
     };
 });
@@ -1529,6 +1541,10 @@ function getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index) {
 
 function getStartKeyIndex(index) {
     return getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index).startKeyIndex;
+}
+
+function getRepairsCount(index) {
+    return getStartKeyIndexAndRepairsCountFromOctaveFromIndexOfPiano(index).repairsCount;
 }
 
 function getDefaultOctaveKeyPosXOfPiano(octaveStartPosX, keyTh) {
@@ -2509,6 +2525,20 @@ function getKeySoundPitch(octave, note) {
         value = getKeySoundPitchWithSteps(octave * 12 + step);
     }
     return value;
+}
+
+function convertKeyThToSoundPitchNote(keyTh) {
+    keyTh = getValidSearchTh(keyTh);
+    const NOTES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"];
+    const keyThIndex = keyTh + 8;
+    const keyIndexInOctave = getStartKeyIndex(keyThIndex);
+    const octaveTh = getRepairsCount(keyThIndex);
+    return NOTES[keyIndexInOctave] + octaveTh;
+}
+
+function getPitchNoteArrayFromKeyThs() {
+    const keyThs = Array.isArray(arguments[0]) ? arguments[0] : arguments;
+    return keyThs.map(keyTh => convertKeyThToSoundPitchNote(keyTh));
 }
 
 function getWholeKeyTypeInOctave(index) {
