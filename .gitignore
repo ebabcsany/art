@@ -1,2 +1,4 @@
 /.idea/
 /node_modules/
+/draw/piano-ui/node_modules/
+/draw/webpack-tonejs/node_modules/
