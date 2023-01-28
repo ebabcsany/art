@@ -16,6 +16,7 @@ import {
     getValidInteger,
     getValidNumber,
     getValidOnceOccurringIntegersArray,
+    getValidPositiveIntegersArray,
     getValidSearchTh,
     getValidString,
     isArrayElementsTrue,
@@ -217,6 +218,7 @@ const saveEnterTheFileSelectorId = document.getElementById("save-enter-the-file-
 const setFileSelector = document.getElementById("set-file-selector");
 let savedFileContent = "";
 let settedFileContent = "";
+let uploadedFileContent = "";
 const resetColorsOnCanvasPart = document.getElementById("reset-colors-on-canvas-part");
 const resetColorsOnCanvasButton = document.getElementById("reset-colors-on-canvas");
 const reloadingTimeInput = document.getElementById("reloading-time");
@@ -485,113 +487,146 @@ function setCanvasInputsColors() {
     }
 }
 
-export function uploadFileContent() {
-    let fileContent;
-    const [file] = uploadFile.files;
-    const reader = new FileReader();
+function handleFileLoad(ev) {
+    const errorStrings = [
+        "Unexpected error: ",
+        "Invalid array",
+        "This is not an array",
+        "Array is not found",
+        " (use an array of square brackets)"
+    ];
+    const result = getValidString(ev.target.result);
 
-    reader.addEventListener("load", () => {
-        // this will then display a text file
-        let content = reader.result;
-        console.log(content);
-        fileContent = content;
-        synth.triggerAttackRelease("C4", "8n");
-    }, false);
+    const openingSquareBracketIndex = result.indexOf("[");
+    const openingBraceIndex = result.indexOf("{");
+    const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
+    const isContainsClosingSquareBracket = StringManipulation.isContainsSearch(result, "]");
+    const isContainsOpeningBrace = openingBraceIndex > -1;
+    const isContainsClosingBrace = StringManipulation.isContainsSearch(result, "}");
+    const isContainsOpenOrClosingSquareBracket =
+        isContainsOpeningSquareBracket ||
+        isContainsClosingSquareBracket;
+    const isContainsOpenOrClosingBrace =
+        isContainsOpeningBrace ||
+        isContainsClosingBrace;
+    const isContainsBracket =
+        isContainsOpenOrClosingSquareBracket ||
+        isContainsOpenOrClosingBrace;
+    const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
 
-    if (file) {
-        reader.readAsText(file);
+    let value;
+    let content = [];
+    let error = "";
+    try {
+        content = JSON.parse(result);
+        const isValid =
+            isContainsBracket &&
+            Array.isArray(content) &&
+            isFirstJustSquareBrackets;
+        value = isValid ? content : [];
+        if (isValid) {
+            const savedFileContent = tHex.getValidRgbHexsArray(content);
+            const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
+            const toIndex = defaultCanvasColorValues.length - 1;
+            if (content.length <= defaultCanvasColorValues.length) {
+                savedCanvasInputsColors = addNewArrayToAfterOfTheArray(savedFileContent, specifiedColors);
+            } else {
+                savedCanvasInputsColors = subArrayWithToIndex(savedFileContent, toIndex);
+            }
+            setCanvasInputsColorsButton.click();
+        } else {
+            error += errorStrings[0];
+            error += errorStrings[isContainsBracket ? 1 : 3];
+            error += isContainsBracket && Array.isArray(content) ? errorStrings[4] : "";
+        }
+        if (!isValid) if (isContainsBracket && Array.isArray(content)) {
+            console.warn(error);
+        } else {
+            console.error(error);
+        }
+    } catch (e) {
+        error = isContainsBracket ? errorStrings[2] : errorStrings[3];
+        console.error(e + error);
+        value = [];
     }
-    return fileContent;
+    return value;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     startOfUploadedSound.onclick = function () {
         isWindowClicked = false;
-        const files = setFileSelector.files;
-        const reader = new FileReader();
-        reader.onload = handleFileLoad;
-        settedFileContent = "";
-        if (files.length > 0) {
-            reader.readAsText(files[0]);
+
+        function getValidKeysThsAndTimes(...keysParameters) {
+            keysParameters = Array.isArray(keysParameters[0]) ? keysParameters[0] : keysParameters;
+            const keysThs = [];
+            const keysTimes = [];
+            keysParameters.forEach(keyParameters => {
+                const validKeyTh = validateInteger(keyParameters[0], 1, 88);
+                const validKeyTime = validateIntegerWithMin(keyParameters[0], 1);
+                keysThs.push(validKeyTh);
+                keysTimes.push(validKeyTime);
+            });
+            return [keysThs, keysTimes];
         }
 
-        function handleFileLoad(ev) {
-            const c = uploadFileContent();
-            const errorStrings = [
-                "Unexpected error: ",
-                "Invalid array",
-                "This is not an array",
-                "Array is not found",
-                " (use an array of square brackets)"
-            ];
-            const result = getValidString(ev.target.result);
-
-            const openingSquareBracketIndex = result.indexOf("[");
-            const openingBraceIndex = result.indexOf("{");
-            const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
-            const isContainsClosingSquareBracket = StringManipulation.isContainsSearch(result, "]");
-            const isContainsOpeningBrace = openingBraceIndex > -1;
-            const isContainsClosingBrace = StringManipulation.isContainsSearch(result, "}");
-            const isContainsOpenOrClosingSquareBracket =
-                isContainsOpeningSquareBracket ||
-                isContainsClosingSquareBracket;
-            const isContainsOpenOrClosingBrace =
-                isContainsOpeningBrace ||
-                isContainsClosingBrace;
-            const isContainsBracket =
-                isContainsOpenOrClosingSquareBracket ||
-                isContainsOpenOrClosingBrace;
-            const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
-
-            let content = [];
-            let error = "";
-            try {
-                content = JSON.parse(result);
-                const isValid =
-                    isContainsBracket &&
-                    Array.isArray(content) &&
-                    isFirstJustSquareBrackets;
-                if (isValid) {
-                    const savedFileContent = tHex.getValidRgbHexsArray(content);
-                    const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
-                    const toIndex = defaultCanvasColorValues.length - 1;
-                    if (content.length <= defaultCanvasColorValues.length) {
-                        savedCanvasInputsColors = addNewArrayToAfterOfTheArray(savedFileContent, specifiedColors);
-                    } else {
-                        savedCanvasInputsColors = subArrayWithToIndex(savedFileContent, toIndex);
-                    }
-                    setCanvasInputsColorsButton.click();
-                } else {
-                    error += errorStrings[0];
-                    error += errorStrings[isContainsBracket ? 1 : 3];
-                    error += isContainsBracket && Array.isArray(content) ? errorStrings[4] : "";
+        function convertKeysSoundsParametersArrayFromKeysThsAndKeysTimes(keysThsArray, keysTimesArray, length) {
+            keysThsArray = getValidPositiveIntegersArray(keysThsArray);
+            keysTimesArray = getValidPositiveIntegersArray(keysTimesArray);
+            length = validateIntegerWithMin(length, 0);
+            let value = [];
+            if (length > 0) {
+                let keyTh = isEmptyArray(keysThsArray) ? 1 : validateIntegerWithMin(keysThsArray[0], 1);
+                let keyTime = isEmptyArray(keysTimesArray) ? 1 : validateIntegerWithMin(keysTimesArray[0], 1);
+                let element = [
+                    keyTh,
+                    keyTime
+                ];
+                value.push(element);
+                for (let j = 1; j < length; j++) {
+                    keyTh = typeof keysThsArray[j] === "undefined" ? 1 : validateIntegerWithMin(keysThsArray[j], 1);
+                    keyTime = typeof keysTimesArray[j] === "undefined" ? 1 : validateIntegerWithMin(keysTimesArray[j], 1);
+                    element = [
+                        keyTh,
+                        keyTime
+                    ];
+                    value.push(element);
                 }
-                if (!isValid) if (isContainsBracket && Array.isArray(content)) {
-                    console.warn(error);
-                } else {
-                    console.error(error);
-                }
-            } catch (e) {
-                error = isContainsBracket ? errorStrings[2] : errorStrings[3];
-                console.log(e + error);
+            }
+            return value;
+        }
+
+        if (uploadFile.files.length > 0) {
+            const files = uploadFile.files;
+            const reader = new FileReader();
+            reader.onload = handleFileLoad;
+            uploadedFileContent = "";
+            if (files.length > 0) {
+                reader.readAsText(files[0]);
             }
         }
-
-        const keysThs = [15, 44, 33, 35, 37, 39, 36, 32, 34, 35, 12, 48, 46, 44, 45, 51, 10, 43, 46, 38];
+        let keysParameters = [];
+        try {
+            keysParameters = JSON.parse(uploadedFileContent);
+        } catch (e) {
+            console.log(e + " (invalid keys parameters)");
+        }
+        const validKeysThsAndTimes = getValidKeysThsAndTimes(keysParameters);
+        const length = keysParameters.length;
+        const keysThs = validKeysThsAndTimes[0];
         const keysThsNotes = getPitchNoteArrayFromKeyThs(keysThs);
-        const keysTimes = [900, 100, 124, 230, 460, 335, 661, 572, 396, 134, 752, 489, 189, 355, 664, 831, 945, 254, 132, 1033];
-        let now = Tone.now();
+        const keysTimes = validKeysThsAndTimes[1];
+        let now1 = now;
         let i = 0;
         let note = keysThsNotes[0];
         let duration = keysTimes[0] / 1000;
-        synth.triggerAttackRelease(note, duration, now);
+        synth.triggerAttackRelease(note, duration, now1);
         i++;
-        for (; i < 20; i++) {
+        for (; i < length; i++) {
             note = keysThsNotes[i];
             duration = keysTimes[i] / 1000;
-            synth.triggerAttackRelease(note, duration, now + duration);
-            if (i < 19) {
-                now += duration;
+            synth.triggerAttackRelease(note, duration, now1 + duration);
+            if (i < length - 1) {
+                now1 += duration;
             }
         }
     };
@@ -603,69 +638,6 @@ setCanvasInputsColorsButton.onclick = function () {
 };
 setCanvasInputsColorsFromFile.onclick = function () {
     isWindowClicked = false;
-
-    function handleFileLoad(ev) {
-        const errorStrings = [
-            "Unexpected error: ",
-            "Invalid array",
-            "This is not valid array",
-            "Array is not found",
-            " (use an array of square brackets)"
-        ];
-        const result = getValidString(ev.target.result);
-
-        const openingSquareBracketIndex = result.indexOf("[");
-        const openingBraceIndex = result.indexOf("{");
-        const isContainsOpeningSquareBracket = openingSquareBracketIndex > -1;
-        const isContainsClosingSquareBracket = StringManipulation.isContainsSearch(result, "]");
-        const isContainsOpeningBrace = openingBraceIndex > -1;
-        const isContainsClosingBrace = StringManipulation.isContainsSearch(result, "}");
-        const isContainsOpenOrClosingSquareBracket =
-            isContainsOpeningSquareBracket ||
-            isContainsClosingSquareBracket;
-        const isContainsOpenOrClosingBrace =
-            isContainsOpeningBrace ||
-            isContainsClosingBrace;
-        const isContainsBracket =
-            isContainsOpenOrClosingSquareBracket ||
-            isContainsOpenOrClosingBrace;
-        const isFirstJustSquareBrackets = openingSquareBracketIndex < openingBraceIndex || !isContainsOpenOrClosingBrace;
-
-        let content = [];
-        let error = "";
-        try {
-            content = JSON.parse(result);
-            const isValid =
-                isContainsBracket &&
-                Array.isArray(content) &&
-                isFirstJustSquareBrackets;
-            settedFileContent = isValid ? content : [];
-            if (isValid) {
-                const savedFileContent = tHex.getValidRgbHexsArray(content);
-                const specifiedColors = subArrayWithFromIndex(defaultCanvasColorValues, content.length);
-                const toIndex = defaultCanvasColorValues.length - 1;
-                if (content.length <= defaultCanvasColorValues.length) {
-                    savedCanvasInputsColors = addNewArrayToAfterOfTheArray(savedFileContent, specifiedColors);
-                } else {
-                    savedCanvasInputsColors = subArrayWithToIndex(savedFileContent, toIndex);
-                }
-                setCanvasInputsColorsButton.click();
-            } else {
-                error += errorStrings[0];
-                error += errorStrings[isContainsBracket ? 1 : 3];
-                error += isContainsBracket && Array.isArray(content) ? errorStrings[4] : "";
-            }
-            if (!isValid) if (isContainsBracket && Array.isArray(content)) {
-                console.warn(error);
-            } else {
-                console.error(error);
-            }
-        } catch (e) {
-            error = isContainsBracket ? errorStrings[2] : errorStrings[3];
-            console.error(e + " (" + error + ")");
-            settedFileContent = [];
-        }
-    }
 
     if (setFileSelector.files.length > 0) {
         const files = setFileSelector.files;

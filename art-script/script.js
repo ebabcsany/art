@@ -714,6 +714,16 @@ export function getValidIntegersArray(array) {
     return value;
 }
 
+export function getValidPositiveIntegersArray(array) {
+    array = getValidArray(array);
+    let value = [];
+    for (const element of array) {
+        const validIntegerElement = validateIntegerWithMin(element, 0);
+        value.push(validIntegerElement);
+    }
+    return value;
+}
+
 /**
  * Return valid arrays
  * @param arrays {*[]}
